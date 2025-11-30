@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --border-color: #d1d5dc;
 }
 
 @theme inline {
@@ -19,8 +20,98 @@
   }
 }
 
+/* Cấu hình font để hiển thị emoji và ẩn scrollbar */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE và Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Style cho NavLink active */
+a.active {
+  opacity: 1 !important;
+}
+
+a.active span {
+  opacity: 1 !important;
+}
+
 body {
-  background: var(--background);
+  background: #fafbfc;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Style cho admin sidebar active state */
+.admin-sidebar-active {
+  background-color: #f9fafb !important;
+  position: relative;
+  overflow: visible;
+}
+
+.admin-sidebar-active svg {
+  color: #1f2937 !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* Style cho dropdown menu đổi màu sidebar */
+.sidebar-color-dropdown .ant-dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px 0;
+  min-width: 200px;
+}
+
+.sidebar-color-dropdown .ant-dropdown-menu-item {
+  padding: 10px 16px;
+  transition: all 0.2s;
+}
+
+.sidebar-color-dropdown .ant-dropdown-menu-item:hover {
+  background-color: #f0f7ff;
+}
+
+/* Ant Design Card border color */
+.ant-card.ant-card-bordered {
+  border-color: #d1d5dc !important;
+}
+
+/* Apply border color to all gray borders */
+.border-gray-300,
+.border-gray-200,
+.border-gray-100,
+.border-gray-50,
+.border-t.border-gray-300,
+.border-b.border-gray-300,
+.border-l.border-gray-300,
+.border-r.border-gray-300,
+.border-t.border-gray-200,
+.border-b.border-gray-200,
+.border-l.border-gray-200,
+.border-r.border-gray-200,
+[class*="border-gray"] {
+  border-color: #d1d5dc !important;
+}
+
+/* Notification Panel Animation */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }

@@ -115,7 +115,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       {/* Welcome Section */}
       <div className="bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white border border-gray-200 hover:shadow-lg transition-shadow duration-300">
         <h1 className="text-3xl font-bold mb-2">{getGreeting()}, Admin Teacher!</h1>
@@ -123,13 +123,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card
               key={index}
-              className="border border-gray-200 hover:shadow-lg transition-all duration-300"
+              className="border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-default"
               styles={{
                 body: { padding: "24px" },
               }}
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
       {/* Quick Actions Section */}
       <div>
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Truy cập nhanh</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {dashboardItems.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -159,7 +159,7 @@ export default function AdminDashboard() {
                 key={index}
                 hoverable
                 onClick={() => router.push(item.path)}
-                className="group cursor-pointer border border-gray-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden"
+                className="group cursor-pointer border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden"
                 styles={{
                   body: { padding: 0 },
                 }}
@@ -191,30 +191,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Recent Activity Section (Optional) */}
-      <div className="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow duration-300 p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Hoạt động gần đây</h2>
-        <div className="space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <span className="text-green-500">
-              <CheckCircleOutlined className="text-xl" />
-            </span>
-            <div className="flex-1">
-              <p className="text-gray-800 font-medium">Đã tạo bài tập mới</p>
-              <p className="text-gray-500 text-sm">2 giờ trước</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <span className="text-blue-500">
-              <ClockCircleOutlined className="text-blue-500 text-xl" />
-            </span>
-            <div className="flex-1">
-              <p className="text-gray-800 font-medium">Đã cập nhật tin tức</p>
-              <p className="text-gray-500 text-sm">5 giờ trước</p>
-            </div>
-          </div>
-        </div>
-      </div>
+    
     </div>
   );
 }

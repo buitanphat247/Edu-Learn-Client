@@ -23,7 +23,6 @@ const menuItems = [
   { path: "/user/community", icon: TeamOutlined, label: "Cộng đồng" },
   { path: "/user/documents", icon: ReadOutlined, label: "Tài liệu" },
   { path: "/user/chat", icon: MessageOutlined, label: "Tin nhắn" },
-  { path: "/user/profile", icon: IdcardOutlined, label: "Hồ sơ" },
 ];
 
 const sidebarColors = [

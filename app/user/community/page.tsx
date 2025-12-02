@@ -252,25 +252,26 @@ export default function UserCommunity() {
     // In real app, this would update the post's likes
   };
 
-  const handleSearchPostClick = (post: (typeof posts)[0]) => {
+  const handleSearchPostClick = (post: { id: string | number; [key: string]: any }) => {
     setSearchText("");
+    // Find the full post from posts array
+    const fullPost = posts.find((p) => p.id === post.id);
+    if (fullPost) {
     // Scroll to post or highlight it
-    const element = document.getElementById(`post-${post.id}`);
+      const element = document.getElementById(`post-${fullPost.id}`);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "center" });
       element.classList.add("ring-2", "ring-blue-500");
       setTimeout(() => {
         element.classList.remove("ring-2", "ring-blue-500");
       }, 2000);
+      }
     }
   };
 
   return (
     <div className="space-y-3">
-      <CommunityHeader
-        onSearchClick={() => setIsSearchModalOpen(true)}
-        onCreatePostClick={() => setIsModalOpen(true)}
-      />
+      <CommunityHeader onSearchClick={() => setIsSearchModalOpen(true)} onCreatePostClick={() => setIsModalOpen(true)} />
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 min-w-0 space-y-3">
@@ -302,19 +303,19 @@ export default function UserCommunity() {
         </div>
 
         <div className="w-full lg:w-80 shrink-0">
-          <CustomCard padding="none">
-            <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+          {/* Popular Topics */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800">Chủ đề phổ biến</h3>
               <FireOutlined className="text-orange-500" />
             </div>
-            <div className="p-6">
-              <div className="space-y-0">
+            <div className="space-y-1 p-2">
                 {topics.map((topic, index) => {
                   const IconComponent = topic.icon;
                   return (
                     <div
                       key={index}
-                      className="cursor-pointer hover:bg-blue-50/50 rounded-lg px-3 py-3 transition-colors mb-2 border-gray-100 last:border-b-0 last:mb-0"
+                    className="cursor-pointer hover:bg-gray-50 rounded-lg px-3 py-2.5 transition-colors border border-gray-200"
                       onClick={() => setSearchText(topic.name)}
                     >
                       <div className="flex items-center justify-between w-full">
@@ -324,30 +325,25 @@ export default function UserCommunity() {
                           </span>
                           <span className="font-medium text-gray-800">{topic.name}</span>
                         </div>
-                        <Tag color="blue" className="px-2 py-0.5 rounded-md text-xs">{topic.count}</Tag>
+                      <Tag color="blue" className="px-2 py-0.5 rounded-md text-xs">
+                        {topic.count}
+                      </Tag>
                       </div>
                     </div>
                   );
                 })}
               </div>
             </div>
-          </CustomCard>
         </div>
       </div>
 
-      <CreatePostModal
-        open={isModalOpen}
-        postContent={postContent}
-        onContentChange={setPostContent}
-        onPost={handlePost}
-        onCancel={handleCancel}
-      />
+      <CreatePostModal open={isModalOpen} postContent={postContent} onContentChange={setPostContent} onPost={handlePost} onCancel={handleCancel} />
 
       <CommunitySearchModal
         open={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
-        posts={posts}
-        onPostClick={handleSearchPostClick}
+        posts={posts.map(({ commentsList, ...post }) => post)}
+        onPostClick={handleSearchPostClick as (post: { id: string | number; [key: string]: any }) => void}
       />
 
       {selectedPostForShare && (
@@ -382,4 +378,3 @@ export default function UserCommunity() {
     </div>
   );
 }
-

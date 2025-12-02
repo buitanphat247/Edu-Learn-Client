@@ -23,7 +23,6 @@ const menuItems = [
   { path: "/admin/news", icon: BellOutlined, label: "Quản lý Tin tức" },
   { path: "/admin/classes", icon: AppstoreOutlined, label: "Quản lý Lớp học" },
   { path: "/admin/students", icon: UserOutlined, label: "Quản lý Học sinh" },
-  { path: "/admin/profile", icon: IdcardOutlined, label: "Hồ sơ học sinh" },
   { path: "/admin/class-chat", icon: MessageOutlined, label: "Chat / Hỏi đáp" },
   { path: "/admin/content", icon: ReadOutlined, label: "Quản lý Nội dung" },
 ];

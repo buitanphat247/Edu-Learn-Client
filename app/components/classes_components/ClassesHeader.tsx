@@ -22,7 +22,7 @@ export default function ClassesHeader({ onSearchClick }: ClassesHeaderProps) {
           icon={<PlusOutlined />}
           size="middle"
           className="bg-linear-to-r from-blue-500 to-purple-500 border-0 hover:from-blue-600 hover:to-purple-600 shadow-md hover:shadow-lg transition-all duration-300"
-          onClick={() => router.push("/admin/classes/handle/new")}
+          onClick={() => router.push("/admin/classes/create")}
         >
           Thêm lớp học
         </Button>

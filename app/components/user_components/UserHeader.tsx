@@ -1,9 +1,13 @@
+"use client";
+
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { BellOutlined, RobotOutlined } from "@ant-design/icons";
 import NotificationPanel from "../NotificationPanel";
 import AIChatPanel from "../AIChatPanel";
 
 export default function UserHeader() {
+  const router = useRouter();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
@@ -27,7 +31,10 @@ export default function UserHeader() {
             <BellOutlined className="text-2xl" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
-        <div className="flex items-center gap-3 pl-4 border-l border-gray-300">
+          <div
+            onClick={() => router.push("/user/profile")}
+            className="flex items-center gap-3 pl-4 border-l border-gray-300 cursor-pointer hover:opacity-80 transition-opacity"
+          >
           <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
             HS
           </div>

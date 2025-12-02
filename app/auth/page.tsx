@@ -1,0 +1,404 @@
+"use client";
+
+import { useState } from "react";
+import { Form, Input, Button, Divider, Checkbox, message } from "antd";
+import {
+  UserOutlined,
+  LockOutlined,
+  MailOutlined,
+  GoogleOutlined,
+  FacebookOutlined,
+} from "@ant-design/icons";
+import { useRouter } from "next/navigation";
+
+export default function AuthPage() {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [signInForm] = Form.useForm();
+  const [signUpForm] = Form.useForm();
+  const router = useRouter();
+
+  const handleSignIn = (values: any) => {
+    console.log("Sign in:", values);
+    message.success("Đăng nhập thành công!");
+    router.push("/user");
+  };
+
+  const handleSignUp = (values: any) => {
+    console.log("Sign up:", values);
+    message.success("Đăng ký thành công!");
+    router.push("/user");
+  };
+
+  const switchToSignUp = () => {
+    setIsSignUp(true);
+  };
+
+  const switchToSignIn = () => {
+    setIsSignUp(false);
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Left Side - Branding với Gradient */}
+      <div className="hidden lg:flex flex-1 bg-linear-to-br from-blue-500 via-cyan-500 to-teal-400 flex-col items-center justify-center px-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 to-teal-500/20"></div>
+        <div className="relative z-10 max-w-lg space-y-8 text-white">
+          <div className="space-y-6">
+            <h1 className="text-5xl font-bold leading-tight">
+              Giữ sức khỏe học tập trong tay bạn!
+            </h1>
+            <p className="text-xl text-white/90 leading-relaxed">
+              Khám phá nền tảng EduLearn - Nơi học tập trở nên dễ dàng và hiệu quả
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mt-12">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
+              <div className="text-3xl mb-3">📚</div>
+              <h3 className="font-semibold text-white mb-2 text-lg">Học tập</h3>
+              <p className="text-sm text-white/80">Tài liệu phong phú</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
+              <div className="text-3xl mb-3">💬</div>
+              <h3 className="font-semibold text-white mb-2 text-lg">Tương tác</h3>
+              <p className="text-sm text-white/80">Cộng đồng sôi động</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
+              <div className="text-3xl mb-3">📊</div>
+              <h3 className="font-semibold text-white mb-2 text-lg">Theo dõi</h3>
+              <p className="text-sm text-white/80">Tiến độ học tập</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
+              <div className="text-3xl mb-3">🎯</div>
+              <h3 className="font-semibold text-white mb-2 text-lg">Mục tiêu</h3>
+              <p className="text-sm text-white/80">Đạt thành tích cao</p>
+            </div>
+            </div>
+          </div>
+        </div>
+
+      {/* Right Side - Auth Forms (White Background) */}
+      <div className="flex-1 bg-white flex items-center justify-center p-6 lg:p-12">
+        <div className="w-full max-w-3xl">
+          <div className="relative overflow-hidden">
+            {/* Switch Link ở trên cùng - Vị trí cố định */}
+            <div className="text-right mb-4 min-h-[28px] flex items-center justify-end">
+              {!isSignUp ? (
+                <span className="text-gray-600 text-sm">
+                  Chưa có tài khoản?{" "}
+                  <button
+                    onClick={switchToSignUp}
+                    className="text-blue-600 hover:text-blue-700 font-semibold transition-colors cursor-pointer"
+                  >
+                    Đăng ký miễn phí
+                  </button>
+                </span>
+              ) : (
+                <span className="text-gray-600 text-sm">
+                  Đã có tài khoản?{" "}
+                  <button
+                    onClick={switchToSignIn}
+                    className="text-blue-600 hover:text-blue-700 font-semibold transition-colors cursor-pointer"
+                  >
+                    Đăng nhập
+                  </button>
+                </span>
+              )}
+            </div>
+
+            {/* Container với animation */}
+            <div
+              className={`flex transition-transform duration-700 ease-in-out ${
+                isSignUp ? "-translate-x-1/2" : "translate-x-0"
+              }`}
+              style={{ width: "200%" }}
+            >
+              {/* Sign In Form */}
+              <div className="w-1/2 px-2 shrink-0">
+                <div className="bg-white rounded-2xl p-8 lg:p-10">
+                  {/* Logo */}
+                  <div className="text-center mb-8">
+                    <div className="inline-flex items-center gap-2 mb-6">
+                      <div className="w-10 h-10 bg-linear-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-xl">E</span>
+                      </div>
+                      <span className="text-2xl font-bold text-gray-900">EduLearn</span>
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                      Đăng nhập vào tài khoản
+                    </h2>
+                  </div>
+
+                  <Form
+                    form={signInForm}
+                    name="signin"
+                    onFinish={handleSignIn}
+                    layout="vertical"
+                    autoComplete="off"
+                    size="large"
+                  >
+                    {/* Social Login Buttons */}
+                    <div className="space-y-3 mb-6">
+                      <Button
+                        icon={<GoogleOutlined />}
+                        block
+                        size="large"
+                        className="h-12 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium cursor-pointer"
+                        onClick={() => {
+                          message.info("Tính năng đang phát triển");
+                        }}
+                      >
+                        Tiếp tục với Google
+                      </Button>
+                      <Button
+                        icon={<FacebookOutlined />}
+                        block
+                        size="large"
+                        className="h-12 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium cursor-pointer"
+                        onClick={() => {
+                          message.info("Tính năng đang phát triển");
+                        }}
+                      >
+                        Tiếp tục với Facebook
+                      </Button>
+                    </div>
+
+                    <Divider className="my-6">
+                      <span className="text-gray-500 text-sm">Hoặc</span>
+                    </Divider>
+
+                    <Form.Item
+                      name="email"
+                      label={<span className="text-gray-700 font-medium">Địa chỉ email</span>}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập email!" },
+                        { type: "email", message: "Email không hợp lệ!" },
+                      ]}
+                    >
+                      <Input
+                        placeholder="example@mail.com"
+                        className="h-12 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 transition-colors cursor-text"
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="password"
+                      label={<span className="text-gray-700 font-medium">Mật khẩu</span>}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập mật khẩu!" },
+                      ]}
+                    >
+                      <Input.Password
+                        placeholder="Nhập mật khẩu của bạn"
+                        className="h-12 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 transition-colors cursor-text"
+                      />
+                    </Form.Item>
+
+                    <Form.Item>
+                      <div className="flex items-center justify-between">
+                        <Form.Item name="remember" valuePropName="checked" noStyle>
+                          <Checkbox className="text-gray-600 cursor-pointer">
+                            Ghi nhớ đăng nhập
+                          </Checkbox>
+                        </Form.Item>
+                        <a
+                          href="#"
+                          className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors cursor-pointer"
+                        >
+                          Tôi quên mật khẩu
+                        </a>
+                      </div>
+                    </Form.Item>
+
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        block
+                        size="large"
+                        className="bg-blue-600 hover:bg-blue-700 border-none rounded-lg h-12 font-semibold text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
+                      >
+                        Đăng nhập
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </div>
+              </div>
+
+              {/* Sign Up Form */}
+              <div className="w-1/2 px-2 shrink-0">
+                <div className="bg-white rounded-2xl p-8 lg:p-10">
+                  {/* Logo */}
+                  <div className="text-center mb-8">
+                    <div className="inline-flex items-center gap-2 mb-6">
+                      <div className="w-10 h-10 bg-linear-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-xl">E</span>
+                      </div>
+                      <span className="text-2xl font-bold text-gray-900">EduLearn</span>
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                      Tạo tài khoản mới
+                    </h2>
+                  </div>
+
+                  <Form
+                    form={signUpForm}
+                    name="signup"
+                    onFinish={handleSignUp}
+                    layout="vertical"
+                    autoComplete="off"
+                    size="large"
+                  >
+                    {/* Social Login Buttons */}
+                    <div className="space-y-3 mb-6">
+                      <Button
+                        icon={<GoogleOutlined />}
+                        block
+                        size="large"
+                        className="h-12 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium cursor-pointer"
+                        onClick={() => {
+                          message.info("Tính năng đang phát triển");
+                        }}
+                      >
+                        Tiếp tục với Google
+                      </Button>
+                      <Button
+                        icon={<FacebookOutlined />}
+                        block
+                        size="large"
+                        className="h-12 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium cursor-pointer"
+                        onClick={() => {
+                          message.info("Tính năng đang phát triển");
+                        }}
+                      >
+                        Tiếp tục với Facebook
+                      </Button>
+                    </div>
+
+                    <Divider className="my-6">
+                      <span className="text-gray-500 text-sm">Hoặc</span>
+                    </Divider>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Form.Item
+                      name="name"
+                        label={<span className="text-gray-700 font-medium">Họ và tên</span>}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập họ tên!" },
+                      ]}
+                    >
+                      <Input
+                          placeholder="Nhập họ và tên của bạn"
+                          className="h-12 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 transition-colors cursor-text"
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="email"
+                        label={<span className="text-gray-700 font-medium">Địa chỉ email</span>}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập email!" },
+                        { type: "email", message: "Email không hợp lệ!" },
+                      ]}
+                    >
+                      <Input
+                          placeholder="example@mail.com"
+                          className="h-12 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 transition-colors"
+                      />
+                    </Form.Item>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Form.Item
+                      name="password"
+                        label={<span className="text-gray-700 font-medium">Mật khẩu</span>}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập mật khẩu!" },
+                        {
+                          min: 6,
+                          message: "Mật khẩu phải có ít nhất 6 ký tự!",
+                        },
+                      ]}
+                    >
+                      <Input.Password
+                          placeholder="Nhập mật khẩu của bạn"
+                          className="h-12 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 transition-colors"
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="confirmPassword"
+                      dependencies={["password"]}
+                        label={<span className="text-gray-700 font-medium">Xác nhận mật khẩu</span>}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng xác nhận mật khẩu!",
+                        },
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (
+                              !value ||
+                              getFieldValue("password") === value
+                            ) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(
+                              new Error("Mật khẩu xác nhận không khớp!")
+                            );
+                          },
+                        }),
+                      ]}
+                    >
+                      <Input.Password
+                          placeholder="Nhập lại mật khẩu"
+                          className="h-12 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 transition-colors cursor-text"
+                      />
+                    </Form.Item>
+                    </div>
+
+                    <Form.Item
+                      name="agreement"
+                      valuePropName="checked"
+                      rules={[
+                        {
+                          validator: (_, value) =>
+                            value
+                              ? Promise.resolve()
+                              : Promise.reject(
+                                  new Error("Vui lòng đồng ý với điều khoản!")
+                                ),
+                        },
+                      ]}
+                    >
+                      <Checkbox className="text-gray-600 text-sm cursor-pointer">
+                        Bằng cách tạo tài khoản, bạn đồng ý với{" "}
+                        <a
+                          href="#"
+                          className="text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                        >
+                          Điều khoản sử dụng
+                        </a>
+                      </Checkbox>
+                    </Form.Item>
+
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        block
+                        size="large"
+                        className="bg-blue-600 hover:bg-blue-700 border-none rounded-lg h-12 font-semibold text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
+                      >
+                        Đăng ký miễn phí
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

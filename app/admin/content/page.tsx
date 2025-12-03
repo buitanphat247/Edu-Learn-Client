@@ -1,25 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Modal, Upload, Button, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { message } from "antd";
 import DocumentPreviewModal from "@/app/components/modal_components/DocumentPreviewModal";
+import ContributeContentModal from "@/app/components/modal_components/ContributeContentModal";
 import ContentSidebar from "@/app/components/content_components/ContentSidebar";
 import ContentHeader from "@/app/components/content_components/ContentHeader";
 import DocumentGrid, { type DocumentItem } from "@/app/components/content_components/DocumentGrid";
-
-// Hàm tạo viewer URL dựa trên loại file
-const getViewerUrl = (url: string) => {
-  const lowerUrl = url.toLowerCase();
-  
-  // Nếu là PDF thì dùng Google Docs viewer
-  if (lowerUrl.endsWith(".pdf")) {
-    return `https://docs.google.com/viewer?embedded=true&url=${encodeURIComponent(url)}`;
-  }
-  
-  // Còn lại dùng Microsoft Office viewer
-  return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
-};
+import { getViewerUrl } from "@/app/components/content_components/getViewerUrl";
 
 const documents: DocumentItem[] = [
   // Demo documents với link mới
@@ -70,12 +58,6 @@ export default function AdminContent() {
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
   const [isContributeModalOpen, setIsContributeModalOpen] = useState(false);
 
-  const uploadProps = {
-    multiple: true,
-    beforeUpload: () => false,
-    showUploadList: true,
-  };
-
   const handleSubmitContribution = () => {
     // Mock gửi nội dung
     message.success("Đã gửi nội dung đóng góp (mock)");
@@ -104,28 +86,11 @@ export default function AdminContent() {
         onClose={() => setPreviewDoc(null)}
       />
 
-      <Modal
-        title="Đóng góp nội dung"
+      <ContributeContentModal
         open={isContributeModalOpen}
         onOk={handleSubmitContribution}
         onCancel={() => setIsContributeModalOpen(false)}
-        okText="Gửi nội dung"
-        cancelText="Hủy"
-      >
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600">
-            Chọn file tài liệu bạn muốn đóng góp vào kho nội dung. Quản trị viên sẽ kiểm duyệt trước khi hiển thị.
-          </p>
-          <Upload {...uploadProps}>
-            <Button icon={<UploadOutlined />} className="rounded-lg cursor-pointer">
-              Chọn file để upload
-            </Button>
-          </Upload>
-          <p className="text-xs text-gray-400 mt-3">
-            Hỗ trợ các định dạng: .pdf, .doc, .docx, .ppt, .pptx, .xlsx, .zip (tối đa 50MB).
-          </p>
-        </div>
-      </Modal>
+      />
     </div>
   );
 }

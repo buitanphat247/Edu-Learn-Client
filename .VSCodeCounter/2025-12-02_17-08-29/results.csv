@@ -1,0 +1,134 @@
+"filename", "language", "JSON with Comments", "HTML", "XML", "JavaScript", "JSON", "TypeScript", "TypeScript JSX", "CSS", "comment", "blank", "total"
+"e:\Workspace\Edu_Learn_Nest\MIGRATION_SUMMARY.md", "HTML", 0, 192, 0, 0, 0, 0, 0, 0, 0, 49, 241
+"e:\Workspace\Edu_Learn_Nest\NEXTJS_MIGRATION_COMPLETE.md", "HTML", 0, 163, 0, 0, 0, 0, 0, 0, 0, 30, 193
+"e:\Workspace\Edu_Learn_Nest\README.md", "HTML", 0, 23, 0, 0, 0, 0, 0, 0, 0, 14, 37
+"e:\Workspace\Edu_Learn_Nest\app\(root)\about\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 119, 0, 0, 9, 128
+"e:\Workspace\Edu_Learn_Nest\app\(root)\events\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 187, 0, 0, 18, 205
+"e:\Workspace\Edu_Learn_Nest\app\(root)\features\[type]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 21, 0, 0, 4, 25
+"e:\Workspace\Edu_Learn_Nest\app\(root)\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 15, 0, 0, 3, 18
+"e:\Workspace\Edu_Learn_Nest\app\(root)\news\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 350, 0, 0, 21, 371
+"e:\Workspace\Edu_Learn_Nest\app\(root)\news\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 148, 0, 0, 14, 162
+"e:\Workspace\Edu_Learn_Nest\app\(root)\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 20, 0, 0, 3, 23
+"e:\Workspace\Edu_Learn_Nest\app\admin\class-chat\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 75, 0, 2, 12, 89
+"e:\Workspace\Edu_Learn_Nest\app\admin\classes\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 115, 0, 8, 15, 138
+"e:\Workspace\Edu_Learn_Nest\app\admin\classes\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 34, 0, 1, 10, 45
+"e:\Workspace\Edu_Learn_Nest\app\admin\content\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 112, 0, 6, 14, 132
+"e:\Workspace\Edu_Learn_Nest\app\admin\exercises\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 214, 0, 0, 17, 231
+"e:\Workspace\Edu_Learn_Nest\app\admin\exercises\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 79, 0, 5, 13, 97
+"e:\Workspace\Edu_Learn_Nest\app\admin\exercises\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 48, 0, 2, 11, 61
+"e:\Workspace\Edu_Learn_Nest\app\admin\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 22, 0, 0, 4, 26
+"e:\Workspace\Edu_Learn_Nest\app\admin\news\handle\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 121, 0, 0, 10, 131
+"e:\Workspace\Edu_Learn_Nest\app\admin\news\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 34, 0, 1, 9, 44
+"e:\Workspace\Edu_Learn_Nest\app\admin\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 182, 0, 5, 11, 198
+"e:\Workspace\Edu_Learn_Nest\app\admin\profile\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 179, 0, 9, 10, 198
+"e:\Workspace\Edu_Learn_Nest\app\admin\students\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 132, 0, 11, 15, 158
+"e:\Workspace\Edu_Learn_Nest\app\admin\students\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 35, 0, 1, 9, 45
+"e:\Workspace\Edu_Learn_Nest\app\assets\react.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Nest\app\auth\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 7, 0, 0, 1, 8
+"e:\Workspace\Edu_Learn_Nest\app\auth\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 370, 0, 10, 25, 405
+"e:\Workspace\Edu_Learn_Nest\app\components\AIChatPanel.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 207, 0, 9, 31, 247
+"e:\Workspace\Edu_Learn_Nest\app\components\AdminSidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 101, 0, 3, 11, 115
+"e:\Workspace\Edu_Learn_Nest\app\components\Footer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 100, 0, 0, 7, 107
+"e:\Workspace\Edu_Learn_Nest\app\components\Header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 132, 0, 0, 15, 147
+"e:\Workspace\Edu_Learn_Nest\app\components\NotificationPanel.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 167, 0, 5, 13, 185
+"e:\Workspace\Edu_Learn_Nest\app\components\UserSidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 99, 0, 3, 11, 113
+"e:\Workspace\Edu_Learn_Nest\app\components\admin_components\AdminBottomBar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 34, 0, 1, 8, 43
+"e:\Workspace\Edu_Learn_Nest\app\components\admin_components\AdminHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 48, 0, 0, 6, 54
+"e:\Workspace\Edu_Learn_Nest\app\components\auth_components\SignIn.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 109, 0, 2, 12, 123
+"e:\Workspace\Edu_Learn_Nest\app\components\auth_components\SignUp.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 150, 0, 2, 14, 166
+"e:\Workspace\Edu_Learn_Nest\app\components\card_components\Card_document.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 86, 0, 5, 9, 100
+"e:\Workspace\Edu_Learn_Nest\app\components\card_components\Card_event.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 81, 0, 0, 4, 85
+"e:\Workspace\Edu_Learn_Nest\app\components\card_components\Card_news.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 47, 0, 0, 3, 50
+"e:\Workspace\Edu_Learn_Nest\app\components\class_chat_components\ClassChatHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 37, 0, 1, 5, 43
+"e:\Workspace\Edu_Learn_Nest\app\components\class_chat_components\ClassChatTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 158, 0, 0, 8, 166
+"e:\Workspace\Edu_Learn_Nest\app\components\class_chat_components\types.ts", "TypeScript", 0, 0, 0, 0, 0, 10, 0, 0, 0, 1, 11
+"e:\Workspace\Edu_Learn_Nest\app\components\classes_components\ClassesHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 1, 6, 45
+"e:\Workspace\Edu_Learn_Nest\app\components\classes_components\ClassesTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 136, 0, 0, 8, 144
+"e:\Workspace\Edu_Learn_Nest\app\components\classes_components\types.ts", "TypeScript", 0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 9
+"e:\Workspace\Edu_Learn_Nest\app\components\community_components\CommunityHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 37, 0, 1, 5, 43
+"e:\Workspace\Edu_Learn_Nest\app\components\community_components\CreatePostModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 55, 0, 0, 5, 60
+"e:\Workspace\Edu_Learn_Nest\app\components\community_components\PostCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 53, 0, 4, 6, 63
+"e:\Workspace\Edu_Learn_Nest\app\components\content_components\ContentHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 47, 0, 1, 5, 53
+"e:\Workspace\Edu_Learn_Nest\app\components\content_components\ContentSidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 93, 0, 3, 7, 103
+"e:\Workspace\Edu_Learn_Nest\app\components\content_components\DocumentGrid.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 37, 0, 0, 5, 42
+"e:\Workspace\Edu_Learn_Nest\app\components\documents_components\DocumentsHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 27, 0, 1, 5, 33
+"e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\ExerciseContent.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 76, 0, 4, 10, 90
+"e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\ExerciseHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 62, 0, 0, 4, 66
+"e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\FileAttachmentSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 57, 0, 0, 4, 61
+"e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\GradeTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 128, 0, 0, 9, 137
+"e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\SubmissionList.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 44, 0, 0, 6, 50
+"e:\Workspace\Edu_Learn_Nest\app\components\exercises_components\ExerciseCreateHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 105, 0, 5, 14, 124
+"e:\Workspace\Edu_Learn_Nest\app\components\exercises_components\ExercisesHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 73, 0, 1, 9, 83
+"e:\Workspace\Edu_Learn_Nest\app\components\exercises_components\ExercisesTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 144, 0, 0, 8, 152
+"e:\Workspace\Edu_Learn_Nest\app\components\exercises_components\types.ts", "TypeScript", 0, 0, 0, 0, 0, 9, 0, 0, 0, 1, 10
+"e:\Workspace\Edu_Learn_Nest\app\components\home_components\Banner.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 41, 0, 0, 5, 46
+"e:\Workspace\Edu_Learn_Nest\app\components\home_components\Events.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 122, 0, 0, 6, 128
+"e:\Workspace\Edu_Learn_Nest\app\components\home_components\Features.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 106, 0, 0, 9, 115
+"e:\Workspace\Edu_Learn_Nest\app\components\home_components\News.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 67, 0, 0, 6, 73
+"e:\Workspace\Edu_Learn_Nest\app\components\import_export_components\ImportExportConfig.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 134, 0, 7, 17, 158
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\ClassChatSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 134, 0, 4, 10, 148
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\ClassesSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 119, 0, 4, 10, 133
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\CommentModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 266, 0, 8, 16, 290
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\CommunitySearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 124, 0, 4, 10, 138
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\DocumentPreviewModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 28, 0, 0, 5, 33
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\DocumentSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 185, 0, 5, 14, 204
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\ExercisesSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 119, 0, 4, 10, 133
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\Modal_Event.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 68, 0, 0, 5, 73
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\NewsSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 114, 0, 4, 10, 128
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\ShareModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 127, 0, 4, 13, 144
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\StudentsSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 123, 0, 4, 10, 137
+"e:\Workspace\Edu_Learn_Nest\app\components\modal_components\UserExercisesSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 122, 0, 4, 10, 136
+"e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsBasicFields.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 27, 0, 0, 7, 34
+"e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsContentEditor.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 83, 0, 0, 5, 88
+"e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsFormActions.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 30, 0, 0, 5, 35
+"e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsFormHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 30, 0, 0, 5, 35
+"e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 1, 6, 45
+"e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsImageUpload.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 28, 0, 0, 5, 33
+"e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 127, 0, 0, 8, 135
+"e:\Workspace\Edu_Learn_Nest\app\components\news_components\types.ts", "TypeScript", 0, 0, 0, 0, 0, 7, 0, 0, 0, 1, 8
+"e:\Workspace\Edu_Learn_Nest\app\components\students_components\StudentsHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 1, 6, 45
+"e:\Workspace\Edu_Learn_Nest\app\components\students_components\StudentsTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 145, 0, 0, 8, 153
+"e:\Workspace\Edu_Learn_Nest\app\components\students_components\types.ts", "TypeScript", 0, 0, 0, 0, 0, 9, 0, 0, 0, 1, 10
+"e:\Workspace\Edu_Learn_Nest\app\components\ui_components\CustomCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 23, 0, 0, 4, 27
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\ChatHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 23, 0, 0, 4, 27
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\ClassListItem.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 46, 0, 0, 5, 51
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\ConversationItem.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 47, 0, 0, 4, 51
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\ExerciseListItem.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 0, 4, 42
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\GradeStatCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 40, 0, 0, 5, 45
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\MessageBubble.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 27, 0, 0, 3, 30
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\ProgressCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 27, 0, 0, 5, 32
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\QuickActionCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 15, 0, 0, 4, 19
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\StatCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 15, 0, 0, 4, 19
+"e:\Workspace\Edu_Learn_Nest\app\components\user_components\UserHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 48, 0, 0, 6, 54
+"e:\Workspace\Edu_Learn_Nest\app\components\user_exercises_components\UserExercisesHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 42, 0, 1, 6, 49
+"e:\Workspace\Edu_Learn_Nest\app\components\user_exercises_components\UserExercisesTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 98, 0, 0, 6, 104
+"e:\Workspace\Edu_Learn_Nest\app\components\user_exercises_components\types.ts", "TypeScript", 0, 0, 0, 0, 0, 9, 0, 0, 0, 1, 10
+"e:\Workspace\Edu_Learn_Nest\app\components\user_grades_components\UserGradesHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 60, 0, 1, 6, 67
+"e:\Workspace\Edu_Learn_Nest\app\contexts\SidebarColorContext.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 30, 0, 0, 10, 40
+"e:\Workspace\Edu_Learn_Nest\app\globals.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 140, 9, 27, 176
+"e:\Workspace\Edu_Learn_Nest\app\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 34, 0, 0, 5, 39
+"e:\Workspace\Edu_Learn_Nest\app\not-found.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 88, 0, 6, 9, 103
+"e:\Workspace\Edu_Learn_Nest\app\providers.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 23, 0, 0, 4, 27
+"e:\Workspace\Edu_Learn_Nest\app\types\types.ts", "TypeScript", 0, 0, 0, 0, 0, 9, 0, 0, 0, 2, 11
+"e:\Workspace\Edu_Learn_Nest\app\user\chat\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 173, 0, 0, 15, 188
+"e:\Workspace\Edu_Learn_Nest\app\user\classes\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 56, 0, 0, 8, 64
+"e:\Workspace\Edu_Learn_Nest\app\user\community\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 343, 0, 7, 31, 381
+"e:\Workspace\Edu_Learn_Nest\app\user\documents\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 158, 0, 6, 15, 179
+"e:\Workspace\Edu_Learn_Nest\app\user\exercises\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 291, 0, 0, 28, 319
+"e:\Workspace\Edu_Learn_Nest\app\user\exercises\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 45, 0, 2, 11, 58
+"e:\Workspace\Edu_Learn_Nest\app\user\grades\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 340, 0, 0, 12, 352
+"e:\Workspace\Edu_Learn_Nest\app\user\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 22, 0, 0, 4, 26
+"e:\Workspace\Edu_Learn_Nest\app\user\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 292, 0, 9, 16, 317
+"e:\Workspace\Edu_Learn_Nest\app\user\profile\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 177, 0, 8, 8, 193
+"e:\Workspace\Edu_Learn_Nest\eslint.config.mjs", "JavaScript", 0, 0, 0, 14, 0, 0, 0, 0, 2, 3, 19
+"e:\Workspace\Edu_Learn_Nest\next.config.ts", "TypeScript", 0, 0, 0, 0, 0, 4, 0, 0, 1, 3, 8
+"e:\Workspace\Edu_Learn_Nest\package-lock.json", "JSON", 0, 0, 0, 0, 7695, 0, 0, 0, 0, 1, 7696
+"e:\Workspace\Edu_Learn_Nest\package.json", "JSON", 0, 0, 0, 0, 33, 0, 0, 0, 0, 1, 34
+"e:\Workspace\Edu_Learn_Nest\postcss.config.mjs", "JavaScript", 0, 0, 0, 6, 0, 0, 0, 0, 0, 2, 8
+"e:\Workspace\Edu_Learn_Nest\public\file.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Nest\public\globe.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Nest\public\next.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Nest\public\vercel.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Nest\public\window.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Nest\tsconfig.json", "JSON with Comments", 34, 0, 0, 0, 0, 0, 0, 0, 0, 1, 35
+"Total", "-", 34, 378, 6, 20, 7728, 65, 10553, 140, 219, 1133, 20276

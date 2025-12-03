@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, Form, Input, Select, Button, Space, message } from "antd";
-import { SaveOutlined } from "@ant-design/icons";
+import { Card, Form, Input, Select, message } from "antd";
 import ImportExportConfig from "@/app/components/import_export_components/ImportExportConfig";
+import PageHeader from "@/app/components/form_components/PageHeader";
+import FormActions from "@/app/components/form_components/FormActions";
 
 const { Option } = Select;
 
@@ -37,14 +38,7 @@ export default function CreateStudent() {
   return (
     <div className="space-y-6">
       {/* Header: Back + Title */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button onClick={() => router.push("/admin/students")} className="rounded-lg cursor-pointer">
-            Quay lại
-          </Button>
-          <h1 className="text-2xl font-bold text-gray-800">Thêm học sinh mới</h1>
-        </div>
-      </div>
+      <PageHeader title="Thêm học sinh mới" backPath="/admin/students" />
 
       {/* Import / Export template */}
       <ImportExportConfig
@@ -130,25 +124,13 @@ export default function CreateStudent() {
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-2">
-              <Space>
-                <Button onClick={() => router.push("/admin/students")} className="rounded-lg cursor-pointer">
-                  Hủy
-                </Button>
-                <Button onClick={handleSaveDraft} className="border-gray-300 rounded-lg cursor-pointer" icon={<SaveOutlined />}>
-                  Lưu nháp
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  icon={<SaveOutlined />}
-                  loading={loading}
-                  className="rounded-lg cursor-pointer"
-                >
-                  Thêm học sinh
-                </Button>
-              </Space>
-            </div>
+            <FormActions
+              onCancel={() => router.push("/admin/students")}
+              onSaveDraft={handleSaveDraft}
+              onSubmit={() => form.submit()}
+              submitText="Thêm học sinh"
+              loading={loading}
+            />
           </div>
         </Card>
       </Form>

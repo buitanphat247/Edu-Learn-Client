@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, Form, Input, InputNumber, Select, Button, Space, message } from "antd";
-import { SaveOutlined } from "@ant-design/icons";
+import { Card, Form, Input, InputNumber, Select, message } from "antd";
 import NewsFormHeader from "@/app/components/news_components/NewsFormHeader";
 import ImportExportConfig from "@/app/components/import_export_components/ImportExportConfig";
+import FormActions from "@/app/components/form_components/FormActions";
 
 const { Option } = Select;
 
@@ -70,29 +70,6 @@ export default function CreateClass() {
                 <Input placeholder="Ví dụ: 10A1" className="rounded-lg cursor-text" />
               </Form.Item>
 
-              {/* Khối */}
-              <Form.Item
-                name="grade"
-                label={<span className="text-gray-700 font-medium">Khối</span>}
-                rules={[{ required: true, message: "Vui lòng chọn khối!" }]}
-              >
-                <Select placeholder="Chọn khối" className="rounded-lg cursor-pointer">
-                  <Option value="Khối 9">Khối 9</Option>
-                  <Option value="Khối 10">Khối 10</Option>
-                  <Option value="Khối 11">Khối 11</Option>
-                  <Option value="Khối 12">Khối 12</Option>
-                </Select>
-              </Form.Item>
-
-              {/* Giáo viên chủ nhiệm */}
-              <Form.Item
-                name="teacher"
-                label={<span className="text-gray-700 font-medium">Giáo viên chủ nhiệm</span>}
-                rules={[{ required: true, message: "Vui lòng nhập tên giáo viên!" }]}
-              >
-                <Input placeholder="Nhập tên giáo viên chủ nhiệm" className="rounded-lg cursor-text" />
-              </Form.Item>
-
               {/* Số lượng học sinh */}
               <Form.Item
                 name="students"
@@ -116,19 +93,13 @@ export default function CreateClass() {
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-2">
-              <Space>
-                <Button onClick={() => router.push("/admin/classes")} className="rounded-lg cursor-pointer">
-                  Hủy
-                </Button>
-                <Button onClick={handleSaveDraft} className="border-gray-300 rounded-lg cursor-pointer" icon={<SaveOutlined />}>
-                  Lưu nháp
-                </Button>
-                <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={loading} className="rounded-lg cursor-pointer">
-                  Tạo lớp học
-                </Button>
-              </Space>
-            </div>
+            <FormActions
+              onCancel={() => router.push("/admin/classes")}
+              onSaveDraft={handleSaveDraft}
+              onSubmit={() => form.submit()}
+              submitText="Tạo lớp học"
+              loading={loading}
+            />
           </div>
         </Card>
       </Form>

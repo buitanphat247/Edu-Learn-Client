@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { Form, Input, Select, DatePicker, Upload, Button, message } from "antd";
-import { UploadOutlined, SaveOutlined, CheckOutlined } from "@ant-design/icons";
+import { UploadOutlined, CheckOutlined } from "@ant-design/icons";
 import ExerciseCreateHeader from "@/app/components/exercises_components/ExerciseCreateHeader";
+import FormActions from "@/app/components/form_components/FormActions";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -64,31 +65,24 @@ export default function AdminExerciseCreate() {
 
           {/* File đính kèm */}
           <Form.Item label="Tài liệu đính kèm" name="attachments">
-            <Upload multiple beforeUpload={() => false} showUploadList>
-              <Button icon={<UploadOutlined />} className="rounded-lg cursor-pointer">
-                Chọn file đính kèm
-              </Button>
-            </Upload>
-            <p className="text-xs text-gray-400 mt-2">Hỗ trợ các định dạng: .pdf, .docx, .pptx, .xlsx, hình ảnh...</p>
+            <div>
+              <Upload multiple beforeUpload={() => false} showUploadList>
+                <Button icon={<UploadOutlined />} className="rounded-lg cursor-pointer">
+                  Chọn file đính kèm
+                </Button>
+              </Upload>
+              <p className="text-xs text-gray-400 mt-2">Hỗ trợ các định dạng: .pdf, .docx, .pptx, .xlsx, hình ảnh...</p>
+            </div>
           </Form.Item>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button onClick={() => router.push("/admin/classes")} className="rounded-lg cursor-pointer">
-              Hủy
-            </Button>
-            <Button onClick={handleSaveDraft} className="border-gray-300 rounded-lg cursor-pointer" icon={<SaveOutlined />}>
-              Lưu nháp
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="bg-linear-to-r from-blue-500 to-purple-500 border-0 hover:from-blue-600 hover:to-purple-600 rounded-lg shadow-md hover:shadow-lg cursor-pointer"
-              icon={<CheckOutlined />}
-            >
-              Tạo bài tập
-            </Button>
-          </div>
+          <FormActions
+            onCancel={() => router.push("/admin/exercises")}
+            onSaveDraft={handleSaveDraft}
+            onSubmit={() => form.submit()}
+            submitText="Tạo bài tập"
+            submitIcon={<CheckOutlined />}
+          />
         </Form>
       </div>
     </div>

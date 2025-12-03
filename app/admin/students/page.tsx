@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import StudentsHeader from "@/app/components/students_components/StudentsHeader";
 import StudentsTable from "@/app/components/students_components/StudentsTable";
 import StudentsSearchModal from "@/app/components/modal_components/StudentsSearchModal";
+import StudentDetailModal from "@/app/components/modal_components/StudentDetailModal";
 import type { StudentItem } from "@/app/components/students_components/types";
 
 const data: StudentItem[] = [
@@ -15,6 +16,8 @@ const data: StudentItem[] = [
 
 export default function AdminStudents() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<StudentItem | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   // Keyboard shortcut: Ctrl/Cmd + K to open search
   useEffect(() => {
@@ -32,13 +35,28 @@ export default function AdminStudents() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isSearchModalOpen]);
 
+  const handleViewStudent = (student: StudentItem) => {
+    setSelectedStudent(student);
+    setIsViewModalOpen(true);
+  };
+
   return (
     <div className="space-y-3">
       <StudentsHeader onSearchClick={() => setIsSearchModalOpen(true)} />
 
-      <StudentsTable data={data} />
+      <StudentsTable data={data} onViewStudent={handleViewStudent} />
 
       <StudentsSearchModal open={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} data={data} />
+
+      {/* Modal xem chi tiết học sinh */}
+      <StudentDetailModal
+        open={isViewModalOpen}
+        onCancel={() => {
+          setIsViewModalOpen(false);
+          setSelectedStudent(null);
+        }}
+        student={selectedStudent}
+      />
     </div>
   );
 }

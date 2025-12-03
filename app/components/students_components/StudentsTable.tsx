@@ -8,9 +8,10 @@ import type { StudentItem } from "./types";
 
 interface StudentsTableProps {
   data: StudentItem[];
+  onViewStudent?: (student: StudentItem) => void;
 }
 
-export default function StudentsTable({ data }: StudentsTableProps) {
+export default function StudentsTable({ data, onViewStudent }: StudentsTableProps) {
   const router = useRouter();
   const { modal, message } = App.useApp();
 
@@ -95,10 +96,14 @@ export default function StudentsTable({ data }: StudentsTableProps) {
             <Button
               icon={<EyeOutlined />}
               size="small"
-              className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
+              className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                router.push(`/admin/students/${record.key}`);
+                if (onViewStudent) {
+                  onViewStudent(record);
+                } else {
+                  router.push(`/admin/students/${record.key}`);
+                }
               }}
             >
               Xem
@@ -131,7 +136,6 @@ export default function StudentsTable({ data }: StudentsTableProps) {
       columns={columns}
       dataSource={data}
       pagination={{
-        position: ["bottomRight"],
         showSizeChanger: true,
         showTotal: (total) => `Tổng ${total} học sinh`,
         pageSizeOptions: ["10", "20", "50"],
@@ -145,7 +149,13 @@ export default function StudentsTable({ data }: StudentsTableProps) {
         padding: "0",
       }}
       onRow={(record) => ({
-        onClick: () => router.push(`/admin/students/${record.key}`),
+        onClick: () => {
+          if (onViewStudent) {
+            onViewStudent(record);
+          } else {
+            router.push(`/admin/students/${record.key}`);
+          }
+        },
       })}
     />
   );

@@ -1,0 +1,231 @@
+Date : 2025-12-02 17:08:29
+Directory : e:\Workspace\Edu_Learn_Nest
+Total : 132 files,  18924 codes, 219 comments, 1133 blanks, all 20276 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| TypeScript JSX     |        109 |     10,553 |        207 |        994 |     11,754 |
+| JSON               |          2 |      7,728 |          0 |          2 |      7,730 |
+| HTML               |          3 |        378 |          0 |         93 |        471 |
+| CSS                |          1 |        140 |          9 |         27 |        176 |
+| TypeScript         |          8 |         65 |          1 |         11 |         77 |
+| JSON with Comments |          1 |         34 |          0 |          1 |         35 |
+| JavaScript         |          2 |         20 |          2 |          5 |         27 |
+| XML                |          6 |          6 |          0 |          0 |          6 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                         | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                            |        132 |     18,924 |        219 |      1,133 |     20,276 |
+| . (Files)                                                                                    |          9 |      8,164 |          3 |        104 |      8,271 |
+| app                                                                                          |        118 |     10,755 |        216 |      1,029 |     12,000 |
+| app (Files)                                                                                  |          4 |        285 |         15 |         45 |        345 |
+| app\(root)                                                                                   |          7 |        860 |          0 |         72 |        932 |
+| app\(root) (Files)                                                                           |          2 |         35 |          0 |          6 |         41 |
+| app\(root)\about                                                                             |          1 |        119 |          0 |          9 |        128 |
+| app\(root)\events                                                                            |          1 |        187 |          0 |         18 |        205 |
+| app\(root)\features                                                                          |          1 |         21 |          0 |          4 |         25 |
+| app\(root)\features\[type]                                                                   |          1 |         21 |          0 |          4 |         25 |
+| app\(root)\news                                                                              |          2 |        498 |          0 |         35 |        533 |
+| app\(root)\news (Files)                                                                      |          1 |        148 |          0 |         14 |        162 |
+| app\(root)\news\[id]                                                                         |          1 |        350 |          0 |         21 |        371 |
+| app\admin                                                                                    |         14 |      1,382 |         51 |        160 |      1,593 |
+| app\admin (Files)                                                                            |          2 |        204 |          5 |         15 |        224 |
+| app\admin\class-chat                                                                         |          1 |         75 |          2 |         12 |         89 |
+| app\admin\classes                                                                            |          2 |        149 |          9 |         25 |        183 |
+| app\admin\classes (Files)                                                                    |          1 |         34 |          1 |         10 |         45 |
+| app\admin\classes\create                                                                     |          1 |        115 |          8 |         15 |        138 |
+| app\admin\content                                                                            |          1 |        112 |          6 |         14 |        132 |
+| app\admin\exercises                                                                          |          3 |        341 |          7 |         41 |        389 |
+| app\admin\exercises (Files)                                                                  |          1 |         48 |          2 |         11 |         61 |
+| app\admin\exercises\[id]                                                                     |          1 |        214 |          0 |         17 |        231 |
+| app\admin\exercises\create                                                                   |          1 |         79 |          5 |         13 |         97 |
+| app\admin\news                                                                               |          2 |        155 |          1 |         19 |        175 |
+| app\admin\news (Files)                                                                       |          1 |         34 |          1 |          9 |         44 |
+| app\admin\news\handle                                                                        |          1 |        121 |          0 |         10 |        131 |
+| app\admin\news\handle\[id]                                                                   |          1 |        121 |          0 |         10 |        131 |
+| app\admin\profile                                                                            |          1 |        179 |          9 |         10 |        198 |
+| app\admin\students                                                                           |          2 |        167 |         12 |         24 |        203 |
+| app\admin\students (Files)                                                                   |          1 |         35 |          1 |          9 |         45 |
+| app\admin\students\create                                                                    |          1 |        132 |         11 |         15 |        158 |
+| app\assets                                                                                   |          1 |          1 |          0 |          0 |          1 |
+| app\auth                                                                                     |          2 |        377 |         10 |         26 |        413 |
+| app\components                                                                               |         78 |      5,914 |        108 |        566 |      6,588 |
+| app\components (Files)                                                                       |          6 |        806 |         20 |         88 |        914 |
+| app\components\admin_components                                                              |          2 |         82 |          1 |         14 |         97 |
+| app\components\auth_components                                                               |          2 |        259 |          4 |         26 |        289 |
+| app\components\card_components                                                               |          3 |        214 |          5 |         16 |        235 |
+| app\components\class_chat_components                                                         |          3 |        205 |          1 |         14 |        220 |
+| app\components\classes_components                                                            |          3 |        182 |          1 |         15 |        198 |
+| app\components\community_components                                                          |          3 |        145 |          5 |         16 |        166 |
+| app\components\content_components                                                            |          3 |        177 |          4 |         17 |        198 |
+| app\components\documents_components                                                          |          1 |         27 |          1 |          5 |         33 |
+| app\components\exercise_components                                                           |          5 |        367 |          4 |         33 |        404 |
+| app\components\exercises_components                                                          |          4 |        331 |          6 |         32 |        369 |
+| app\components\home_components                                                               |          4 |        336 |          0 |         26 |        362 |
+| app\components\import_export_components                                                      |          1 |        134 |          7 |         17 |        158 |
+| app\components\modal_components                                                              |         12 |      1,529 |         45 |        123 |      1,697 |
+| app\components\news_components                                                               |          8 |        370 |          1 |         42 |        413 |
+| app\components\students_components                                                           |          3 |        192 |          1 |         15 |        208 |
+| app\components\ui_components                                                                 |          1 |         23 |          0 |          4 |         27 |
+| app\components\user_components                                                               |         10 |        326 |          0 |         44 |        370 |
+| app\components\user_exercises_components                                                     |          3 |        149 |          1 |         13 |        163 |
+| app\components\user_grades_components                                                        |          1 |         60 |          1 |          6 |         67 |
+| app\contexts                                                                                 |          1 |         30 |          0 |         10 |         40 |
+| app\types                                                                                    |          1 |          9 |          0 |          2 |         11 |
+| app\user                                                                                     |         10 |      1,897 |         32 |        148 |      2,077 |
+| app\user (Files)                                                                             |          2 |        314 |          9 |         20 |        343 |
+| app\user\chat                                                                                |          1 |        173 |          0 |         15 |        188 |
+| app\user\classes                                                                             |          1 |         56 |          0 |          8 |         64 |
+| app\user\community                                                                           |          1 |        343 |          7 |         31 |        381 |
+| app\user\documents                                                                           |          1 |        158 |          6 |         15 |        179 |
+| app\user\exercises                                                                           |          2 |        336 |          2 |         39 |        377 |
+| app\user\exercises (Files)                                                                   |          1 |         45 |          2 |         11 |         58 |
+| app\user\exercises\[id]                                                                      |          1 |        291 |          0 |         28 |        319 |
+| app\user\grades                                                                              |          1 |        340 |          0 |         12 |        352 |
+| app\user\profile                                                                             |          1 |        177 |          8 |          8 |        193 |
+| public                                                                                       |          5 |          5 |          0 |          0 |          5 |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                     | language           | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| e:\Workspace\Edu_Learn_Nest\MIGRATION_SUMMARY.md                                             | HTML               |        192 |          0 |         49 |        241 |
+| e:\Workspace\Edu_Learn_Nest\NEXTJS_MIGRATION_COMPLETE.md                                     | HTML               |        163 |          0 |         30 |        193 |
+| e:\Workspace\Edu_Learn_Nest\README.md                                                        | HTML               |         23 |          0 |         14 |         37 |
+| e:\Workspace\Edu_Learn_Nest\app\(root)\about\page.tsx                                        | TypeScript JSX     |        119 |          0 |          9 |        128 |
+| e:\Workspace\Edu_Learn_Nest\app\(root)\events\page.tsx                                       | TypeScript JSX     |        187 |          0 |         18 |        205 |
+| e:\Workspace\Edu_Learn_Nest\app\(root)\features\[type]\page.tsx                              | TypeScript JSX     |         21 |          0 |          4 |         25 |
+| e:\Workspace\Edu_Learn_Nest\app\(root)\layout.tsx                                            | TypeScript JSX     |         15 |          0 |          3 |         18 |
+| e:\Workspace\Edu_Learn_Nest\app\(root)\news\[id]\page.tsx                                    | TypeScript JSX     |        350 |          0 |         21 |        371 |
+| e:\Workspace\Edu_Learn_Nest\app\(root)\news\page.tsx                                         | TypeScript JSX     |        148 |          0 |         14 |        162 |
+| e:\Workspace\Edu_Learn_Nest\app\(root)\page.tsx                                              | TypeScript JSX     |         20 |          0 |          3 |         23 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\class-chat\page.tsx                                    | TypeScript JSX     |         75 |          2 |         12 |         89 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\classes\create\page.tsx                                | TypeScript JSX     |        115 |          8 |         15 |        138 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\classes\page.tsx                                       | TypeScript JSX     |         34 |          1 |         10 |         45 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\content\page.tsx                                       | TypeScript JSX     |        112 |          6 |         14 |        132 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\exercises\[id]\page.tsx                                | TypeScript JSX     |        214 |          0 |         17 |        231 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\exercises\create\page.tsx                              | TypeScript JSX     |         79 |          5 |         13 |         97 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\exercises\page.tsx                                     | TypeScript JSX     |         48 |          2 |         11 |         61 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\layout.tsx                                             | TypeScript JSX     |         22 |          0 |          4 |         26 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\news\handle\[id]\page.tsx                              | TypeScript JSX     |        121 |          0 |         10 |        131 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\news\page.tsx                                          | TypeScript JSX     |         34 |          1 |          9 |         44 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\page.tsx                                               | TypeScript JSX     |        182 |          5 |         11 |        198 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\profile\page.tsx                                       | TypeScript JSX     |        179 |          9 |         10 |        198 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\students\create\page.tsx                               | TypeScript JSX     |        132 |         11 |         15 |        158 |
+| e:\Workspace\Edu_Learn_Nest\app\admin\students\page.tsx                                      | TypeScript JSX     |         35 |          1 |          9 |         45 |
+| e:\Workspace\Edu_Learn_Nest\app\assets\react.svg                                             | XML                |          1 |          0 |          0 |          1 |
+| e:\Workspace\Edu_Learn_Nest\app\auth\layout.tsx                                              | TypeScript JSX     |          7 |          0 |          1 |          8 |
+| e:\Workspace\Edu_Learn_Nest\app\auth\page.tsx                                                | TypeScript JSX     |        370 |         10 |         25 |        405 |
+| e:\Workspace\Edu_Learn_Nest\app\components\AIChatPanel.tsx                                   | TypeScript JSX     |        207 |          9 |         31 |        247 |
+| e:\Workspace\Edu_Learn_Nest\app\components\AdminSidebar.tsx                                  | TypeScript JSX     |        101 |          3 |         11 |        115 |
+| e:\Workspace\Edu_Learn_Nest\app\components\Footer.tsx                                        | TypeScript JSX     |        100 |          0 |          7 |        107 |
+| e:\Workspace\Edu_Learn_Nest\app\components\Header.tsx                                        | TypeScript JSX     |        132 |          0 |         15 |        147 |
+| e:\Workspace\Edu_Learn_Nest\app\components\NotificationPanel.tsx                             | TypeScript JSX     |        167 |          5 |         13 |        185 |
+| e:\Workspace\Edu_Learn_Nest\app\components\UserSidebar.tsx                                   | TypeScript JSX     |         99 |          3 |         11 |        113 |
+| e:\Workspace\Edu_Learn_Nest\app\components\admin_components\AdminBottomBar.tsx               | TypeScript JSX     |         34 |          1 |          8 |         43 |
+| e:\Workspace\Edu_Learn_Nest\app\components\admin_components\AdminHeader.tsx                  | TypeScript JSX     |         48 |          0 |          6 |         54 |
+| e:\Workspace\Edu_Learn_Nest\app\components\auth_components\SignIn.tsx                        | TypeScript JSX     |        109 |          2 |         12 |        123 |
+| e:\Workspace\Edu_Learn_Nest\app\components\auth_components\SignUp.tsx                        | TypeScript JSX     |        150 |          2 |         14 |        166 |
+| e:\Workspace\Edu_Learn_Nest\app\components\card_components\Card_document.tsx                 | TypeScript JSX     |         86 |          5 |          9 |        100 |
+| e:\Workspace\Edu_Learn_Nest\app\components\card_components\Card_event.tsx                    | TypeScript JSX     |         81 |          0 |          4 |         85 |
+| e:\Workspace\Edu_Learn_Nest\app\components\card_components\Card_news.tsx                     | TypeScript JSX     |         47 |          0 |          3 |         50 |
+| e:\Workspace\Edu_Learn_Nest\app\components\class_chat_components\ClassChatHeader.tsx         | TypeScript JSX     |         37 |          1 |          5 |         43 |
+| e:\Workspace\Edu_Learn_Nest\app\components\class_chat_components\ClassChatTable.tsx          | TypeScript JSX     |        158 |          0 |          8 |        166 |
+| e:\Workspace\Edu_Learn_Nest\app\components\class_chat_components\types.ts                    | TypeScript         |         10 |          0 |          1 |         11 |
+| e:\Workspace\Edu_Learn_Nest\app\components\classes_components\ClassesHeader.tsx              | TypeScript JSX     |         38 |          1 |          6 |         45 |
+| e:\Workspace\Edu_Learn_Nest\app\components\classes_components\ClassesTable.tsx               | TypeScript JSX     |        136 |          0 |          8 |        144 |
+| e:\Workspace\Edu_Learn_Nest\app\components\classes_components\types.ts                       | TypeScript         |          8 |          0 |          1 |          9 |
+| e:\Workspace\Edu_Learn_Nest\app\components\community_components\CommunityHeader.tsx          | TypeScript JSX     |         37 |          1 |          5 |         43 |
+| e:\Workspace\Edu_Learn_Nest\app\components\community_components\CreatePostModal.tsx          | TypeScript JSX     |         55 |          0 |          5 |         60 |
+| e:\Workspace\Edu_Learn_Nest\app\components\community_components\PostCard.tsx                 | TypeScript JSX     |         53 |          4 |          6 |         63 |
+| e:\Workspace\Edu_Learn_Nest\app\components\content_components\ContentHeader.tsx              | TypeScript JSX     |         47 |          1 |          5 |         53 |
+| e:\Workspace\Edu_Learn_Nest\app\components\content_components\ContentSidebar.tsx             | TypeScript JSX     |         93 |          3 |          7 |        103 |
+| e:\Workspace\Edu_Learn_Nest\app\components\content_components\DocumentGrid.tsx               | TypeScript JSX     |         37 |          0 |          5 |         42 |
+| e:\Workspace\Edu_Learn_Nest\app\components\documents_components\DocumentsHeader.tsx          | TypeScript JSX     |         27 |          1 |          5 |         33 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\ExerciseContent.tsx           | TypeScript JSX     |         76 |          4 |         10 |         90 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\ExerciseHeader.tsx            | TypeScript JSX     |         62 |          0 |          4 |         66 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\FileAttachmentSection.tsx     | TypeScript JSX     |         57 |          0 |          4 |         61 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\GradeTable.tsx                | TypeScript JSX     |        128 |          0 |          9 |        137 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercise_components\SubmissionList.tsx            | TypeScript JSX     |         44 |          0 |          6 |         50 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercises_components\ExerciseCreateHeader.tsx     | TypeScript JSX     |        105 |          5 |         14 |        124 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercises_components\ExercisesHeader.tsx          | TypeScript JSX     |         73 |          1 |          9 |         83 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercises_components\ExercisesTable.tsx           | TypeScript JSX     |        144 |          0 |          8 |        152 |
+| e:\Workspace\Edu_Learn_Nest\app\components\exercises_components\types.ts                     | TypeScript         |          9 |          0 |          1 |         10 |
+| e:\Workspace\Edu_Learn_Nest\app\components\home_components\Banner.tsx                        | TypeScript JSX     |         41 |          0 |          5 |         46 |
+| e:\Workspace\Edu_Learn_Nest\app\components\home_components\Events.tsx                        | TypeScript JSX     |        122 |          0 |          6 |        128 |
+| e:\Workspace\Edu_Learn_Nest\app\components\home_components\Features.tsx                      | TypeScript JSX     |        106 |          0 |          9 |        115 |
+| e:\Workspace\Edu_Learn_Nest\app\components\home_components\News.tsx                          | TypeScript JSX     |         67 |          0 |          6 |         73 |
+| e:\Workspace\Edu_Learn_Nest\app\components\import_export_components\ImportExportConfig.tsx   | TypeScript JSX     |        134 |          7 |         17 |        158 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\ClassChatSearchModal.tsx         | TypeScript JSX     |        134 |          4 |         10 |        148 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\ClassesSearchModal.tsx           | TypeScript JSX     |        119 |          4 |         10 |        133 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\CommentModal.tsx                 | TypeScript JSX     |        266 |          8 |         16 |        290 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\CommunitySearchModal.tsx         | TypeScript JSX     |        124 |          4 |         10 |        138 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\DocumentPreviewModal.tsx         | TypeScript JSX     |         28 |          0 |          5 |         33 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\DocumentSearchModal.tsx          | TypeScript JSX     |        185 |          5 |         14 |        204 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\ExercisesSearchModal.tsx         | TypeScript JSX     |        119 |          4 |         10 |        133 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\Modal_Event.tsx                  | TypeScript JSX     |         68 |          0 |          5 |         73 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\NewsSearchModal.tsx              | TypeScript JSX     |        114 |          4 |         10 |        128 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\ShareModal.tsx                   | TypeScript JSX     |        127 |          4 |         13 |        144 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\StudentsSearchModal.tsx          | TypeScript JSX     |        123 |          4 |         10 |        137 |
+| e:\Workspace\Edu_Learn_Nest\app\components\modal_components\UserExercisesSearchModal.tsx     | TypeScript JSX     |        122 |          4 |         10 |        136 |
+| e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsBasicFields.tsx               | TypeScript JSX     |         27 |          0 |          7 |         34 |
+| e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsContentEditor.tsx             | TypeScript JSX     |         83 |          0 |          5 |         88 |
+| e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsFormActions.tsx               | TypeScript JSX     |         30 |          0 |          5 |         35 |
+| e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsFormHeader.tsx                | TypeScript JSX     |         30 |          0 |          5 |         35 |
+| e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsHeader.tsx                    | TypeScript JSX     |         38 |          1 |          6 |         45 |
+| e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsImageUpload.tsx               | TypeScript JSX     |         28 |          0 |          5 |         33 |
+| e:\Workspace\Edu_Learn_Nest\app\components\news_components\NewsTable.tsx                     | TypeScript JSX     |        127 |          0 |          8 |        135 |
+| e:\Workspace\Edu_Learn_Nest\app\components\news_components\types.ts                          | TypeScript         |          7 |          0 |          1 |          8 |
+| e:\Workspace\Edu_Learn_Nest\app\components\students_components\StudentsHeader.tsx            | TypeScript JSX     |         38 |          1 |          6 |         45 |
+| e:\Workspace\Edu_Learn_Nest\app\components\students_components\StudentsTable.tsx             | TypeScript JSX     |        145 |          0 |          8 |        153 |
+| e:\Workspace\Edu_Learn_Nest\app\components\students_components\types.ts                      | TypeScript         |          9 |          0 |          1 |         10 |
+| e:\Workspace\Edu_Learn_Nest\app\components\ui_components\CustomCard.tsx                      | TypeScript JSX     |         23 |          0 |          4 |         27 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\ChatHeader.tsx                    | TypeScript JSX     |         23 |          0 |          4 |         27 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\ClassListItem.tsx                 | TypeScript JSX     |         46 |          0 |          5 |         51 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\ConversationItem.tsx              | TypeScript JSX     |         47 |          0 |          4 |         51 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\ExerciseListItem.tsx              | TypeScript JSX     |         38 |          0 |          4 |         42 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\GradeStatCard.tsx                 | TypeScript JSX     |         40 |          0 |          5 |         45 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\MessageBubble.tsx                 | TypeScript JSX     |         27 |          0 |          3 |         30 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\ProgressCard.tsx                  | TypeScript JSX     |         27 |          0 |          5 |         32 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\QuickActionCard.tsx               | TypeScript JSX     |         15 |          0 |          4 |         19 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\StatCard.tsx                      | TypeScript JSX     |         15 |          0 |          4 |         19 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_components\UserHeader.tsx                    | TypeScript JSX     |         48 |          0 |          6 |         54 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_exercises_components\UserExercisesHeader.tsx | TypeScript JSX     |         42 |          1 |          6 |         49 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_exercises_components\UserExercisesTable.tsx  | TypeScript JSX     |         98 |          0 |          6 |        104 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_exercises_components\types.ts                | TypeScript         |          9 |          0 |          1 |         10 |
+| e:\Workspace\Edu_Learn_Nest\app\components\user_grades_components\UserGradesHeader.tsx       | TypeScript JSX     |         60 |          1 |          6 |         67 |
+| e:\Workspace\Edu_Learn_Nest\app\contexts\SidebarColorContext.tsx                             | TypeScript JSX     |         30 |          0 |         10 |         40 |
+| e:\Workspace\Edu_Learn_Nest\app\globals.css                                                  | CSS                |        140 |          9 |         27 |        176 |
+| e:\Workspace\Edu_Learn_Nest\app\layout.tsx                                                   | TypeScript JSX     |         34 |          0 |          5 |         39 |
+| e:\Workspace\Edu_Learn_Nest\app\not-found.tsx                                                | TypeScript JSX     |         88 |          6 |          9 |        103 |
+| e:\Workspace\Edu_Learn_Nest\app\providers.tsx                                                | TypeScript JSX     |         23 |          0 |          4 |         27 |
+| e:\Workspace\Edu_Learn_Nest\app\types\types.ts                                               | TypeScript         |          9 |          0 |          2 |         11 |
+| e:\Workspace\Edu_Learn_Nest\app\user\chat\page.tsx                                           | TypeScript JSX     |        173 |          0 |         15 |        188 |
+| e:\Workspace\Edu_Learn_Nest\app\user\classes\page.tsx                                        | TypeScript JSX     |         56 |          0 |          8 |         64 |
+| e:\Workspace\Edu_Learn_Nest\app\user\community\page.tsx                                      | TypeScript JSX     |        343 |          7 |         31 |        381 |
+| e:\Workspace\Edu_Learn_Nest\app\user\documents\page.tsx                                      | TypeScript JSX     |        158 |          6 |         15 |        179 |
+| e:\Workspace\Edu_Learn_Nest\app\user\exercises\[id]\page.tsx                                 | TypeScript JSX     |        291 |          0 |         28 |        319 |
+| e:\Workspace\Edu_Learn_Nest\app\user\exercises\page.tsx                                      | TypeScript JSX     |         45 |          2 |         11 |         58 |
+| e:\Workspace\Edu_Learn_Nest\app\user\grades\page.tsx                                         | TypeScript JSX     |        340 |          0 |         12 |        352 |
+| e:\Workspace\Edu_Learn_Nest\app\user\layout.tsx                                              | TypeScript JSX     |         22 |          0 |          4 |         26 |
+| e:\Workspace\Edu_Learn_Nest\app\user\page.tsx                                                | TypeScript JSX     |        292 |          9 |         16 |        317 |
+| e:\Workspace\Edu_Learn_Nest\app\user\profile\page.tsx                                        | TypeScript JSX     |        177 |          8 |          8 |        193 |
+| e:\Workspace\Edu_Learn_Nest\eslint.config.mjs                                                | JavaScript         |         14 |          2 |          3 |         19 |
+| e:\Workspace\Edu_Learn_Nest\next.config.ts                                                   | TypeScript         |          4 |          1 |          3 |          8 |
+| e:\Workspace\Edu_Learn_Nest\package-lock.json                                                | JSON               |      7,695 |          0 |          1 |      7,696 |
+| e:\Workspace\Edu_Learn_Nest\package.json                                                     | JSON               |         33 |          0 |          1 |         34 |
+| e:\Workspace\Edu_Learn_Nest\postcss.config.mjs                                               | JavaScript         |          6 |          0 |          2 |          8 |
+| e:\Workspace\Edu_Learn_Nest\public\file.svg                                                  | XML                |          1 |          0 |          0 |          1 |
+| e:\Workspace\Edu_Learn_Nest\public\globe.svg                                                 | XML                |          1 |          0 |          0 |          1 |
+| e:\Workspace\Edu_Learn_Nest\public\next.svg                                                  | XML                |          1 |          0 |          0 |          1 |
+| e:\Workspace\Edu_Learn_Nest\public\vercel.svg                                                | XML                |          1 |          0 |          0 |          1 |
+| e:\Workspace\Edu_Learn_Nest\public\window.svg                                                | XML                |          1 |          0 |          0 |          1 |
+| e:\Workspace\Edu_Learn_Nest\tsconfig.json                                                    | JSON with Comments |         34 |          0 |          1 |         35 |
+| Total                                                                                        |                    |     18,924 |        219 |      1,133 |     20,276 |
++----------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

@@ -79,7 +79,7 @@ export default function Profile() {
                   className="border-4 border-white shadow-xl"
                 />
                 {isAdmin && (
-                  <div className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-2 shadow-lg">
+                  <div className="absolute top-0 right-2 bg-yellow-400 rounded-full p-2 shadow-lg">
                     <CrownOutlined className="text-yellow-800 text-xl" />
                   </div>
                 )}
@@ -162,6 +162,9 @@ export default function Profile() {
                 size="large"
                 block
                 className="h-12 text-base font-semibold"
+                onClick={() => {
+                  message.info("Chức năng này đang phát triển");
+                }}
               >
                 Chỉnh sửa hồ sơ
               </Button>
@@ -177,7 +180,14 @@ export default function Profile() {
                   </div>
                   Thông tin cá nhân
                 </h3>
-                <Button type="text" icon={<EditOutlined />} className="text-blue-600">
+                <Button 
+                  type="text" 
+                  icon={<EditOutlined />} 
+                  className="text-blue-600"
+                  onClick={() => {
+                    message.info("Chức năng này đang phát triển");
+                  }}
+                >
                   Chỉnh sửa
                 </Button>
               </div>

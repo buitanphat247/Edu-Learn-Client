@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Form, Input, Button, Divider, Checkbox, App } from "antd";
-import { UserOutlined, LockOutlined, MailOutlined, GoogleOutlined, FacebookOutlined, HomeOutlined } from "@ant-design/icons";
+import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn, signUp } from "@/lib/api/auth";
@@ -172,7 +172,7 @@ export default function AuthPage() {
               style={{ width: "200%" }}
             >
               <div className="w-1/2 px-2 shrink-0">
-                <div className="bg-white rounded-2xl p-8 lg:p-10">
+                <div className="bg-white rounded-2xl">
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 mb-6">
                       <div className="w-10 h-10 bg-linear-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
@@ -187,7 +187,7 @@ export default function AuthPage() {
                     {/* Social Login Buttons */}
                     <div className="space-y-3 mb-6">
                       <Button
-                        icon={<GoogleOutlined />}
+                        icon={<i className="fab fa-google" />}
                         block
                         size="large"
                         className="h-12 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium cursor-pointer"
@@ -198,7 +198,7 @@ export default function AuthPage() {
                         Tiếp tục với Google
                       </Button>
                       <Button
-                        icon={<FacebookOutlined />}
+                        icon={<i className="fa-brands fa-facebook-f"></i>}
                         block
                         size="large"
                         className="h-12 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium cursor-pointer"
@@ -267,7 +267,7 @@ export default function AuthPage() {
                       <Link href="/">
                         <Button
                           type="default"
-                          icon={<HomeOutlined />}
+                          icon={<i className="fas fa-home" />}
                           block
                           size="large"
                           className="h-12 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all cursor-pointer"
@@ -281,7 +281,7 @@ export default function AuthPage() {
               </div>
 
               <div className="w-1/2 px-2 shrink-0">
-                <div className="bg-white rounded-2xl p-8 lg:p-10">
+                <div className="bg-white rounded-2xl ">
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 mb-6">
                       <div className="w-10 h-10 bg-linear-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
@@ -296,7 +296,7 @@ export default function AuthPage() {
                     {/* Social Login Buttons */}
                     <div className="space-y-3 mb-6">
                       <Button
-                        icon={<GoogleOutlined />}
+                        icon={<i className="fab fa-google" />}
                         block
                         size="large"
                         className="h-12 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium cursor-pointer"
@@ -307,7 +307,7 @@ export default function AuthPage() {
                         Tiếp tục với Google
                       </Button>
                       <Button
-                        icon={<FacebookOutlined />}
+                        icon={<i className="fa-brands fa-facebook-f"></i>}
                         block
                         size="large"
                         className="h-12 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium cursor-pointer"
@@ -445,7 +445,7 @@ export default function AuthPage() {
                       <Link href="/">
                         <Button
                           type="default"
-                          icon={<HomeOutlined />}
+                          icon={<i className="fas fa-home" />}
                           block
                           size="large"
                           className="h-12 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all cursor-pointer"

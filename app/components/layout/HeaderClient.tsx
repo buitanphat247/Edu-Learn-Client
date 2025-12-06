@@ -173,7 +173,7 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
                       : "hover:opacity-80"
                   }`}
                 >
-                  <span className="font-bold text-white">{link.label}</span>
+                  <span className="font-bold text-white text-lg">{link.label}</span>
                 </Link>
               );
             })}
@@ -195,7 +195,7 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
                     : "hover:opacity-80"
                 }`}
               >
-                <span className="font-bold text-white">Tính năng</span>
+                <span className="font-bold text-white text-lg">Tính năng</span>
               </button>
             </Dropdown>
 
@@ -211,7 +211,7 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
                       : "hover:opacity-80"
                   }`}
                 >
-                  <span className="font-bold text-white">{link.label}</span>
+                  <span className="font-bold text-white text-lg">{link.label}</span>
                 </Link>
               );
             })}
@@ -228,7 +228,7 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
             ) : (
               <>
                 <Button type="default" onClick={() => router.push("/auth")}>
-                  Đăng nhập / Đăng ký
+                  Đăng Nhập
                 </Button>
               </>
             )}

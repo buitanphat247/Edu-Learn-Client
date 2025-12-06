@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ClassesHeader from "@/app/components/classes_components/ClassesHeader";
-import ClassesTable from "@/app/components/classes_components/ClassesTable";
-import ClassesSearchModal from "@/app/components/modal_components/ClassesSearchModal";
-import type { ClassItem } from "@/app/components/classes_components/types";
+import ClassesHeader from "@/app/components/classes/ClassesHeader";
+import ClassesTable from "@/app/components/classes/ClassesTable";
+import ClassesSearchModal from "@/app/components/classes/ClassesSearchModal";
+import type { ClassItem } from "@/interface/classes";
 
 const data: ClassItem[] = [
   { key: "1", name: "Lớp 10A1", code: "10A1", students: 35, teacher: "Nguyễn Văn A", status: "Đang hoạt động" },

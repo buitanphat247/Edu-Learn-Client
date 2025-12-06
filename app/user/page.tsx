@@ -7,12 +7,12 @@ import {
   BookOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import UserWelcomeBanner from "@/app/components/user_components/UserWelcomeBanner";
-import UserStatisticsCards from "@/app/components/user_components/UserStatisticsCards";
-import ProgressCard from "@/app/components/user_components/ProgressCard";
-import QuickActionsGrid from "@/app/components/user_components/QuickActionsGrid";
-import RecentExercisesList from "@/app/components/user_components/RecentExercisesList";
-import UpcomingClassesList from "@/app/components/user_components/UpcomingClassesList";
+import UserWelcomeBanner from "@/app/components/user/dashboard/UserWelcomeBanner";
+import UserStatisticsCards from "@/app/components/user/dashboard/UserStatisticsCards";
+import ProgressCard from "@/app/components/user/dashboard/ProgressCard";
+import QuickActionsGrid from "@/app/components/user/dashboard/QuickActionsGrid";
+import RecentExercisesList from "@/app/components/user/exercises/RecentExercisesList";
+import UpcomingClassesList from "@/app/components/user/classes/UpcomingClassesList";
 
 const recentExercises = [
   {

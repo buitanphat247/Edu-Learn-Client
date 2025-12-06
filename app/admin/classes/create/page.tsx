@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Form, Input, InputNumber, Select, message } from "antd";
-import NewsFormHeader from "@/app/components/news_components/NewsFormHeader";
-import ImportExportConfig from "@/app/components/import_export_components/ImportExportConfig";
-import FormActions from "@/app/components/form_components/FormActions";
+import NewsFormHeader from "@/app/components/news/NewsFormHeader";
+import ImportExportConfig from "@/app/components/import_export/ImportExportConfig";
+import FormActions from "@/app/components/form/FormActions";
 
 const { Option } = Select;
 

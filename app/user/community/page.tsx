@@ -3,14 +3,14 @@
 import { Tag, message } from "antd";
 import { FireOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import PostCard from "@/app/components/community_components/PostCard";
-import CreatePostModal from "@/app/components/community_components/CreatePostModal";
-import CommentModal from "@/app/components/modal_components/CommentModal";
-import ShareModal from "@/app/components/modal_components/ShareModal";
-import CommunitySearchModal from "@/app/components/modal_components/CommunitySearchModal";
-import CommunityHeader from "@/app/components/community_components/CommunityHeader";
-import CustomCard from "@/app/components/ui_components/CustomCard";
-import type { Comment } from "@/app/types/types";
+import PostCard from "@/app/components/community/PostCard";
+import CreatePostModal from "@/app/components/community/CreatePostModal";
+import CommentModal from "@/app/components/community/CommentModal";
+import ShareModal from "@/app/components/community/ShareModal";
+import CommunitySearchModal from "@/app/components/community/CommunitySearchModal";
+import CommunityHeader from "@/app/components/community/CommunityHeader";
+import CustomCard from "@/app/components/common/CustomCard";
+import type { Comment } from "@/interface/common";
 
 const posts = [
   {
@@ -187,7 +187,6 @@ const topics = [
 
 export default function UserCommunity() {
   const [searchText, setSearchText] = useState("");
-  const [postContent, setPostContent] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -218,16 +217,11 @@ export default function UserCommunity() {
       post.tags.some((tag) => tag.toLowerCase().includes(searchText.toLowerCase()))
   );
 
-  const handlePost = () => {
-    if (postContent.trim()) {
-      setPostContent("");
+  const handlePost = (content: string, tags: string[]) => {
+    if (content.trim()) {
+      message.success("Đã đăng bài viết thành công!");
       setIsModalOpen(false);
     }
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setPostContent("");
   };
 
   const handleCommentClick = (post: (typeof posts)[0]) => {
@@ -337,7 +331,11 @@ export default function UserCommunity() {
         </div>
       </div>
 
-      <CreatePostModal open={isModalOpen} postContent={postContent} onContentChange={setPostContent} onPost={handlePost} onCancel={handleCancel} />
+      <CreatePostModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onPost={handlePost}
+      />
 
       <CommunitySearchModal
         open={isSearchModalOpen}

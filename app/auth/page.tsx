@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Form, Input, Button, Divider, Checkbox, message } from "antd";
+import { useState, useEffect } from "react";
+import { Form, Input, Button, Divider, Checkbox, App } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -10,23 +10,101 @@ import {
   FacebookOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { signIn, signUp } from "@/lib/api/auth";
+import { getCurrentUser } from "@/lib/api/users";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [signInForm] = Form.useForm();
   const [signUpForm] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { message } = App.useApp();
 
-  const handleSignIn = (values: any) => {
-    console.log("Sign in:", values);
-    message.success("Đăng nhập thành công!");
-    router.push("/user");
+  useEffect(() => {
+    const user = getCurrentUser();
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    
+    if (user && token) {
+      router.push("/profile");
+    }
+  }, [router]);
+
+  const handleSignIn = async (values: any) => {
+    setLoading(true);
+    try {
+      const deviceName = navigator.userAgent || "Web Browser";
+      
+      const response = await signIn({
+        emailOrUsername: values.email,
+        password: values.password,
+        device_name: deviceName,
+      });
+
+      if (response.status && response.data?.user) {
+        const user = response.data.user;
+        
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(user));
+          
+          const userData = { ...user };
+          delete (userData as any).access_token;
+          delete (userData as any).refresh_token;
+          document.cookie = `user=${JSON.stringify(userData)}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+        }
+
+        message.success("Đăng nhập thành công!");
+        router.push("/profile");
+      }
+    } catch (error: any) {
+      message.error(error.message || "Đăng nhập thất bại. Vui lòng thử lại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSignUp = (values: any) => {
-    console.log("Sign up:", values);
-    message.success("Đăng ký thành công!");
-    router.push("/user");
+  const handleSignUp = async (values: any) => {
+    setLoading(true);
+    try {
+      const deviceName = navigator.userAgent || "Web Browser";
+      const username = values.email.split("@")[0] || values.name.toLowerCase().replace(/\s+/g, "_");
+      
+      const response = await signUp({
+        username: username,
+        fullname: values.name,
+        email: values.email,
+        phone: values.phone || "",
+        password: values.password,
+        role_id: 2,
+        device_name: deviceName,
+      });
+
+      if (response.user) {
+        message.success("Đăng ký thành công!");
+        
+        const user = response.user as any;
+        if (user?.access_token && user?.refresh_token) {
+          if (typeof window !== "undefined") {
+            localStorage.setItem("user", JSON.stringify(user));
+            
+            const userData = { ...user };
+            delete userData.access_token;
+            delete userData.refresh_token;
+            document.cookie = `user=${JSON.stringify(userData)}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+          }
+          
+          router.push("/profile");
+        } else {
+          setIsSignUp(false);
+          signInForm.setFieldsValue({ email: values.email });
+          message.info("Vui lòng đăng nhập để tiếp tục");
+        }
+      }
+    } catch (error: any) {
+      message.error(error.message || "Đăng ký thất bại. Vui lòng thử lại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const switchToSignUp = () => {
@@ -39,7 +117,6 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Branding với Gradient */}
       <div className="hidden lg:flex flex-1 bg-linear-to-br from-blue-500 via-cyan-500 to-teal-400 flex-col items-center justify-center px-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 to-teal-500/20"></div>
         <div className="relative z-10 max-w-lg space-y-8 text-white">
@@ -53,34 +130,32 @@ export default function AuthPage() {
           </div>
           <div className="grid grid-cols-2 gap-4 mt-12">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
-              <div className="text-3xl mb-3">📚</div>
+              <div className="text-3xl mb-3" suppressHydrationWarning>📚</div>
               <h3 className="font-semibold text-white mb-2 text-lg">Học tập</h3>
               <p className="text-sm text-white/80">Tài liệu phong phú</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
-              <div className="text-3xl mb-3">💬</div>
+              <div className="text-3xl mb-3" suppressHydrationWarning>💬</div>
               <h3 className="font-semibold text-white mb-2 text-lg">Tương tác</h3>
               <p className="text-sm text-white/80">Cộng đồng sôi động</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
-              <div className="text-3xl mb-3">📊</div>
+              <div className="text-3xl mb-3" suppressHydrationWarning>📊</div>
               <h3 className="font-semibold text-white mb-2 text-lg">Theo dõi</h3>
               <p className="text-sm text-white/80">Tiến độ học tập</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
-              <div className="text-3xl mb-3">🎯</div>
+              <div className="text-3xl mb-3" suppressHydrationWarning>🎯</div>
               <h3 className="font-semibold text-white mb-2 text-lg">Mục tiêu</h3>
               <p className="text-sm text-white/80">Đạt thành tích cao</p>
             </div>
-            </div>
           </div>
         </div>
+      </div>
 
-      {/* Right Side - Auth Forms (White Background) */}
       <div className="flex-1 bg-white flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-3xl">
           <div className="relative overflow-hidden">
-            {/* Switch Link ở trên cùng - Vị trí cố định */}
             <div className="text-right mb-4 min-h-[28px] flex items-center justify-end">
               {!isSignUp ? (
                 <span className="text-gray-600 text-sm">
@@ -105,17 +180,14 @@ export default function AuthPage() {
               )}
             </div>
 
-            {/* Container với animation */}
             <div
               className={`flex transition-transform duration-700 ease-in-out ${
                 isSignUp ? "-translate-x-1/2" : "translate-x-0"
               }`}
               style={{ width: "200%" }}
             >
-              {/* Sign In Form */}
               <div className="w-1/2 px-2 shrink-0">
                 <div className="bg-white rounded-2xl p-8 lg:p-10">
-                  {/* Logo */}
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 mb-6">
                       <div className="w-10 h-10 bg-linear-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
@@ -215,6 +287,7 @@ export default function AuthPage() {
                         htmlType="submit"
                         block
                         size="large"
+                        loading={loading}
                         className="bg-blue-600 hover:bg-blue-700 border-none rounded-lg h-12 font-semibold text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
                       >
                         Đăng nhập
@@ -307,6 +380,23 @@ export default function AuthPage() {
                     </Form.Item>
                     </div>
 
+                    <Form.Item
+                      name="phone"
+                        label={<span className="text-gray-700 font-medium">Số điện thoại</span>}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập số điện thoại!" },
+                        {
+                          pattern: /^[0-9]{10,11}$/,
+                          message: "Số điện thoại không hợp lệ!",
+                        },
+                      ]}
+                    >
+                      <Input
+                          placeholder="0912345678"
+                          className="h-12 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 transition-colors"
+                      />
+                    </Form.Item>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Form.Item
                       name="password"
@@ -387,6 +477,7 @@ export default function AuthPage() {
                         htmlType="submit"
                         block
                         size="large"
+                        loading={loading}
                         className="bg-blue-600 hover:bg-blue-700 border-none rounded-lg h-12 font-semibold text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
                       >
                         Đăng ký miễn phí

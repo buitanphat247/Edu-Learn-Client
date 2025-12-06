@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { message } from "antd";
-import DocumentPreviewModal from "@/app/components/modal_components/DocumentPreviewModal";
-import ContributeContentModal from "@/app/components/modal_components/ContributeContentModal";
-import ContentSidebar from "@/app/components/content_components/ContentSidebar";
-import ContentHeader from "@/app/components/content_components/ContentHeader";
-import DocumentGrid, { type DocumentItem } from "@/app/components/content_components/DocumentGrid";
-import { getViewerUrl } from "@/app/components/content_components/getViewerUrl";
+import DocumentPreviewModal from "@/app/components/documents/DocumentPreviewModal";
+import ContributeContentModal from "@/app/components/content/ContributeContentModal";
+import ContentSidebar from "@/app/components/content/ContentSidebar";
+import ContentHeader from "@/app/components/content/ContentHeader";
+import DocumentGrid, { type DocumentItem } from "@/app/components/documents/DocumentGrid";
+import { getViewerUrl } from "@/app/components/content/getViewerUrl";
 
 const documents: DocumentItem[] = [
   // Demo documents với link mới

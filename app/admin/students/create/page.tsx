@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Form, Input, Select, message } from "antd";
-import ImportExportConfig from "@/app/components/import_export_components/ImportExportConfig";
-import PageHeader from "@/app/components/form_components/PageHeader";
-import FormActions from "@/app/components/form_components/FormActions";
+import ImportExportConfig from "@/app/components/import_export/ImportExportConfig";
+import PageHeader from "@/app/components/form/PageHeader";
+import FormActions from "@/app/components/form/FormActions";
 
 const { Option } = Select;
 

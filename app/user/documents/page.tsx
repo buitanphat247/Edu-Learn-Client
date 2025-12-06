@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import CardDocument from "@/app/components/card_components/Card_document";
-import DocumentPreviewModal from "@/app/components/modal_components/DocumentPreviewModal";
-import DocumentSearchModal, { DocumentItem } from "@/app/components/modal_components/DocumentSearchModal";
-import DocumentsHeader from "@/app/components/documents_components/DocumentsHeader";
-import CustomCard from "@/app/components/ui_components/CustomCard";
+import CardDocument from "@/app/components/documents/CardDocument";
+import DocumentPreviewModal from "@/app/components/documents/DocumentPreviewModal";
+import DocumentSearchModal, { DocumentItem } from "@/app/components/documents/DocumentSearchModal";
+import DocumentsHeader from "@/app/components/documents/DocumentsHeader";
+import CustomCard from "@/app/components/common/CustomCard";
 
 const buildOfficeViewer = (url: string) => `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
 

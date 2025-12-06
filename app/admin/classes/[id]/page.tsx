@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { App } from "antd";
-import StudentDetailModal from "@/app/components/modal_components/StudentDetailModal";
-import ClassHeader from "@/app/components/classes_components/ClassHeader";
-import ClassInfoCard from "@/app/components/classes_components/ClassInfoCard";
-import ClassStudentsTable from "@/app/components/classes_components/ClassStudentsTable";
-import type { StudentItem } from "@/app/components/students_components/types";
+import StudentDetailModal from "@/app/components/students/StudentDetailModal";
+import ClassHeader from "@/app/components/classes/ClassHeader";
+import ClassInfoCard from "@/app/components/classes/ClassInfoCard";
+import ClassStudentsTable from "@/app/components/classes/ClassStudentsTable";
+import type { StudentItem } from "@/interface/students";
 
 // Mock data - trong thực tế sẽ fetch từ API
 const mockClassData = {

@@ -2,7 +2,7 @@
 
 import { Pagination, Input, Select } from "antd";
 import { useState, useMemo } from "react";
-import CardNews from "@/app/components/card_components/Card_news";
+import NewsCard from "@/app/components/news/NewsCard";
 
 const { Search } = Input;
 
@@ -124,7 +124,7 @@ export default function News() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {currentNews.map((item) => (
-              <CardNews
+              <NewsCard
                 key={item.id}
                 id={item.id}
                 title={item.title}

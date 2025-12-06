@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { Form, Input, Select, DatePicker, Upload, Button, message } from "antd";
 import { UploadOutlined, CheckOutlined } from "@ant-design/icons";
-import ExerciseCreateHeader from "@/app/components/exercises_components/ExerciseCreateHeader";
-import FormActions from "@/app/components/form_components/FormActions";
+import ExerciseCreateHeader from "@/app/components/exercises/ExerciseCreateHeader";
+import FormActions from "@/app/components/form/FormActions";
 
 const { TextArea } = Input;
 const { Option } = Select;

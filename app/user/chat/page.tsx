@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Input, Button } from "antd";
 import { SendOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
-import ConversationItem from "@/app/components/user_components/ConversationItem";
-import MessageBubble from "@/app/components/user_components/MessageBubble";
-import ChatHeader from "@/app/components/user_components/ChatHeader";
+import ConversationItem from "@/app/components/user/chat/ConversationItem";
+import MessageBubble from "@/app/components/user/chat/MessageBubble";
+import ChatHeader from "@/app/components/user/chat/ChatHeader";
 
 const { TextArea } = Input;
 

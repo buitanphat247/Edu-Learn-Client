@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import UserExercisesHeader from "@/app/components/user_exercises_components/UserExercisesHeader";
-import UserExercisesTable from "@/app/components/user_exercises_components/UserExercisesTable";
-import UserExercisesSearchModal from "@/app/components/modal_components/UserExercisesSearchModal";
-import type { UserExerciseItem } from "@/app/components/user_exercises_components/types";
+import UserExercisesHeader from "@/app/components/user/exercises/UserExercisesHeader";
+import UserExercisesTable from "@/app/components/user/exercises/UserExercisesTable";
+import UserExercisesSearchModal from "@/app/components/user/exercises/UserExercisesSearchModal";
+import type { UserExerciseItem } from "@/interface/exercises";
 
 const data: UserExerciseItem[] = [
   { key: "1", name: "Bài tập Toán chương 1", class: "9A3", subject: "Toán học", date: "15/01/2024", deadline: "20/01/2024", status: "Chưa nộp" },

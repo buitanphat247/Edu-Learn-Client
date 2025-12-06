@@ -6,8 +6,8 @@ import { Button, Upload, message, Tabs } from "antd";
 import type { MenuProps } from "antd";
 import { ArrowLeftOutlined, SettingOutlined, DeleteOutlined, FileTextOutlined as FileIcon, BarChartOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd";
-import ExerciseContent from "@/app/components/exercise_components/ExerciseContent";
-import GradeTable, { type GradeData } from "@/app/components/exercise_components/GradeTable";
+import ExerciseContent from "@/app/components/exercises/ExerciseContent";
+import GradeTable, { type GradeData } from "@/app/components/exercises/GradeTable";
 
 const exerciseData = {
   id: "9",

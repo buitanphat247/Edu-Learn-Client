@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { Tag } from "antd";
 import { CalendarOutlined, UserOutlined } from "@ant-design/icons";
-import CardNews from "@/app/components/card_components/Card_news";
+import NewsCard from "@/app/components/news/NewsCard";
 
 const newsData: Record<
   number,
@@ -351,7 +351,7 @@ export default function NewsDetail() {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Tin tức liên quan</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedNewsList.map((item) => (
-              <CardNews
+              <NewsCard
                 key={item.id}
                 id={item.id}
                 title={item.title}

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import NewsHeader from "@/app/components/news_components/NewsHeader";
-import NewsTable from "@/app/components/news_components/NewsTable";
-import NewsSearchModal from "@/app/components/modal_components/NewsSearchModal";
-import type { NewsItem } from "@/app/components/news_components/types";
+import NewsHeader from "@/app/components/news/NewsHeader";
+import NewsTable from "@/app/components/news/NewsTable";
+import NewsSearchModal from "@/app/components/news/NewsSearchModal";
+import type { NewsItem } from "@/interface/news";
 
 const data: NewsItem[] = [
   { key: "1", title: "Khai giảng khóa học mới", category: "Tin tức", date: "15/01/2024", status: "Đã xuất bản" },

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import StudentsHeader from "@/app/components/students_components/StudentsHeader";
-import StudentsTable from "@/app/components/students_components/StudentsTable";
-import StudentsSearchModal from "@/app/components/modal_components/StudentsSearchModal";
-import StudentDetailModal from "@/app/components/modal_components/StudentDetailModal";
-import type { StudentItem } from "@/app/components/students_components/types";
+import StudentsHeader from "@/app/components/students/StudentsHeader";
+import StudentsTable from "@/app/components/students/StudentsTable";
+import StudentsSearchModal from "@/app/components/students/StudentsSearchModal";
+import StudentDetailModal from "@/app/components/students/StudentDetailModal";
+import type { StudentItem } from "@/interface/students";
 
 const data: StudentItem[] = [
   { key: "1", name: "Nguyễn Văn A", studentId: "HS001", class: "10A1", email: "nguyenvana@example.com", phone: "0987654321", status: "Đang học" },

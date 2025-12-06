@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Table, Tag, Card } from "antd";
 import { TrophyOutlined, BookOutlined } from "@ant-design/icons";
-import GradeStatCard from "@/app/components/user_components/GradeStatCard";
-import UserGradesHeader from "@/app/components/user_grades_components/UserGradesHeader";
+import GradeStatCard from "@/app/components/user/grades/GradeStatCard";
+import UserGradesHeader from "@/app/components/user/grades/UserGradesHeader";
 
 const gradesData = {
   student: {

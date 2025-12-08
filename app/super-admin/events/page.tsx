@@ -14,8 +14,9 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { ColumnsType } from "antd/es/table";
-import { createEvent, getEvents, type EventResponse } from "@/lib/api/events";
+import { createEvent, getEvents, getEventById, type EventResponse } from "@/lib/api/events";
 import { getCurrentUser } from "@/lib/api/users";
+import EventDetailModal from "@/app/components/super-admin/EventDetailModal";
 
 const { Option } = Select;
 
@@ -45,6 +46,10 @@ export default function SuperAdminEvents() {
   const [form] = Form.useForm();
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
+  const [isViewDetailModalOpen, setIsViewDetailModalOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [eventDetail, setEventDetail] = useState<EventResponse | null>(null);
+  const [loadingEventDetail, setLoadingEventDetail] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -192,6 +197,36 @@ export default function SuperAdminEvents() {
     return date.toLocaleDateString("vi-VN");
   };
 
+  const handleViewEvent = async (eventId: number) => {
+    setIsViewDetailModalOpen(true);
+    setSelectedEventId(eventId);
+    setLoadingEventDetail(true);
+    setEventDetail(null);
+
+    try {
+      const eventData = await getEventById(eventId);
+      setEventDetail(eventData);
+      setLoadingEventDetail(false);
+    } catch (error: any) {
+      message.error(error?.message || "Không thể tải thông tin sự kiện");
+      setIsViewDetailModalOpen(false);
+      setSelectedEventId(null);
+      setEventDetail(null);
+      setLoadingEventDetail(false);
+    }
+  };
+
+  const handleCloseEventModal = () => {
+    setIsViewDetailModalOpen(false);
+  };
+
+  const handleAfterClose = () => {
+    // Reset state sau khi animation đóng hoàn tất
+    setSelectedEventId(null);
+    setEventDetail(null);
+    setLoadingEventDetail(false);
+  };
+
   const filteredData = events.filter((item) => {
     const status = getEventStatus(item.start_event_date, item.end_event_date);
     const matchesStatus = !selectedStatus || status === selectedStatus;
@@ -296,7 +331,7 @@ export default function SuperAdminEvents() {
               className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation();
-                message.info("Tính năng xem đang được phát triển");
+                handleViewEvent(record.event_id);
               }}
             >
               Xem
@@ -404,6 +439,15 @@ export default function SuperAdminEvents() {
           }}
         />
       </Modal>
+
+      {/* Event Detail Modal */}
+      <EventDetailModal
+        open={isViewDetailModalOpen}
+        onCancel={handleCloseEventModal}
+        eventDetail={eventDetail}
+        loading={loadingEventDetail}
+        afterClose={handleAfterClose}
+      />
     </div>
   );
 }

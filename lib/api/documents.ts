@@ -1,5 +1,135 @@
 import apiClient from "@/app/config/api";
 
+export interface DocumentResponse {
+  document_id: string;
+  title: string;
+  file_url: string;
+  download_count: number;
+  created_at: string;
+  updated_at: string;
+  uploader: {
+    user_id: string;
+    username: string;
+    fullname: string;
+    email: string;
+    avatar: string;
+  };
+}
+
+export interface GetDocumentsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export interface GetDocumentsResult {
+  data: DocumentResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface DocumentsApiResponse {
+  status: boolean;
+  message: string;
+  data: {
+    data: DocumentResponse[];
+    total: number;
+    page: number;
+    limit: number;
+  };
+  statusCode: number;
+  timestamp: string;
+}
+
+export const getDocuments = async (params?: GetDocumentsParams): Promise<GetDocumentsResult> => {
+  try {
+    const requestParams: Record<string, any> = {};
+    
+    if (params?.page) {
+      requestParams.page = params.page;
+    }
+    if (params?.limit) {
+      requestParams.limit = params.limit;
+    }
+    if (params?.search) {
+      requestParams.search = params.search;
+    }
+
+    const response = await apiClient.get<DocumentsApiResponse>("/documents", {
+      params: requestParams,
+    });
+
+    if (response.data.status && response.data.data) {
+      return {
+        data: response.data.data.data || [],
+        total: response.data.data.total || 0,
+        page: response.data.data.page || 1,
+        limit: response.data.data.limit || 10,
+      };
+    }
+
+    throw new Error(response.data.message || "Không thể lấy danh sách tài liệu");
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || error?.message || "Không thể lấy danh sách tài liệu";
+    throw new Error(errorMessage);
+  }
+};
+
+export interface CreateDocumentParams {
+  title: string;
+  file: File;
+  uploaded_by: number;
+}
+
+export interface CreateDocumentResponse {
+  document_id: number;
+  title: string;
+  file_url: string;
+  uploader: {
+    user_id: number;
+    username: string;
+    fullname: string;
+    email: string;
+    avatar: string;
+  };
+  download_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateDocumentApiResponse {
+  status: boolean;
+  message: string;
+  data: CreateDocumentResponse;
+  statusCode: number;
+  timestamp: string;
+}
+
+export const createDocument = async (params: CreateDocumentParams): Promise<CreateDocumentResponse> => {
+  try {
+    const formData = new FormData();
+    formData.append("title", params.title);
+    formData.append("file", params.file);
+    formData.append("uploaded_by", params.uploaded_by.toString());
+
+    const response = await apiClient.post<CreateDocumentApiResponse>("/documents", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (response.data.status && response.data.data) {
+      return response.data.data;
+    }
+
+    throw new Error(response.data.message || "Không thể tạo tài liệu");
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || error?.message || "Không thể tạo tài liệu";
+    throw new Error(errorMessage);
+  }
+};
+
 export interface DocumentAttachmentCrawl {
   id: number;
   attachment_id: number;

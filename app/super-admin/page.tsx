@@ -12,6 +12,10 @@ import {
 } from "@ant-design/icons";
 import { Card } from "antd";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import CountUp from "react-countup";
+import { getStats } from "@/lib/api/stats";
+import { App } from "antd";
 
 const dashboardItems = [
   {
@@ -79,36 +83,7 @@ const dashboardItems = [
   },
 ];
 
-const stats = [
-  {
-    label: "Tài liệu",
-    value: "128",
-    icon: ReadOutlined,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-  },
-  {
-    label: "Tài khoản",
-    value: "342",
-    icon: UserOutlined,
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-  },
-  {
-    label: "Tin tức",
-    value: "45",
-    icon: BellOutlined,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-  },
-  {
-    label: "Bài viết",
-    value: "89",
-    icon: FileTextOutlined,
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
-  },
-];
+// Stats sẽ được fetch từ API
 
 function WelcomeBanner() {
   const getGreeting = () => {
@@ -128,40 +103,103 @@ function WelcomeBanner() {
   );
 }
 
-function StatisticsCards({ stats }: { stats: any[] }) {
+function StatCard({ label, value, icon: IconComponent, color, bgColor }: { label: string; value: number; icon: any; color: string; bgColor: string }) {
+  return (
+    <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-gray-600 text-sm mb-1">{label}</p>
+          <p className="text-3xl font-bold text-gray-800">
+            <CountUp
+              start={0}
+              end={value}
+              duration={2}
+              separator=","
+              decimals={0}
+            />
+          </p>
+        </div>
+        <div className={`${bgColor} p-4 rounded-lg`}>
+          <IconComponent className={`${color} text-2xl`} />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function StatisticsCards({ stats }: { stats: { label: string; value: number; icon: any; color: string; bgColor: string }[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {stats.map((stat, index) => {
-        const IconComponent = stat.icon;
-        return (
-          <Card
-            key={index}
-            className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm mb-1">{stat.label}</p>
-                <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
-              </div>
-              <div className={`${stat.bgColor} p-4 rounded-lg`}>
-                <IconComponent className={`${stat.color} text-2xl`} />
-              </div>
-            </div>
-          </Card>
-        );
-      })}
+      {stats.map((stat, index) => (
+        <StatCard key={index} {...stat} />
+      ))}
     </div>
   );
 }
 
 export default function SuperAdminDashboard() {
   const router = useRouter();
+  const { message } = App.useApp();
+  const [stats, setStats] = useState({
+    documents: 0,
+    users: 0,
+    news: 0,
+    events: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const data = await getStats();
+        setStats(data);
+      } catch (error: any) {
+        message.error(error?.message || "Không thể tải thống kê");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [message]);
+
+  const statsCards = [
+    {
+      label: "Tài liệu Crawl",
+      value: stats.documents,
+      icon: CloudDownloadOutlined,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+    },
+    {
+      label: "Tài khoản",
+      value: stats.users,
+      icon: UserOutlined,
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+    },
+    {
+      label: "Tin tức",
+      value: stats.news,
+      icon: BellOutlined,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+    },
+    {
+      label: "Sự kiện",
+      value: stats.events,
+      icon: CalendarOutlined,
+      color: "text-pink-600",
+      bgColor: "bg-pink-50",
+    },
+  ];
 
   return (
     <div className="space-y-6">
       <WelcomeBanner />
 
-      <StatisticsCards stats={stats} />
+      <StatisticsCards stats={statsCards} />
 
       <div>
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Chức năng quản lý</h2>

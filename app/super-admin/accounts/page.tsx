@@ -2,10 +2,11 @@
 
 import { Table, Tag, Button, Space, Select, App, Spin, Input, Modal, Form } from "antd";
 import { SearchOutlined, EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, LoadingOutlined, UploadOutlined } from "@ant-design/icons";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { ColumnsType } from "antd/es/table";
-import { getUsers, createUser, type GetUsersResponse } from "@/lib/api/users";
+import { getUsers, createUser, getUserInfo, type GetUsersResponse, type UserInfoResponse } from "@/lib/api/users";
+import UserDetailModal from "@/app/components/super-admin/UserDetailModal";
 
 const { Option } = Select;
 
@@ -24,8 +25,25 @@ interface AccountType {
 export default function SuperAdminAccounts() {
   const router = useRouter();
   const { modal, message } = App.useApp();
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [isAddSingleModalOpen, setIsAddSingleModalOpen] = useState(false);
+  
+  // Gộp modal states thành một object
+  const [modalState, setModalState] = useState({
+    search: false,
+    addSingle: false,
+    viewDetail: false,
+  });
+
+  // Gộp user detail states thành một object
+  const [userDetailState, setUserDetailState] = useState<{
+    userId: number | null;
+    data: UserInfoResponse | null;
+    loading: boolean;
+  }>({
+    userId: null,
+    data: null,
+    loading: false,
+  });
+
   const [selectedRole, setSelectedRole] = useState<number | undefined>();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
@@ -45,16 +63,16 @@ export default function SuperAdminAccounts() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
-        setIsSearchModalOpen(true);
+        setModalState((prev) => ({ ...prev, search: true }));
       }
-      if (e.key === "Escape" && isSearchModalOpen) {
-        setIsSearchModalOpen(false);
+      if (e.key === "Escape" && modalState.search) {
+        setModalState((prev) => ({ ...prev, search: false }));
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isSearchModalOpen]);
+  }, [modalState.search]);
 
   const fetchUsers = async (page: number = 1, limit: number = 10, search?: string) => {
     // Prevent multiple simultaneous calls
@@ -162,21 +180,53 @@ export default function SuperAdminAccounts() {
     }
   };
 
-  const handleSearch = (value: string) => {
+  const handleSearch = useCallback((value: string) => {
     setSearchQuery(value);
     setPagination((prev) => ({ ...prev, current: 1 }));
-  };
+  }, []);
 
-  const filteredData = accounts.filter((item) => {
-    const matchesRole = !selectedRole || item.role_id === selectedRole;
-    return matchesRole;
-  });
+  // Sử dụng useMemo để tránh tính toán lại filteredData không cần thiết
+  const filteredData = useMemo(() => {
+    return accounts.filter((item) => {
+      const matchesRole = !selectedRole || item.role_id === selectedRole;
+      return matchesRole;
+    });
+  }, [accounts, selectedRole]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleDateString("vi-VN");
   };
+
+  const handleViewUser = useCallback(async (userId: number) => {
+    // Set all states in one batch to reduce rerenders
+    setModalState((prev) => ({ ...prev, viewDetail: true }));
+    setUserDetailState({
+      userId,
+      data: null,
+      loading: true,
+    });
+
+    try {
+      const userData = await getUserInfo(userId);
+      // Only update userDetail and loading state on success
+      setUserDetailState({
+        userId,
+        data: userData,
+        loading: false,
+      });
+    } catch (error: any) {
+      message.error(error?.message || "Không thể tải thông tin người dùng");
+      // Close modal and reset on error
+      setModalState((prev) => ({ ...prev, viewDetail: false }));
+      setUserDetailState({
+        userId: null,
+        data: null,
+        loading: false,
+      });
+    }
+  }, [message]);
 
   const columns: ColumnsType<AccountType> = [
     {
@@ -279,7 +329,7 @@ export default function SuperAdminAccounts() {
               className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation();
-                message.info("Tính năng đang được phát triển");
+                handleViewUser(record.user_id);
               }}
             >
               Xem
@@ -324,7 +374,7 @@ export default function SuperAdminAccounts() {
             type="default"
             icon={<PlusOutlined />}
             className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300"
-            onClick={() => setIsAddSingleModalOpen(true)}
+            onClick={() => setModalState((prev) => ({ ...prev, addSingle: true }))}
             size="middle"
           >
             Thêm single
@@ -367,9 +417,9 @@ export default function SuperAdminAccounts() {
       {/* Add Single Account Modal */}
       <Modal
         title="Thêm tài khoản"
-        open={isAddSingleModalOpen}
+        open={modalState.addSingle}
         onCancel={() => {
-          setIsAddSingleModalOpen(false);
+          setModalState((prev) => ({ ...prev, addSingle: false }));
           form.resetFields();
         }}
         footer={null}
@@ -378,12 +428,27 @@ export default function SuperAdminAccounts() {
         <SingleAccountForm
           form={form}
           onSuccess={() => {
-            setIsAddSingleModalOpen(false);
+            setModalState((prev) => ({ ...prev, addSingle: false }));
             form.resetFields();
             fetchUsers(pagination.current, pagination.pageSize, debouncedSearchQuery);
           }}
         />
       </Modal>
+
+      {/* User Detail Modal */}
+      <UserDetailModal
+        open={modalState.viewDetail}
+        onCancel={() => {
+          setModalState((prev) => ({ ...prev, viewDetail: false }));
+          setUserDetailState({
+            userId: null,
+            data: null,
+            loading: false,
+          });
+        }}
+        userDetail={userDetailState.data}
+        loading={userDetailState.loading}
+      />
     </div>
   );
 }

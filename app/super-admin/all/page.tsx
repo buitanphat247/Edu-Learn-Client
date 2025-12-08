@@ -109,7 +109,7 @@ export default function SuperAdminAll() {
       const responseTime = Date.now() - startTime;
 
       // Ensure minimum loading time of 1.5 seconds
-      const minLoadingTime = 1500;
+      const minLoadingTime = 500;
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
       if (remainingTime > 0) {
@@ -129,7 +129,7 @@ export default function SuperAdminAll() {
       const responseTime = Date.now() - startTime;
 
       // Ensure minimum loading time of 1.5 seconds even on error
-      const minLoadingTime = 1500;
+      const minLoadingTime = 500;
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
       if (remainingTime > 0) {
@@ -178,7 +178,7 @@ export default function SuperAdminAll() {
         )
       );
       message.success("Backup thành công!");
-    }, 3000);
+    }, 500);
   };
 
   const handleRestoreBackup = (backup: BackupInfo) => {
@@ -275,6 +275,7 @@ export default function SuperAdminAll() {
                 value={baseUrl}
                 onChange={(e) => setBaseUrl(e.target.value)}
                 className="h-10"
+                disabled
               />
             </Form.Item>
 
@@ -291,7 +292,8 @@ export default function SuperAdminAll() {
                     { value: "DELETE", label: "DELETE" },
                     { value: "PATCH", label: "PATCH" },
                   ]}
-                />
+                  disabled
+                  />
               </Form.Item>
 
               <Form.Item label="Endpoint" required className="col-span-2">
@@ -301,7 +303,8 @@ export default function SuperAdminAll() {
                   value={endpoint}
                   onChange={(e) => setEndpoint(e.target.value)}
                   className="h-10"
-                />
+                  disabled
+                  />
               </Form.Item>
             </div>
 

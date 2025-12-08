@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import type { ColumnsType } from "antd/es/table";
 import { getDocumentAttachmentsCrawl, type DocumentAttachmentCrawl } from "@/lib/api/documents";
 import DocumentPreviewModal from "@/app/components/documents/DocumentPreviewModal";
-import { getViewerUrl } from "@/app/components/content/getViewerUrl";
+import { useDocumentPreview } from "@/app/components/documents/useDocumentPreview";
 
 const { Option } = Select;
 
@@ -29,11 +29,11 @@ interface DocumentTableType {
 export default function SuperAdminDocumentsCrawl() {
   const router = useRouter();
   const { message } = App.useApp();
+  const { previewDoc, openPreview, closePreview, handleAfterClose, isOpen } = useDocumentPreview();
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [selectedMonHoc, setSelectedMonHoc] = useState<string | undefined>();
   const [documents, setDocuments] = useState<DocumentTableType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [previewDoc, setPreviewDoc] = useState<DocumentTableType | null>(null);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
@@ -196,14 +196,6 @@ export default function SuperAdminDocumentsCrawl() {
       title: "Hành động",
       key: "action",
       render: (_: any, record: DocumentTableType) => {
-        const handleView = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (!record.link) {
-            message.warning("Không có link để xem");
-            return;
-          }
-          setPreviewDoc(record);
-        };
 
         const handleDownload = async (e: React.MouseEvent) => {
           e.stopPropagation();
@@ -231,6 +223,18 @@ export default function SuperAdminDocumentsCrawl() {
           } catch (error: any) {
             message.error(error?.message || "Không thể tải file");
           }
+        };
+
+        const handleView = (e: React.MouseEvent) => {
+          e.stopPropagation();
+          if (!record.link) {
+            message.warning("Không có link để xem");
+            return;
+          }
+          openPreview({
+            title: record.fileName,
+            fileUrl: record.link,
+          });
         };
 
         return (
@@ -285,10 +289,11 @@ export default function SuperAdminDocumentsCrawl() {
       />
 
       <DocumentPreviewModal
-        open={Boolean(previewDoc)}
-        title={previewDoc?.fileName || ""}
-        viewerUrl={previewDoc ? getViewerUrl(previewDoc.link) : ""}
-        onClose={() => setPreviewDoc(null)}
+        open={isOpen}
+        title={previewDoc?.title}
+        fileUrl={previewDoc?.fileUrl}
+        onClose={closePreview}
+        afterClose={handleAfterClose}
       />
     </div>
   );

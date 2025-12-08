@@ -99,3 +99,18 @@ export const createEvent = async (params: CreateEventParams): Promise<CreateEven
   }
 };
 
+export const getEventById = async (eventId: number | string): Promise<EventResponse> => {
+  try {
+    const response = await apiClient.get(`/events/${eventId}`);
+    
+    if (response.data.status && response.data.data) {
+      return response.data.data;
+    }
+    
+    return response.data as any;
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || error?.message || "Không thể lấy thông tin sự kiện";
+    throw new Error(errorMessage);
+  }
+};
+

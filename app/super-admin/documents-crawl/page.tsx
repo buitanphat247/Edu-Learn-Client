@@ -160,16 +160,7 @@ export default function SuperAdminDocumentsCrawl() {
         <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">{fileName}</span>
       ),
     },
-    {
-      title: "Môn học",
-      dataIndex: "documentMonHoc",
-      key: "documentMonHoc",
-      render: (monHoc: string) => (
-        <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color="blue">
-          {monHoc || "Khác"}
-        </Tag>
-      ),
-    },
+ 
     {
       title: "Loại file",
       dataIndex: "fileType",

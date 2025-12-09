@@ -95,12 +95,7 @@ export default function UploadDocumentModal({ open, onCancel, onSuccess }: Uploa
       closable={!uploading}
       destroyOnClose={true}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        className="mt-4"
-      >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
           name="title"
           label="Tiêu đề tài liệu"
@@ -109,11 +104,7 @@ export default function UploadDocumentModal({ open, onCancel, onSuccess }: Uploa
             { max: 255, message: "Tiêu đề không được vượt quá 255 ký tự" },
           ]}
         >
-          <Input
-            placeholder="Nhập tiêu đề tài liệu"
-            disabled={uploading}
-            size="large"
-          />
+          <Input placeholder="Nhập tiêu đề tài liệu" disabled={uploading} size="middle" />
         </Form.Item>
 
         <Form.Item
@@ -138,12 +129,7 @@ export default function UploadDocumentModal({ open, onCancel, onSuccess }: Uploa
             maxCount={1}
             disabled={uploading}
           >
-            <Button
-              icon={<UploadOutlined />}
-              disabled={uploading}
-              size="large"
-              block
-            >
+            <Button icon={<UploadOutlined />} disabled={uploading} size="small" block>
               Chọn file
             </Button>
           </Upload>
@@ -153,18 +139,10 @@ export default function UploadDocumentModal({ open, onCancel, onSuccess }: Uploa
                 <div className="flex items-center gap-2">
                   <FileOutlined className="text-blue-500" />
                   <span className="text-sm text-gray-700">{fileList[0].name}</span>
-                  <span className="text-xs text-gray-500">
-                    ({(fileList[0].size! / 1024 / 1024).toFixed(2)} MB)
-                  </span>
+                  <span className="text-xs text-gray-500">({(fileList[0].size! / 1024 / 1024).toFixed(2)} MB)</span>
                 </div>
                 {!uploading && (
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined />}
-                    size="small"
-                    onClick={handleRemove}
-                  >
+                  <Button type="text" danger icon={<DeleteOutlined />} size="small" onClick={handleRemove}>
                     Xóa
                   </Button>
                 )}
@@ -175,21 +153,10 @@ export default function UploadDocumentModal({ open, onCancel, onSuccess }: Uploa
 
         <Form.Item className="mb-0">
           <div className="flex justify-end gap-2">
-            <Button
-              onClick={handleCancel}
-              disabled={uploading}
-              size="large"
-            >
+            <Button onClick={handleCancel} disabled={uploading} size="middle">
               Hủy
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={uploading}
-              disabled={uploading}
-              size="large"
-              className="bg-blue-500 hover:bg-blue-600"
-            >
+            <Button type="primary" htmlType="submit" loading={uploading} disabled={uploading} size="middle" className="bg-blue-500 hover:bg-blue-600">
               {uploading ? "Đang upload..." : "Upload"}
             </Button>
           </div>
@@ -198,4 +165,3 @@ export default function UploadDocumentModal({ open, onCancel, onSuccess }: Uploa
     </Modal>
   );
 }
-

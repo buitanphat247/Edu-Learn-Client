@@ -5,7 +5,6 @@ import {
   ApiOutlined,
   DatabaseOutlined,
   CloudDownloadOutlined,
-  CloudUploadOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   LoadingOutlined,
@@ -15,8 +14,10 @@ import {
   ClockCircleOutlined,
   GlobalOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { createBackup, getBackups, type BackupResponse } from "@/lib/api/backup";
+import { getCurrentUser } from "@/lib/api/users";
 
 const { Option } = Select;
 
@@ -43,6 +44,14 @@ interface BackupInfo {
   date: string;
   size: string;
   status: "completed" | "failed" | "in-progress";
+  file_path?: string;
+  creator?: {
+    user_id: string;
+    username: string;
+    fullname: string;
+    email: string;
+    avatar: string;
+  };
 }
 
 export default function SuperAdminAll() {
@@ -55,14 +64,73 @@ export default function SuperAdminAll() {
   const [endpoint, setEndpoint] = useState("/health");
   const [method, setMethod] = useState<"GET" | "POST" | "PUT" | "DELETE" | "PATCH">("GET");
 
-  const [backups, setBackups] = useState<BackupInfo[]>([
-    { id: "1", name: "Backup đầy đủ - 2024-01-20", date: "20/01/2024 10:30", size: "2.5 GB", status: "completed" },
-    { id: "2", name: "Backup đầy đủ - 2024-01-19", date: "19/01/2024 10:30", size: "2.4 GB", status: "completed" },
-    { id: "3", name: "Backup đầy đủ - 2024-01-18", date: "18/01/2024 10:30", size: "2.3 GB", status: "completed" },
-  ]);
+  const [backups, setBackups] = useState<BackupInfo[]>([]);
+  const [loadingBackups, setLoadingBackups] = useState(true);
+  const [creatingBackup, setCreatingBackup] = useState(false);
 
-  const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
-  const [backupName, setBackupName] = useState("");
+  // Format file size từ bytes sang readable format
+  const formatFileSize = (bytes: string | number): string => {
+    const size = typeof bytes === "string" ? parseInt(bytes, 10) : bytes;
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
+    if (size < 1024 * 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+    return `${(size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  };
+
+  // Format date từ ISO string sang định dạng Việt Nam
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Tạo tên backup tự động theo định dạng "Backup đầy đủ - YYYY-MM-DD HH:MM:SS"
+  const generateBackupName = (): string => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    return `Backup đầy đủ - ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+
+  // Fetch backups từ API (chỉ lấy 2 backups mới nhất)
+  const fetchBackups = useCallback(async () => {
+    try {
+      setLoadingBackups(true);
+      const result = await getBackups({ page: 1, limit: 2 });
+      
+      // Xử lý cả trường hợp có pagination và không có pagination
+      const backupsData = Array.isArray(result) ? result : result.data;
+      
+      const formattedBackups: BackupInfo[] = backupsData.map((backup) => ({
+        id: backup.backup_id,
+        name: backup.name,
+        date: formatDate(backup.created_at),
+        size: formatFileSize(backup.file_size),
+        status: "completed" as const,
+        file_path: backup.file_path,
+        creator: backup.creator,
+      }));
+      setBackups(formattedBackups);
+    } catch (error: any) {
+      message.error(error?.message || "Không thể tải danh sách backup");
+    } finally {
+      setLoadingBackups(false);
+    }
+  }, [message]);
+
+  // Load backups khi component mount
+  useEffect(() => {
+    fetchBackups();
+  }, [fetchBackups]);
 
   const handleHealthCheck = async () => {
     if (!baseUrl.trim() || !endpoint.trim()) {
@@ -153,46 +221,50 @@ export default function SuperAdminAll() {
     }
   };
 
-  const handleCreateBackup = () => {
-    if (!backupName.trim()) {
-      message.error("Vui lòng nhập tên backup");
+  const handleCreateBackup = async () => {
+    const user = getCurrentUser();
+    if (!user || !user.user_id) {
+      message.error("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại!");
       return;
     }
 
-    const newBackup: BackupInfo = {
-      id: Date.now().toString(),
-      name: backupName,
-      date: new Date().toLocaleString("vi-VN"),
-      size: "0 MB",
-      status: "in-progress",
-    };
-
-    setBackups((prev) => [newBackup, ...prev]);
-    setIsBackupModalOpen(false);
-    setBackupName("");
-
-    setTimeout(() => {
-      setBackups((prev) =>
-        prev.map((backup) =>
-          backup.id === newBackup.id ? { ...backup, status: "completed", size: `${(Math.random() * 2 + 2).toFixed(1)} GB` } : backup
-        )
-      );
-      message.success("Backup thành công!");
-    }, 500);
+    setCreatingBackup(true);
+    try {
+      const backupName = generateBackupName();
+      await createBackup({
+        name: backupName,
+        created_by: Number(user.user_id),
+      });
+      message.success("Tạo backup thành công!");
+      // Refresh danh sách backups
+      await fetchBackups();
+    } catch (error: any) {
+      message.error(error?.message || "Không thể tạo backup");
+    } finally {
+      setCreatingBackup(false);
+    }
   };
 
-  const handleRestoreBackup = (backup: BackupInfo) => {
-    modal.confirm({
-      title: "Xác nhận khôi phục",
-      content: `Bạn có chắc chắn muốn khôi phục từ "${backup.name}"? Hành động này sẽ ghi đè dữ liệu hiện tại.`,
-      okText: "Khôi phục",
-      okType: "danger",
-      cancelText: "Hủy",
-      onOk() {
-        message.warning("Tính năng khôi phục đang được phát triển");
-      },
-    });
+  const handleDownloadBackup = (backup: BackupInfo) => {
+    if (!backup.file_path) {
+      message.warning("Không có đường dẫn file để tải xuống");
+      return;
+    }
+
+    // Cloudflare R2 base URL
+    const CLOUDFLARE_R2_BASE_URL = "https://pub-3aaf3c9cd7694383ab5e47980be6dc67.r2.dev";
+    const fullUrl = `${CLOUDFLARE_R2_BASE_URL}${backup.file_path}`;
+    
+    // Tạo link download
+    const link = document.createElement("a");
+    link.href = fullUrl;
+    link.download = backup.name || "backup.json";
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
+
 
   const getStatusIcon = (status: HealthCheckResult["status"]) => {
     switch (status) {
@@ -350,15 +422,28 @@ export default function SuperAdminAll() {
               <Button
                 type="default"
                 icon={<SaveOutlined />}
-                onClick={() => setIsBackupModalOpen(true)}
+                onClick={handleCreateBackup}
+                loading={creatingBackup}
+                disabled={creatingBackup}
                 className="bg-white text-green-600 hover:bg-green-50 border-0"
               >
-                Tạo backup
+                {creatingBackup ? "Đang tạo..." : "Tạo backup"}
               </Button>
             </div>
           </div>
           <div className="p-6 bg-white">
-            <div className="space-y-3">
+            {loadingBackups ? (
+              <div className="text-center py-8">
+                <LoadingOutlined spin className="text-2xl text-green-500" />
+                <p className="mt-2 text-gray-600">Đang tải danh sách backup...</p>
+              </div>
+            ) : backups.length === 0 ? (
+              <div className="text-center py-8">
+                <DatabaseOutlined className="text-4xl text-gray-400 mb-2" />
+                <p className="text-gray-600">Chưa có backup nào</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
             {backups.map((backup) => (
               <div key={backup.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-green-300 transition-all">
                 <div className="flex items-center justify-between mb-2">
@@ -381,18 +466,16 @@ export default function SuperAdminAll() {
                       type="default"
                       icon={<CloudDownloadOutlined />}
                       size="small"
-                      onClick={() => message.info("Tính năng tải xuống đang được phát triển")}
+                      onClick={() => handleDownloadBackup(backup)}
                     >
                       Tải xuống
-                    </Button>
-                    <Button type="default" icon={<CloudUploadOutlined />} size="small" onClick={() => handleRestoreBackup(backup)}>
-                      Khôi phục
                     </Button>
                   </div>
                 )}
               </div>
             ))}
             </div>
+            )}
           </div>
         </Card>
       </div>
@@ -414,33 +497,6 @@ export default function SuperAdminAll() {
         </div>
       </div>
 
-      {/* Backup Modal */}
-      <Modal
-        title="Tạo backup mới"
-        open={isBackupModalOpen}
-        onOk={handleCreateBackup}
-        onCancel={() => {
-          setIsBackupModalOpen(false);
-          setBackupName("");
-        }}
-        okText="Tạo backup"
-        cancelText="Hủy"
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tên backup</label>
-            <Input
-              placeholder="Nhập tên backup (ví dụ: Backup đầy đủ - 2024-01-20)"
-              value={backupName}
-              onChange={(e) => setBackupName(e.target.value)}
-              onPressEnter={handleCreateBackup}
-            />
-          </div>
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <p className="text-sm text-blue-800">Backup sẽ bao gồm: Database, Files, Configurations. Quá trình này có thể mất vài phút.</p>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

@@ -70,6 +70,7 @@ export interface GetUsersResponse {
   email: string;
   phone: string | null;
   avatar: string | null;
+  status?: string;
   role_id: number;
   role: {
     role_id: number;
@@ -210,6 +211,54 @@ export const createUser = async (params: CreateUserParams): Promise<CreateUserRe
     return response.data;
   } catch (error: any) {
     const errorMessage = error?.response?.data?.message || error?.message || "Không thể tạo user";
+    throw new Error(errorMessage);
+  }
+};
+
+export interface UpdateUserStatusResponse {
+  user_id: number;
+  status: string;
+  updated_at: string;
+}
+
+export interface UpdateUserStatusApiResponse {
+  status: boolean;
+  message: string;
+  data: UpdateUserStatusResponse;
+  statusCode: number;
+  timestamp: string;
+}
+
+export const updateUserStatus = async (
+  userId: string | number,
+  status: string
+): Promise<UpdateUserStatusResponse> => {
+  try {
+    // Convert userId to number if it's a string
+    const id = typeof userId === "string" ? parseInt(userId, 10) : userId;
+    
+    if (isNaN(id)) {
+      throw new Error("ID người dùng không hợp lệ");
+    }
+
+    const response = await apiClient.patch<UpdateUserStatusApiResponse>(
+      `/users/${id}/status`,
+      { status },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.data.status && response.data.data) {
+      return response.data.data;
+    }
+
+    throw new Error(response.data.message || "Không thể cập nhật trạng thái");
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message || error?.message || "Không thể cập nhật trạng thái";
     throw new Error(errorMessage);
   }
 };

@@ -1,12 +1,13 @@
 "use client";
 
 import { Table, Tag, Button, Space, Select, App, Spin, Input, Modal, Form } from "antd";
-import { SearchOutlined, EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, LoadingOutlined, UploadOutlined } from "@ant-design/icons";
+import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LoadingOutlined, UploadOutlined } from "@ant-design/icons";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { ColumnsType } from "antd/es/table";
 import { getUsers, createUser, getUserInfo, type GetUsersResponse, type UserInfoResponse } from "@/lib/api/users";
 import UserDetailModal from "@/app/components/super-admin/UserDetailModal";
+import UpdateUserStatusModal from "@/app/components/super-admin/UpdateUserStatusModal";
 
 const { Option } = Select;
 
@@ -17,6 +18,7 @@ interface AccountType {
   fullname: string;
   email: string;
   phone: string | null;
+  status?: string;
   role_id: number;
   role_name: string;
   created_at: string;
@@ -31,7 +33,11 @@ export default function SuperAdminAccounts() {
     search: false,
     addSingle: false,
     viewDetail: false,
+    updateStatus: false,
   });
+
+  // State cho update status modal
+  const [selectedUser, setSelectedUser] = useState<{ id: number; username: string; status?: string } | null>(null);
 
   // Gộp user detail states thành một object
   const [userDetailState, setUserDetailState] = useState<{
@@ -115,6 +121,7 @@ export default function SuperAdminAccounts() {
         fullname: user.fullname,
         email: user.email,
         phone: user.phone,
+        status: user.status,
         role_id: user.role_id,
         role_name: user.role?.role_name || "",
         created_at: user.created_at,
@@ -291,6 +298,24 @@ export default function SuperAdminAccounts() {
       },
     },
     {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      width: 120,
+      render: (status: string) => {
+        const statusMap: Record<string, { color: string; text: string }> = {
+          online: { color: "green", text: "Hoạt động" },
+          banned: { color: "red", text: "Bị cấm" },
+        };
+        const statusInfo = statusMap[status || "online"] || { color: "default", text: status || "N/A" };
+        return (
+          <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color={statusInfo.color}>
+            {statusInfo.text}
+          </Tag>
+        );
+      },
+    },
+    {
       title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
@@ -304,21 +329,12 @@ export default function SuperAdminAccounts() {
       render: (_: any, record: AccountType) => {
         const handleEdit = (e: React.MouseEvent) => {
           e.stopPropagation();
-          message.warning("Tính năng đang được phát triển");
-        };
-
-        const handleDelete = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          modal.confirm({
-            title: "Xác nhận xóa",
-            content: `Bạn có chắc chắn muốn xóa tài khoản "${record.username}"?`,
-            okText: "Xóa",
-            okType: "danger",
-            cancelText: "Hủy",
-            onOk() {
-              message.warning("Tính năng đang được phát triển");
-            },
+          setSelectedUser({
+            id: record.user_id,
+            username: record.username,
+            status: record.status,
           });
+          setModalState((prev) => ({ ...prev, updateStatus: true }));
         };
 
         return (
@@ -341,15 +357,6 @@ export default function SuperAdminAccounts() {
               onClick={handleEdit}
             >
               Sửa
-            </Button>
-            <Button
-              icon={<DeleteOutlined />}
-              size="small"
-              danger
-              className="hover:bg-red-50 hover:border-red-400 transition-all duration-200"
-              onClick={handleDelete}
-            >
-              Xóa
             </Button>
           </Space>
         );
@@ -448,6 +455,24 @@ export default function SuperAdminAccounts() {
         }}
         userDetail={userDetailState.data}
         loading={userDetailState.loading}
+      />
+
+      {/* Update User Status Modal */}
+      <UpdateUserStatusModal
+        open={modalState.updateStatus}
+        onCancel={() => {
+          setModalState((prev) => ({ ...prev, updateStatus: false }));
+          setSelectedUser(null);
+        }}
+        onSuccess={() => {
+          setModalState((prev) => ({ ...prev, updateStatus: false }));
+          setSelectedUser(null);
+          // Refresh danh sách users
+          fetchUsers(pagination.current, pagination.pageSize, debouncedSearchQuery);
+        }}
+        userId={selectedUser?.id || 0}
+        currentStatus={selectedUser?.status}
+        userName={selectedUser?.username}
       />
     </div>
   );

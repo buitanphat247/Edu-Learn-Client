@@ -14,9 +14,10 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { ColumnsType } from "antd/es/table";
-import { createEvent, getEvents, getEventById, type EventResponse } from "@/lib/api/events";
+import { createEvent, getEvents, getEventById, deleteEvent, type EventResponse } from "@/lib/api/events";
 import { getCurrentUser } from "@/lib/api/users";
 import EventDetailModal from "@/app/components/super-admin/EventDetailModal";
+import UpdateEventModal from "@/app/components/super-admin/UpdateEventModal";
 
 const { Option } = Select;
 
@@ -47,9 +48,11 @@ export default function SuperAdminEvents() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
   const [isViewDetailModalOpen, setIsViewDetailModalOpen] = useState(false);
+  const [isUpdateEventModalOpen, setIsUpdateEventModalOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [eventDetail, setEventDetail] = useState<EventResponse | null>(null);
   const [loadingEventDetail, setLoadingEventDetail] = useState(false);
+  const [selectedEventForUpdate, setSelectedEventForUpdate] = useState<EventResponse | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -304,9 +307,19 @@ export default function SuperAdminEvents() {
       title: "Hành động",
       key: "action",
       render: (_: any, record: EventType) => {
-        const handleEdit = (e: React.MouseEvent) => {
+        const handleEdit = async (e: React.MouseEvent) => {
           e.stopPropagation();
-          message.warning("Tính năng sửa đang được phát triển");
+          try {
+            setLoadingEventDetail(true);
+            const eventData = await getEventById(record.event_id);
+            setSelectedEventForUpdate(eventData);
+            setSelectedEventId(record.event_id);
+            setIsUpdateEventModalOpen(true);
+          } catch (error: any) {
+            message.error(error?.message || "Không thể tải thông tin sự kiện");
+          } finally {
+            setLoadingEventDetail(false);
+          }
         };
 
         const handleDelete = (e: React.MouseEvent) => {
@@ -317,8 +330,15 @@ export default function SuperAdminEvents() {
             okText: "Xóa",
             okType: "danger",
             cancelText: "Hủy",
-            onOk() {
-              message.warning("Tính năng xóa đang được phát triển");
+            async onOk() {
+              try {
+                await deleteEvent(record.event_id);
+                message.success("Xóa sự kiện thành công!");
+                // Refresh danh sách events
+                fetchEvents(pagination.current, pagination.pageSize, debouncedSearchQuery);
+              } catch (error: any) {
+                message.error(error?.message || "Không thể xóa sự kiện");
+              }
             },
           });
         };
@@ -447,6 +467,25 @@ export default function SuperAdminEvents() {
         eventDetail={eventDetail}
         loading={loadingEventDetail}
         afterClose={handleAfterClose}
+      />
+
+      {/* Update Event Modal */}
+      <UpdateEventModal
+        open={isUpdateEventModalOpen}
+        onCancel={() => {
+          setIsUpdateEventModalOpen(false);
+          setSelectedEventForUpdate(null);
+          setSelectedEventId(null);
+        }}
+        onSuccess={() => {
+          setIsUpdateEventModalOpen(false);
+          setSelectedEventForUpdate(null);
+          setSelectedEventId(null);
+          // Refresh danh sách events
+          fetchEvents(pagination.current, pagination.pageSize, debouncedSearchQuery);
+        }}
+        eventId={selectedEventId || 0}
+        eventData={selectedEventForUpdate}
       />
     </div>
   );

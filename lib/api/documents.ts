@@ -5,6 +5,7 @@ export interface DocumentResponse {
   title: string;
   file_url: string;
   download_count: number;
+  status?: string;
   created_at: string;
   updated_at: string;
   uploader: {
@@ -162,6 +163,59 @@ export interface GetDocumentAttachmentsCrawlResult {
   page: number;
   limit: number;
 }
+
+export interface UpdateDocumentStatusParams {
+  documentId: string;
+  status: string;
+}
+
+export interface UpdateDocumentStatusResponse {
+  document_id: string;
+  status: string;
+  updated_at: string;
+}
+
+export interface UpdateDocumentStatusApiResponse {
+  status: boolean;
+  message: string;
+  data: UpdateDocumentStatusResponse;
+  statusCode: number;
+  timestamp: string;
+}
+
+export const updateDocumentStatus = async (
+  documentId: string | number,
+  status: string
+): Promise<UpdateDocumentStatusResponse> => {
+  try {
+    // Convert documentId to number if it's a string
+    const id = typeof documentId === "string" ? parseInt(documentId, 10) : documentId;
+    
+    if (isNaN(id)) {
+      throw new Error("ID tài liệu không hợp lệ");
+    }
+
+    const response = await apiClient.patch<UpdateDocumentStatusApiResponse>(
+      `/documents/${id}/status`,
+      { status },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.data.status && response.data.data) {
+      return response.data.data;
+    }
+
+    throw new Error(response.data.message || "Không thể cập nhật trạng thái");
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message || error?.message || "Không thể cập nhật trạng thái";
+    throw new Error(errorMessage);
+  }
+};
 
 export const getDocumentAttachmentsCrawl = async (
   params?: GetDocumentAttachmentsCrawlParams

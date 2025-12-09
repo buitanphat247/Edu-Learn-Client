@@ -11,13 +11,14 @@ import {
   DownloadOutlined,
   ConsoleSqlOutlined,
 } from "@ant-design/icons";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { ColumnsType } from "antd/es/table";
 import { getDocuments, type DocumentResponse } from "@/lib/api/documents";
 import DocumentPreviewModal from "@/app/components/documents/DocumentPreviewModal";
 import { useDocumentPreview } from "@/app/components/documents/useDocumentPreview";
 import UploadDocumentModal from "@/app/components/super-admin/UploadDocumentModal";
+import UpdateDocumentStatusModal from "@/app/components/super-admin/UpdateDocumentStatusModal";
 
 const { Option } = Select;
 
@@ -33,21 +34,24 @@ interface DocumentType {
   createdAt: string;
   fileUrl: string;
   fileType: string;
+  status?: string;
   uploader: DocumentResponse["uploader"];
 }
 
 export default function SuperAdminDocumentsUser() {
   const router = useRouter();
-  const { modal, message } = App.useApp();
+  const { message } = App.useApp();
   const { previewDoc, openPreview, closePreview, handleAfterClose, isOpen } = useDocumentPreview();
   const [documents, setDocuments] = useState<DocumentType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<{ id: string; title: string; status?: string } | null>(null);
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 20,
     total: 0,
   });
 
@@ -61,8 +65,15 @@ export default function SuperAdminDocumentsUser() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // Lấy file extension từ fileUrl
+  const getFileType = (fileUrl: string): string => {
+    if (!fileUrl) return "N/A";
+    const extension = fileUrl.split(".").pop()?.toLowerCase() || "";
+    return extension.toUpperCase();
+  };
+
   // Fetch documents function để có thể gọi lại sau khi upload
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
     const startTime = Date.now();
     try {
       setLoading(true);
@@ -82,6 +93,7 @@ export default function SuperAdminDocumentsUser() {
         createdAt: doc.created_at,
         fileUrl: doc.file_url,
         fileType: getFileType(doc.file_url),
+        status: doc.status,
         uploader: doc.uploader,
       }));
 
@@ -107,17 +119,12 @@ export default function SuperAdminDocumentsUser() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Fetch documents
-  useEffect(() => {
-    fetchDocuments();
   }, [pagination.current, pagination.pageSize, debouncedSearchQuery, message]);
 
   // Fetch documents
   useEffect(() => {
     fetchDocuments();
-  }, [pagination.current, pagination.pageSize, debouncedSearchQuery, message]);
+  }, [fetchDocuments]);
 
   const formatDateTime = (dateString: string) => {
     if (!dateString) return "-";
@@ -129,32 +136,38 @@ export default function SuperAdminDocumentsUser() {
     });
   };
 
-  // Lấy file extension từ fileUrl
-  const getFileType = (fileUrl: string): string => {
-    if (!fileUrl) return "N/A";
-    const extension = fileUrl.split(".").pop()?.toLowerCase() || "";
-    return extension.toUpperCase();
+  // Lấy màu Tag dựa trên trạng thái
+  const getStatusColor = (status?: string): string => {
+    if (!status) return "default";
+    const statusLower = status.toLowerCase();
+    if (statusLower === "pending") return "orange";
+    if (statusLower === "approved" || statusLower === "active") return "green";
+    if (statusLower === "rejected" || statusLower === "inactive") return "red";
+    return "default";
   };
 
-  // Lấy màu Tag dựa trên loại file
-  const getFileTypeColor = (fileType: string): string => {
-    const type = fileType.toLowerCase();
-    if (["pdf"].includes(type)) return "red";
-    if (["doc", "docx"].includes(type)) return "blue";
-    if (["xls", "xlsx"].includes(type)) return "green";
-    if (["ppt", "pptx"].includes(type)) return "orange";
-    if (["jpg", "jpeg", "png", "gif"].includes(type)) return "purple";
-    if (["zip", "rar", "7z"].includes(type)) return "cyan";
-    return "default";
+  // Lấy text hiển thị cho trạng thái
+  const getStatusText = (status?: string): string => {
+    if (!status) return "N/A";
+    const statusLower = status.toLowerCase();
+    if (statusLower === "pending") return "Chờ duyệt";
+    if (statusLower === "approved" || statusLower === "active") return "Đã duyệt";
+    if (statusLower === "rejected" || statusLower === "inactive") return "Từ chối";
+    return status;
   };
 
   const columns: ColumnsType<DocumentType> = [
     {
-      title: "ID",
+      title: "STT",
       dataIndex: "id",
       key: "id",
-      width: 100,
-      render: (text: string) => <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">{text}</span>,
+      width: 80,
+      render: (_: any, __: DocumentType, index: number) => {
+        const currentPage = pagination.current;
+        const pageSize = pagination.pageSize;
+        const stt = (currentPage - 1) * pageSize + index + 1;
+        return <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">{stt}</span>;
+      },
     },
     {
       title: "Tiêu đề",
@@ -170,6 +183,17 @@ export default function SuperAdminDocumentsUser() {
       render: (fileType: string) => (
         <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color="default">
           {fileType.toUpperCase()}
+        </Tag>
+      ),
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      width: 120,
+      render: (status: string) => (
+        <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color={getStatusColor(status)}>
+          {getStatusText(status)}
         </Tag>
       ),
     },
@@ -211,21 +235,12 @@ export default function SuperAdminDocumentsUser() {
       render: (_: any, record: DocumentType) => {
         const handleEdit = (e: React.MouseEvent) => {
           e.stopPropagation();
-          message.warning("Tính năng sửa đang được phát triển");
-        };
-
-        const handleDelete = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          modal.confirm({
-            title: "Xác nhận xóa",
-            content: `Bạn có chắc chắn muốn xóa tài liệu "${record.title}"?`,
-            okText: "Xóa",
-            okType: "danger",
-            cancelText: "Hủy",
-            onOk() {
-              message.warning("Tính năng xóa đang được phát triển");
-            },
+          setSelectedDocument({
+            id: record.id,
+            title: record.title,
+            status: record.status,
           });
+          setIsUpdateStatusModalOpen(true);
         };
 
         const handleView = (e: React.MouseEvent) => {
@@ -244,6 +259,24 @@ export default function SuperAdminDocumentsUser() {
           });
         };
 
+        const handleDownload = (e: React.MouseEvent) => {
+          e.stopPropagation();
+          if (!record.fileUrl) {
+            message.warning("Không có file để tải xuống");
+            return;
+          }
+          // Tự động thêm Cloudflare R2 base URL nếu fileUrl không bắt đầu bằng http
+          const fullFileUrl = `${CLOUDFLARE_R2_BASE_URL}${record.fileUrl}`;
+          // Tạo link download
+          const link = document.createElement("a");
+          link.href = fullFileUrl;
+          link.download = record.title || "document";
+          link.target = "_blank";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
         return (
           <Space size={4}>
             <Button
@@ -255,21 +288,20 @@ export default function SuperAdminDocumentsUser() {
               Xem
             </Button>
             <Button
+              icon={<DownloadOutlined />}
+              size="small"
+              className="hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200"
+              onClick={handleDownload}
+            >
+              Tải xuống
+            </Button>
+            <Button
               icon={<EditOutlined />}
               size="small"
               className="hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300 transition-all duration-200"
               onClick={handleEdit}
             >
               Sửa
-            </Button>
-            <Button
-              icon={<DeleteOutlined />}
-              size="small"
-              danger
-              className="hover:bg-red-50 hover:border-red-400 transition-all duration-200"
-              onClick={handleDelete}
-            >
-              Xóa
             </Button>
           </Space>
         );
@@ -318,13 +350,11 @@ export default function SuperAdminDocumentsUser() {
           pageSize: pagination.pageSize,
           total: pagination.total,
           position: ["bottomRight"],
-          showSizeChanger: true,
+          showSizeChanger: false,
           showTotal: (total) => `Tổng ${total} tài liệu`,
-          pageSizeOptions: ["10", "20", "50"],
           className: "px-4 py-3",
           size: "small",
           onChange: handleTableChange,
-          onShowSizeChange: handleTableChange,
         }}
         className="news-table"
         rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
@@ -350,6 +380,23 @@ export default function SuperAdminDocumentsUser() {
           // Refresh danh sách tài liệu
           fetchDocuments();
         }}
+      />
+
+      <UpdateDocumentStatusModal
+        open={isUpdateStatusModalOpen}
+        onCancel={() => {
+          setIsUpdateStatusModalOpen(false);
+          setSelectedDocument(null);
+        }}
+        onSuccess={() => {
+          setIsUpdateStatusModalOpen(false);
+          setSelectedDocument(null);
+          // Refresh danh sách tài liệu
+          fetchDocuments();
+        }}
+        documentId={selectedDocument?.id || ""}
+        currentStatus={selectedDocument?.status}
+        documentTitle={selectedDocument?.title}
       />
     </div>
   );

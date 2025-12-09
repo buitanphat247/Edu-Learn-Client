@@ -114,3 +114,85 @@ export const getEventById = async (eventId: number | string): Promise<EventRespo
   }
 };
 
+export interface UpdateEventParams {
+  title: string;
+  description: string;
+  start_event_date: string;
+  end_event_date: string;
+  location: string;
+  created_by: number;
+}
+
+export interface UpdateEventResponse {
+  event_id: number;
+  title: string;
+  description: string;
+  start_event_date: string;
+  end_event_date: string;
+  location: string;
+  created_by: number;
+  creator: {
+    user_id: number;
+    username: string;
+    fullname: string;
+    email: string;
+    avatar: string;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UpdateEventApiResponse {
+  status: boolean;
+  message: string;
+  data: UpdateEventResponse;
+  statusCode: number;
+  timestamp: string;
+}
+
+export const updateEvent = async (eventId: number | string, params: UpdateEventParams): Promise<UpdateEventResponse> => {
+  try {
+    const id = typeof eventId === "string" ? parseInt(eventId, 10) : eventId;
+    
+    if (isNaN(id)) {
+      throw new Error("ID sự kiện không hợp lệ");
+    }
+
+    const response = await apiClient.patch<UpdateEventApiResponse>(
+      `/events/${id}`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.data.status && response.data.data) {
+      return response.data.data;
+    }
+
+    throw new Error(response.data.message || "Không thể cập nhật sự kiện");
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message || error?.message || "Không thể cập nhật sự kiện";
+    throw new Error(errorMessage);
+  }
+};
+
+export const deleteEvent = async (eventId: number | string): Promise<void> => {
+  try {
+    const id = typeof eventId === "string" ? parseInt(eventId, 10) : eventId;
+    
+    if (isNaN(id)) {
+      throw new Error("ID sự kiện không hợp lệ");
+    }
+
+    await apiClient.delete(`/events/${id}`);
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message || error?.message || "Không thể xóa sự kiện";
+    throw new Error(errorMessage);
+  }
+};
+

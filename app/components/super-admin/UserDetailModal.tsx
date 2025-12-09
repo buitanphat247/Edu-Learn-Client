@@ -57,9 +57,9 @@ export default function UserDetailModal({ open, onCancel, userDetail, loading = 
           <Spin size="small" />
         </div>
       ) : userDetail ? (
-        <div className="space-y-6">
+        <div className="space-y-3">
           {/* Avatar and Basic Info */}
-          <div className="flex items-center gap-6 pb-6 border-b border-gray-200">
+          <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
             <Avatar
               size={100}
               src={userDetail.avatar}
@@ -67,10 +67,10 @@ export default function UserDetailModal({ open, onCancel, userDetail, loading = 
               className="border-4 border-blue-100 shadow-lg"
             />
             <div className="flex-1">
-              <Title level={4} className="mb-2 text-gray-800" style={{ marginBottom: '0.5rem' }}>
+              <Title level={4} className=" text-gray-800" style={{ marginBottom: '0.5rem' }}>
                 {userDetail.fullname}
               </Title>
-              <Text type="secondary" className="text-base block mb-2">
+              <Text type="secondary" className="text-base block mb-1">
                 @{userDetail.username}
               </Text>
               <Tag color={roleInfo.color} className="px-3 py-1 text-sm font-semibold">

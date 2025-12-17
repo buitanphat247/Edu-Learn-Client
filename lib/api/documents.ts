@@ -30,6 +30,19 @@ export interface GetDocumentsResult {
   limit: number;
 }
 
+export interface GetDocumentsByUserParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export interface GetDocumentsByUserResult {
+  data: DocumentResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface DocumentsApiResponse {
   status: boolean;
   message: string;
@@ -58,6 +71,43 @@ export const getDocuments = async (params?: GetDocumentsParams): Promise<GetDocu
     }
 
     const response = await apiClient.get<DocumentsApiResponse>("/documents", {
+      params: requestParams,
+    });
+
+    if (response.data.status && response.data.data) {
+      return {
+        data: response.data.data.data || [],
+        total: response.data.data.total || 0,
+        page: response.data.data.page || 1,
+        limit: response.data.data.limit || 10,
+      };
+    }
+
+    throw new Error(response.data.message || "Không thể lấy danh sách tài liệu");
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || error?.message || "Không thể lấy danh sách tài liệu";
+    throw new Error(errorMessage);
+  }
+};
+
+export const getDocumentsByUser = async (
+  userId: number | string,
+  params?: GetDocumentsByUserParams
+): Promise<GetDocumentsByUserResult> => {
+  try {
+    const requestParams: Record<string, any> = {};
+
+    if (params?.page) {
+      requestParams.page = params.page;
+    }
+    if (params?.limit) {
+      requestParams.limit = params.limit;
+    }
+    if (params?.search) {
+      requestParams.search = params.search;
+    }
+
+    const response = await apiClient.get<DocumentsApiResponse>(`/documents/by-user/${userId}`, {
       params: requestParams,
     });
 

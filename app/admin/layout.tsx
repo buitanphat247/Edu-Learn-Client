@@ -16,7 +16,8 @@ const pageTitles: Record<string, string> = {
   "/admin/classes": "Quản lý Lớp học",
   "/admin/students": "Quản lý Học sinh",
   "/admin/class-chat": "Chat / Hỏi đáp",
-  "/admin/content": "Quản lý Nội dung",
+  "/admin/document-crawl": "Quản lý Tài liệu Crawl",
+  "/admin/documents-user": "Quản lý Tài liệu User",
 };
 
 function AdminHeader() {

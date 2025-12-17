@@ -1,35 +1,22 @@
 "use client";
 
-import { Table, Tag, Button, Space, Select, App, Input, Spin } from "antd";
-import {
-  SearchOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  UserOutlined,
-  DownloadOutlined,
-  ConsoleSqlOutlined,
-} from "@ant-design/icons";
+import { Table, Tag, Button, Space, App, Input } from "antd";
+import { SearchOutlined, EyeOutlined, PlusOutlined, DownloadOutlined } from "@ant-design/icons";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import type { ColumnsType } from "antd/es/table";
-import { getDocuments, type DocumentResponse } from "@/lib/api/documents";
+import { getDocumentsByUser, type DocumentResponse } from "@/lib/api/documents";
 import DocumentPreviewModal from "@/app/components/documents/DocumentPreviewModal";
 import { useDocumentPreview } from "@/app/components/documents/useDocumentPreview";
 import UploadDocumentModal from "@/app/components/super-admin/UploadDocumentModal";
-import UpdateDocumentStatusModal from "@/app/components/super-admin/UpdateDocumentStatusModal";
+import { getUserIdFromCookie } from "@/lib/utils/cookies";
 
-const { Option } = Select;
-
-// Cloudflare R2 Storage Base URL cho documents-user
+// Cloudflare R2 Storage Base URL dùng chung với super admin
 const CLOUDFLARE_R2_BASE_URL = "https://pub-3aaf3c9cd7694383ab5e47980be6dc67.r2.dev";
 
 interface DocumentType {
   key: string;
   id: string;
   title: string;
-  author: string;
   downloadCount: number;
   createdAt: string;
   fileUrl: string;
@@ -38,17 +25,15 @@ interface DocumentType {
   uploader: DocumentResponse["uploader"];
 }
 
-export default function SuperAdminDocumentsUser() {
-  const router = useRouter();
+export default function AdminDocumentsUser() {
   const { message } = App.useApp();
   const { previewDoc, openPreview, closePreview, handleAfterClose, isOpen } = useDocumentPreview();
+
   const [documents, setDocuments] = useState<DocumentType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<{ id: string; title: string; status?: string } | null>(null);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
@@ -59,7 +44,7 @@ export default function SuperAdminDocumentsUser() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-      setPagination((prev) => ({ ...prev, current: 1 })); // Reset to page 1 when search changes
+      setPagination((prev) => ({ ...prev, current: 1 }));
     }, 500);
 
     return () => clearTimeout(timer);
@@ -72,23 +57,28 @@ export default function SuperAdminDocumentsUser() {
     return extension.toUpperCase();
   };
 
-  // Fetch documents function để có thể gọi lại sau khi upload
+  // Fetch documents function để có thể gọi lại sau khi upload / cập nhật trạng thái
   const fetchDocuments = useCallback(async () => {
     const startTime = Date.now();
     try {
+      const userId = getUserIdFromCookie();
+      if (!userId) {
+        message.error("Không tìm thấy thông tin người dùng (cookie)");
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
-      const result = await getDocuments({
+      const result = await getDocumentsByUser(userId, {
         page: pagination.current,
         limit: pagination.pageSize,
         search: debouncedSearchQuery || undefined,
       });
 
-      // Map API response to component format
       const mappedDocuments: DocumentType[] = result.data.map((doc) => ({
         key: doc.document_id,
         id: doc.document_id,
         title: doc.title,
-        author: doc.uploader?.fullname || doc.uploader?.username || "N/A",
         downloadCount: doc.download_count || 0,
         createdAt: doc.created_at,
         fileUrl: doc.file_url,
@@ -97,7 +87,6 @@ export default function SuperAdminDocumentsUser() {
         uploader: doc.uploader,
       }));
 
-      // Ensure minimum loading time
       const elapsedTime = Date.now() - startTime;
       const minLoadingTime = 250;
       const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
@@ -109,19 +98,17 @@ export default function SuperAdminDocumentsUser() {
         total: result.total,
       }));
     } catch (error: any) {
-      // Ensure minimum loading time even on error
       const elapsedTime = Date.now() - startTime;
       const minLoadingTime = 250;
       const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
-      
+
       message.error(error?.message || "Không thể tải danh sách tài liệu");
     } finally {
       setLoading(false);
     }
   }, [pagination.current, pagination.pageSize, debouncedSearchQuery, message]);
 
-  // Fetch documents
   useEffect(() => {
     fetchDocuments();
   }, [fetchDocuments]);
@@ -136,7 +123,6 @@ export default function SuperAdminDocumentsUser() {
     });
   };
 
-  // Lấy màu Tag dựa trên trạng thái
   const getStatusColor = (status?: string): string => {
     if (!status) return "default";
     const statusLower = status.toLowerCase();
@@ -146,7 +132,6 @@ export default function SuperAdminDocumentsUser() {
     return "default";
   };
 
-  // Lấy text hiển thị cho trạng thái
   const getStatusText = (status?: string): string => {
     if (!status) return "N/A";
     const statusLower = status.toLowerCase();
@@ -156,152 +141,142 @@ export default function SuperAdminDocumentsUser() {
     return status;
   };
 
-  const columns: ColumnsType<DocumentType> = [
-    {
-      title: "STT",
-      dataIndex: "id",
-      key: "id",
-      width: 80,
-      render: (_: any, __: DocumentType, index: number) => {
-        const currentPage = pagination.current;
-        const pageSize = pagination.pageSize;
-        const stt = (currentPage - 1) * pageSize + index + 1;
-        return <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">{stt}</span>;
+  const columns: ColumnsType<DocumentType> = useMemo(
+    () => [
+      {
+        title: "STT",
+        dataIndex: "id",
+        key: "id",
+        width: 80,
+        render: (_: any, __: DocumentType, index: number) => {
+          const currentPage = pagination.current;
+          const pageSize = pagination.pageSize;
+          const stt = (currentPage - 1) * pageSize + index + 1;
+          return (
+            <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">
+              {stt}
+            </span>
+          );
+        },
       },
-    },
-    {
-      title: "Tiêu đề",
-      dataIndex: "title",
-      key: "title",
-      render: (text: string) => <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200">{text}</span>,
-    },
-    {
-      title: "Loại file",
-      dataIndex: "fileType",
-      key: "fileType",
-      width: 100,
-      render: (fileType: string) => (
-        <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color="default">
-          {fileType.toUpperCase()}
-        </Tag>
-      ),
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      width: 120,
-      render: (status: string) => (
-        <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color={getStatusColor(status)}>
-          {getStatusText(status)}
-        </Tag>
-      ),
-    },
-    {
-      title: "Lượt tải",
-      dataIndex: "downloadCount",
-      key: "downloadCount",
-      width: 100,
-      render: (count: number) => (
-        <div className="flex items-center gap-1 text-gray-600">
-          <DownloadOutlined />
-          <span>{count}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      width: 120,
-      render: (date: string) => <span className="text-gray-600">{formatDateTime(date)}</span>,
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      width: 200,
-      render: (_: any, record: DocumentType) => {
-        const handleEdit = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          setSelectedDocument({
-            id: record.id,
-            title: record.title,
-            status: record.status,
-          });
-          setIsUpdateStatusModalOpen(true);
-        };
-
-        const handleView = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (!record.fileUrl) {
-            message.warning("Không có file để xem");
-            return;
-          }
-          console.log(record);
-          // Tự động thêm Cloudflare R2 base URL nếu fileUrl không bắt đầu bằng http
-          const fullFileUrl = `${CLOUDFLARE_R2_BASE_URL}${record.fileUrl}`;
-          console.log(fullFileUrl);
-          openPreview({
-            title: record.title,
-            fileUrl: fullFileUrl,
-          });
-        };
-
-        const handleDownload = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (!record.fileUrl) {
-            message.warning("Không có file để tải xuống");
-            return;
-          }
-          // Tự động thêm Cloudflare R2 base URL nếu fileUrl không bắt đầu bằng http
-          const fullFileUrl = `${CLOUDFLARE_R2_BASE_URL}${record.fileUrl}`;
-          // Tạo link download
-          const link = document.createElement("a");
-          link.href = fullFileUrl;
-          link.download = record.title || "document";
-          link.target = "_blank";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        };
-
-        return (
-          <Space size={4}>
-            <Button
-              icon={<EyeOutlined />}
-              size="small"
-              className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
-              onClick={handleView}
-            >
-              Xem
-            </Button>
-            <Button
-              icon={<DownloadOutlined />}
-              size="small"
-              className="hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200"
-              onClick={handleDownload}
-            >
-              Tải xuống
-            </Button>
-            <Button
-              icon={<EditOutlined />}
-              size="small"
-              className="hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300 transition-all duration-200"
-              onClick={handleEdit}
-            >
-              Sửa
-            </Button>
-          </Space>
-        );
+      {
+        title: "Tiêu đề",
+        dataIndex: "title",
+        key: "title",
+        render: (text: string) => (
+          <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200">
+            {text}
+          </span>
+        ),
       },
-    },
-  ];
+      {
+        title: "Loại file",
+        dataIndex: "fileType",
+        key: "fileType",
+        width: 100,
+        render: (fileType: string) => (
+          <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color="default">
+            {fileType.toUpperCase()}
+          </Tag>
+        ),
+      },
+      {
+        title: "Trạng thái",
+        dataIndex: "status",
+        key: "status",
+        width: 120,
+        render: (status: string) => (
+          <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color={getStatusColor(status)}>
+            {getStatusText(status)}
+          </Tag>
+        ),
+      },
+      {
+        title: "Lượt tải",
+        dataIndex: "downloadCount",
+        key: "downloadCount",
+        width: 100,
+        render: (count: number) => (
+          <div className="flex items-center gap-1 text-gray-600">
+            <DownloadOutlined />
+            <span>{count}</span>
+          </div>
+        ),
+      },
+      {
+        title: "Ngày tạo",
+        dataIndex: "createdAt",
+        key: "createdAt",
+        width: 120,
+        render: (date: string) => (
+          <span className="text-gray-600">{formatDateTime(date)}</span>
+        ),
+      },
+      {
+        title: "Hành động",
+        key: "action",
+        width: 200,
+        render: (_: any, record: DocumentType) => {
+          const handleView = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            if (!record.fileUrl) {
+              message.warning("Không có file để xem");
+              return;
+            }
+            const fullFileUrl = `${CLOUDFLARE_R2_BASE_URL}${record.fileUrl}`;
+            openPreview({
+              title: record.title,
+              fileUrl: fullFileUrl,
+            });
+          };
+
+          const handleDownload = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            if (!record.fileUrl) {
+              message.warning("Không có file để tải xuống");
+              return;
+            }
+            const fullFileUrl = `${CLOUDFLARE_R2_BASE_URL}${record.fileUrl}`;
+            const link = document.createElement("a");
+            link.href = fullFileUrl;
+            link.download = record.title || "document";
+            link.target = "_blank";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          };
+
+          return (
+            <Space size={4}>
+              <Button
+                icon={<EyeOutlined />}
+                size="small"
+                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
+                onClick={handleView}
+              >
+                Xem
+              </Button>
+              <Button
+                icon={<DownloadOutlined />}
+                size="small"
+                className="hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200"
+                onClick={handleDownload}
+              >
+                Tải xuống
+              </Button>
+            </Space>
+          );
+        },
+      },
+    ],
+    [pagination.current, pagination.pageSize, message]
+  );
 
   const handleTableChange = (page: number, pageSize: number) => {
     setPagination((prev) => ({
       ...prev,
       current: page,
-      pageSize: pageSize,
+      pageSize,
     }));
   };
 
@@ -365,27 +340,11 @@ export default function SuperAdminDocumentsUser() {
         onCancel={() => setIsUploadModalOpen(false)}
         onSuccess={() => {
           setIsUploadModalOpen(false);
-          // Refresh danh sách tài liệu
           fetchDocuments();
         }}
-      />
-
-      <UpdateDocumentStatusModal
-        open={isUpdateStatusModalOpen}
-        onCancel={() => {
-          setIsUpdateStatusModalOpen(false);
-          setSelectedDocument(null);
-        }}
-        onSuccess={() => {
-          setIsUpdateStatusModalOpen(false);
-          setSelectedDocument(null);
-          // Refresh danh sách tài liệu
-          fetchDocuments();
-        }}
-        documentId={selectedDocument?.id || ""}
-        currentStatus={selectedDocument?.status}
-        documentTitle={selectedDocument?.title}
       />
     </div>
   );
 }
+
+

@@ -2,7 +2,6 @@
 
 import AdminSidebar from "../components/layout/AdminSidebar";
 import DashboardFooter from "../components/layout/DashboardFooter";
-import ProtectedRoute from "@/app/components/auth/ProtectedRoute";
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { BellOutlined, RobotOutlined } from "@ant-design/icons";
@@ -96,19 +95,19 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Authentication and authorization are handled by middleware.ts
+  // No need for client-side ProtectedRoute wrapper
   return (
-    <ProtectedRoute>
-      <div className="flex h-screen bg-gray-100 overflow-hidden">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <AdminHeader />
-          <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-            {children}
-          </main>
-          <DashboardFooter />
-        </div>
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
+      <AdminSidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <AdminHeader />
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+          {children}
+        </main>
+        <DashboardFooter />
       </div>
-    </ProtectedRoute>
+    </div>
   );
 }
 

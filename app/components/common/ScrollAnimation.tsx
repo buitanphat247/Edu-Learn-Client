@@ -22,6 +22,9 @@ export default function ScrollAnimation({
     // Reset visibility when delay changes (e.g., after pagination)
     setIsVisible(false);
     
+    const currentRef = ref.current;
+    if (!currentRef) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -39,14 +42,10 @@ export default function ScrollAnimation({
       }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    observer.observe(currentRef);
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
+      observer.disconnect();
     };
   }, [delay]);
 

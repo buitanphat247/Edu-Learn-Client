@@ -57,7 +57,6 @@ export default function VocabularyFeature() {
       const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
       
-      console.error("Error fetching folders:", error);
       message.error(error?.message || "Không thể tải danh sách folders");
       setFolders([]);
       setTotal(0);

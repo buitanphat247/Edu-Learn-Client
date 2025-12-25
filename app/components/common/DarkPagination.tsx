@@ -51,7 +51,7 @@ export default function DarkPagination({
           }
         }}
       >
-        <div className="bg-[#1e293b] px-4 py-2 rounded-xl shadow-lg border border-slate-700/50 [&_.ant-pagination-item]:text-white [&_.ant-pagination-item]:border-none! [&_.ant-pagination-item:hover]:border-none! [&_.ant-pagination-item-active]:bg-blue-600 [&_.ant-pagination-item-active]:border-none! [&_.ant-pagination-item-active_a]:text-white! [&_.ant-pagination-item-active_a]:font-semibold! [&_.ant-pagination-item_a]:text-white [&_.ant-pagination-prev]:text-white [&_.ant-pagination-next]:text-white [&_.ant-pagination-total-text]:text-slate-300">
+        <div className="bg-[#1e293b] px-4 py-2 rounded-xl shadow-lg border border-slate-700/50 [&_.ant-pagination-item]:text-white [&_.ant-pagination-item]:!border-none [&_.ant-pagination-item:hover]:!border-none [&_.ant-pagination-item-active]:bg-blue-600 [&_.ant-pagination-item-active]:!border-none [&_.ant-pagination-item-active_a]:!text-white [&_.ant-pagination-item-active_a]:!font-semibold [&_.ant-pagination-item_a]:text-white [&_.ant-pagination-prev]:text-white [&_.ant-pagination-next]:text-white [&_.ant-pagination-total-text]:text-slate-300">
           <Pagination
             current={current}
             total={total}

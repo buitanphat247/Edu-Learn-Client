@@ -69,10 +69,7 @@ function ClassStudentsTable({ students, onViewStudent, onRemoveStudent, onAddSin
                 icon={<StopOutlined />} 
                 size="small" 
                 danger 
-                onClick={() => {
-                  console.log(record);
-                  onBanStudent(record);
-                }} 
+                onClick={() => onBanStudent(record)} 
                 className="cursor-pointer"
               >
                 Cấm

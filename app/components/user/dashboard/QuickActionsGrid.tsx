@@ -30,7 +30,7 @@ export default function QuickActionsGrid({ items }: QuickActionsGridProps) {
             <div
               key={index}
               onClick={() => router.push(item.path)}
-              className={`flex flex-col items-center justify-center p-6 bg-linear-to-br ${item.gradient} rounded-xl cursor-pointer hover:scale-105 transition-all duration-200 border-2 ${item.borderColor} hover:${item.hoverBorderColor}`}
+              className={`flex flex-col items-center justify-center p-6 bg-gradient-to-br ${item.gradient} rounded-xl cursor-pointer hover:scale-105 transition-all duration-200 border-2 ${item.borderColor} hover:${item.hoverBorderColor}`}
             >
               <Icon className={`text-4xl ${item.iconColor} mb-3`} />
               <span className="font-semibold text-gray-800">{item.label}</span>

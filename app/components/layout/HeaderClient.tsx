@@ -5,9 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Button, Dropdown, Avatar } from "antd";
 import type { MenuProps } from "antd";
-import { UserOutlined, SettingOutlined } from "@ant-design/icons";
-import SignIn from "../auth/SignIn";
-import SignUp from "../auth/SignUp";
+import { UserOutlined } from "@ant-design/icons";
 import { getCurrentUser } from "@/lib/api/users";
 import { signOut } from "@/lib/api/auth";
 import type { AuthState } from "@/lib/utils/auth-server";
@@ -18,8 +16,6 @@ interface HeaderClientProps {
 }
 
 export default function HeaderClient({ initialAuth }: HeaderClientProps) {
-  const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const [isFeatureDropdownOpen, setIsFeatureDropdownOpen] = useState(false);
 
   // Helper to fix common UTF-8 encoding errors (Mojibake)
@@ -132,7 +128,7 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
       setAuthenticated(false);
       router.push("/");
     } catch (error) {
-      console.error("Logout error:", error);
+      // Logout error is handled silently - user is redirected anyway
     }
   };
 
@@ -153,22 +149,6 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
   return (
     <>
       <ScrollProgress />
-      <SignIn
-        open={isSignInOpen}
-        onCancel={() => setIsSignInOpen(false)}
-        onSwitchToSignUp={() => {
-          setIsSignInOpen(false);
-          setIsSignUpOpen(true);
-        }}
-      />
-      <SignUp
-        open={isSignUpOpen}
-        onCancel={() => setIsSignUpOpen(false)}
-        onSwitchToSignIn={() => {
-          setIsSignUpOpen(false);
-          setIsSignInOpen(true);
-        }}
-      />
       <header className="bg-[#001529] shadow-xl shadow-slate-800 sticky top-0 z-50 ">
         <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 group">

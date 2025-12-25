@@ -68,14 +68,14 @@ export default function DocumentSearchModal({ open, onClose, documents, onDocume
     }
   };
 
-  const getTypeColor = (type: string) => {
+  const getTypeColorClass = (type: string) => {
     switch (type) {
       case "word":
-        return "blue";
+        return "text-blue-600";
       case "pdf":
-        return "red";
+        return "text-red-600";
       default:
-        return "orange";
+        return "text-orange-600";
     }
   };
 
@@ -176,7 +176,7 @@ export default function DocumentSearchModal({ open, onClose, documents, onDocume
                             <UserOutlined />
                             {doc.author}
                           </span>
-                          <span className={`flex items-center gap-1 text-${getTypeColor(doc.type)}-600`}>
+                          <span className={`flex items-center gap-1 ${getTypeColorClass(doc.type)}`}>
                             <DownloadOutlined />
                             {doc.downloads} lượt tải
                           </span>

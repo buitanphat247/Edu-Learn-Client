@@ -120,7 +120,7 @@ export default function AIChatPanel({ open, onClose }: AIChatPanelProps) {
         }`}
       >
         {/* Header */}
-        <div className="h-16 bg-linear-to-r from-blue-600 to-purple-600 flex items-center justify-between px-4 shrink-0">
+          <div className="h-16 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-between px-4 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
               <RobotOutlined className="text-2xl text-blue-600" />
@@ -209,7 +209,7 @@ function AIMessageBubble({ text, time, sender }: AIMessageBubbleProps) {
   return (
     <div className={`flex gap-2 ${sender === "user" ? "justify-end" : "justify-start"}`}>
       {sender === "ai" && (
-        <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shrink-0 mt-1">
+        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shrink-0 mt-1">
           <RobotOutlined className="text-white text-sm" />
         </div>
       )}
@@ -217,7 +217,7 @@ function AIMessageBubble({ text, time, sender }: AIMessageBubbleProps) {
         <div
           className={`rounded-lg px-4 py-2.5 ${
             sender === "user"
-              ? "bg-linear-to-r from-blue-500 to-blue-600 text-white"
+              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
               : "bg-white text-gray-800 border border-gray-300 shadow-sm"
           }`}
         >

@@ -27,7 +27,8 @@ export default function CreatePostModal({ open, onClose, onPost }: CreatePostMod
       form.resetFields();
       setLoading(false);
     } catch (error) {
-      console.error("Validate failed:", error);
+      // Validation error is handled by Ant Design Form
+      setLoading(false);
     }
   };
 

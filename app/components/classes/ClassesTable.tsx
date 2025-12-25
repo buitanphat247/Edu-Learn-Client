@@ -164,7 +164,7 @@ export default function ClassesTable({ data, pagination, onEdit, onDelete }: Cla
             }
       }
       className="news-table"
-      rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+      rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
       size="small"
       style={{
         padding: "0",

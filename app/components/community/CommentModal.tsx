@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Avatar, Input, Button } from "antd";
 import { LikeOutlined, LikeFilled, CommentOutlined, SendOutlined } from "@ant-design/icons";
 import type { Comment } from "@/interface/common";
@@ -40,6 +40,20 @@ export default function CommentModal({
   const [isPostLiked, setIsPostLiked] = useState(false);
   const [postLikes, setPostLikes] = useState(initialLikes);
   const [comments, setComments] = useState<Comment[]>(initialComments);
+
+  // Sync state with props when modal opens
+  useEffect(() => {
+    if (open) {
+      setPostLikes(initialLikes);
+      setComments(initialComments);
+      setIsPostLiked(false);
+      setLikedComments(new Set());
+      setCommentLikes({});
+      setNewComment("");
+      setReplyingTo(null);
+      setReplyContent("");
+    }
+  }, [open, initialLikes, initialComments]);
 
   const handleSubmitComment = () => {
     if (newComment.trim()) {

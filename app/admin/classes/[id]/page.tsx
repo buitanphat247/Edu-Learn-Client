@@ -23,7 +23,7 @@ import {
 } from "@/lib/api/classes";
 import type { StudentItem } from "@/interface/students";
 import { ensureMinLoadingTime, STUDENT_STATUS_MAP, CLASS_STATUS_MAP, formatStudentId } from "@/lib/utils/classUtils";
-import { FileTextOutlined, BellOutlined, FileOutlined, UserOutlined } from "@ant-design/icons";
+import { FileTextOutlined, BellOutlined, FileOutlined, UserOutlined, ExperimentOutlined } from "@ant-design/icons";
 
 export default function ClassDetail() {
   const router = useRouter();
@@ -315,7 +315,7 @@ export default function ClassDetail() {
   }, [router, classId]);
 
   const handleAddMultiple = useCallback(() => {
-    router.push(`/admin/classes/${classId}/create`);
+    router.push(`/admin/classes/${classId}/multiple-create`);
   }, [router, classId]);
 
   const handleViewBannedList = useCallback(() => {
@@ -490,6 +490,20 @@ export default function ClassDetail() {
             children: (
               <div className="bg-white rounded-lg p-6 border border-gray-200">
                 <p className="text-gray-500 text-center py-8">Danh sách tài liệu sẽ được hiển thị ở đây</p>
+              </div>
+            ),
+          },
+          {
+            key: "exams",
+            label: (
+              <span>
+                <ExperimentOutlined className="mr-2" />
+                Kỳ thi
+              </span>
+            ),
+            children: (
+              <div className="bg-white rounded-lg p-6 border border-gray-200">
+                <p className="text-gray-500 text-center py-8">Danh sách kỳ thi sẽ được hiển thị ở đây</p>
               </div>
             ),
           },

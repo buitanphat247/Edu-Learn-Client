@@ -61,7 +61,6 @@ export default function ListeningFeature() {
       const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
       
-      console.error("Error fetching lessons:", error);
       message.error(error?.message || "Không thể tải danh sách lessons");
       setLessons([]);
       setTotal(0);

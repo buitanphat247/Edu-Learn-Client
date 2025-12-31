@@ -8,14 +8,24 @@ export interface CreateNotificationParams {
   created_by?: number;
 }
 
+export interface NotificationCreator {
+  user_id: number | string;
+  username: string;
+  fullname: string;
+  email: string;
+  avatar?: string | null;
+}
+
 export interface NotificationResponse {
-  notification_id: number;
+  notification_id: number | string;
   title: string;
   message: string;
   scope: "all" | "user" | "class";
-  scope_id: number | null;
+  scope_id: number | string | null;
+  created_by?: number | string;
   created_at: string;
   updated_at: string;
+  creator?: NotificationCreator;
 }
 
 export interface UpdateNotificationParams {
@@ -238,6 +248,58 @@ export const deleteNotification = async (notificationId: number | string): Promi
   } catch (error: any) {
     const errorMessage =
       error?.response?.data?.message || error?.message || "Không thể xóa thông báo";
+    throw new Error(errorMessage);
+  }
+};
+
+export interface GetNotificationsByScopeIdParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export interface GetNotificationsByScopeIdResult {
+  data: NotificationResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export const getNotificationsByScopeId = async (
+  scopeId: number | string,
+  params?: GetNotificationsByScopeIdParams
+): Promise<GetNotificationsByScopeIdResult> => {
+  try {
+    const numericId = typeof scopeId === "string" ? parseInt(scopeId, 10) : scopeId;
+    if (Number.isNaN(numericId)) {
+      throw new Error("Scope ID không hợp lệ");
+    }
+
+    const requestParams: Record<string, any> = {
+      page: params?.page ?? 1,
+      limit: params?.limit ?? 10,
+    };
+
+    if (params?.search && params.search.trim()) {
+      requestParams.search = params.search.trim();
+    }
+
+    const response = await apiClient.get(`/notifications/by-scope-id/${numericId}`, {
+      params: requestParams,
+    });
+
+    const responseData = response.data?.data || response.data || {};
+    const list = Array.isArray(responseData.data) ? responseData.data : Array.isArray(responseData) ? responseData : [];
+
+    return {
+      data: list,
+      total: responseData.total ?? 0,
+      page: responseData.page ?? params?.page ?? 1,
+      limit: responseData.limit ?? params?.limit ?? 10,
+    };
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message || error?.message || "Không thể lấy danh sách thông báo";
     throw new Error(errorMessage);
   }
 };

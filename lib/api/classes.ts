@@ -237,11 +237,21 @@ export interface GetClassByIdApiResponse {
   timestamp: string;
 }
 
-export const getClassById = async (classId: number | string): Promise<ClassDetailResponse> => {
+export const getClassById = async (classId: number | string, userId?: number | string): Promise<ClassDetailResponse> => {
   try {
     const id = typeof classId === "string" ? classId : String(classId);
     
-    const response = await apiClient.get<GetClassByIdApiResponse>(`/classes/${id}`);
+    const params: Record<string, any> = {};
+    if (userId !== undefined) {
+      const numericUserId = typeof userId === "string" ? Number(userId) : userId;
+      if (!isNaN(numericUserId)) {
+        params.userId = numericUserId;
+      }
+    }
+    
+    const response = await apiClient.get<GetClassByIdApiResponse>(`/classes/${id}`, {
+      params,
+    });
     
     if (response.data.status && response.data.data) {
       return response.data.data;
@@ -595,6 +605,76 @@ export const getBannedStudents = async (params: GetBannedStudentsParams): Promis
     return [];
   } catch (error: any) {
     const errorMessage = error?.response?.data?.message || error?.message || "Không thể lấy danh sách học sinh bị cấm";
+    throw new Error(errorMessage);
+  }
+};
+
+// Get class students by user ID
+export interface GetClassStudentsByUserParams {
+  userId: number | string;
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export interface GetClassStudentsByUserApiResponse {
+  status: boolean;
+  message: string;
+  data: {
+    data: ClassStudentRecord[];
+    total: number;
+    page: number;
+    limit: number;
+  };
+  statusCode: number;
+  timestamp: string;
+}
+
+export interface GetClassStudentsByUserResult {
+  classes: ClassStudentRecord[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export const getClassStudentsByUser = async (params: GetClassStudentsByUserParams): Promise<GetClassStudentsByUserResult> => {
+  try {
+    const userId = typeof params.userId === "string" ? Number(params.userId) : params.userId;
+
+    const requestParams: Record<string, any> = {
+      page: params.page || 1,
+      limit: params.limit || 10,
+    };
+
+    // Add search parameter if provided
+    if (params.search && params.search.trim()) {
+      requestParams.search = params.search.trim();
+    }
+
+    const response = await apiClient.get<GetClassStudentsByUserApiResponse>(
+      `/class-students/by-user/${userId}`,
+      {
+        params: requestParams,
+      }
+    );
+
+    const apiResponse = response.data;
+
+    if (apiResponse.status && apiResponse.data) {
+      // API trả về nested structure: data.data là array, data.total, data.page, data.limit
+      const responseData = apiResponse.data;
+      
+      return {
+        classes: responseData.data || [],
+        total: responseData.total || 0,
+        page: responseData.page || params.page || 1,
+        limit: responseData.limit || params.limit || 10,
+      };
+    }
+
+    throw new Error(apiResponse.message || "Không thể lấy danh sách lớp học");
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || error?.message || "Không thể lấy danh sách lớp học";
     throw new Error(errorMessage);
   }
 };

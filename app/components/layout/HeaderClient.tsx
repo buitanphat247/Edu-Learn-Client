@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Button, Dropdown, Avatar } from "antd";
 import type { MenuProps } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, AppstoreOutlined } from "@ant-design/icons";
 import { getCurrentUser } from "@/lib/api/users";
 import { signOut } from "@/lib/api/auth";
 import type { AuthState } from "@/lib/utils/auth-server";
@@ -132,19 +132,50 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
     }
   };
 
-  const userMenuItems: MenuProps["items"] = user
-    ? [
-        {
-          key: "profile",
-          label: <Link href="/profile">Hồ sơ</Link>,
-        },
-        {
-          key: "logout",
-          label: "Đăng xuất",
-          onClick: handleLogout,
-        },
-      ]
-    : [];
+  // Get user role label
+  const getUserRoleLabel = () => {
+    if (!user) return "Thành viên";
+    
+    const roleId = user.role_id || user.role?.role_id;
+    const roleName = user.role?.role_name?.toLowerCase() || "";
+    
+    // Check by role_id
+    if (roleId === 3 || roleName === "student" || roleName === "học sinh") {
+      return "Học sinh";
+    }
+    if (roleId === 2 || roleName === "teacher" || roleName === "giáo viên" || roleName === "giảng viên") {
+      return "Giáo viên";
+    }
+    if (roleId === 1 || roleName === "admin" || roleName === "super admin") {
+      return "Quản trị viên";
+    }
+    
+    return "Thành viên";
+  };
+
+  // Get role dashboard path
+  const getRoleDashboardPath = () => {
+    if (!user) return null;
+    
+    const roleId = user.role_id || user.role?.role_id;
+    const roleName = user.role?.role_name?.toLowerCase() || "";
+    
+    // Check by role_id
+    if (roleId === 3 || roleName === "student" || roleName === "học sinh") {
+      return "/user";
+    }
+    if (roleId === 2 || roleName === "teacher" || roleName === "giáo viên" || roleName === "giảng viên") {
+      return "/admin";
+    }
+    if (roleId === 1 || roleName === "admin" || roleName === "super admin") {
+      return "/super-admin";
+    }
+    
+    return null;
+  };
+
+  const userRoleLabel = getUserRoleLabel();
+  const roleDashboardPath = getRoleDashboardPath();
 
   return (
     <>
@@ -223,9 +254,9 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
                     {
                       key: 'user-info',
                       label: (
-                        <div className="flex flex-col px-2 py-2 cursor-default">
+                        <div className="flex flex-col  cursor-default">
                           <span className="font-semibold text-white text-base leading-tight">{fixUtf8(user.fullname || user.username)}</span>
-                          <span className="text-xs text-slate-400 mt-0.5">Thành viên</span>
+                          <span className="text-xs text-slate-400 mt-0.5">{userRoleLabel}</span>
                         </div>
                       ),
                       style: { cursor: 'default', backgroundColor: 'transparent', padding: '8px 12px' },
@@ -238,6 +269,16 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
                       label: <Link href="/profile" className="text-slate-200 hover:text-white">Hồ sơ cá nhân</Link>,
                       style: { padding: '10px 16px' },
                     },
+                    ...(roleDashboardPath ? [{
+                      key: "dashboard",
+                      icon: <AppstoreOutlined className="text-slate-300" />,
+                      label: (
+                        <Link href={roleDashboardPath} className="text-slate-200 hover:text-white">
+                          {userRoleLabel}
+                        </Link>
+                      ),
+                      style: { padding: '10px 16px' },
+                    }] : []),
                     {
                       key: "logout",
                       icon: (
@@ -273,7 +314,7 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
                         {fixUtf8(user.fullname || user.username)}
                      </div>
                      <div className="text-[10px] text-blue-100 font-medium opacity-80 uppercase tracking-widest">
-                        Tài khoản
+                        {userRoleLabel.toUpperCase()}
                      </div>
                   </div>
                   <svg className="w-4 h-4 text-blue-100 group-hover:rotate-180 transition-transform duration-300 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">

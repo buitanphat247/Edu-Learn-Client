@@ -98,7 +98,9 @@ export default function AdminClasses() {
   const handleEdit = async (classItem: ClassItem) => {
     try {
       // Fetch class detail để lấy đầy đủ thông tin
-      const classDetail = await getClassById(classItem.key);
+      const userId = getUserIdFromCookie();
+      const numericUserId = userId ? (typeof userId === "string" ? Number(userId) : userId) : undefined;
+      const classDetail = await getClassById(classItem.key, numericUserId);
       setOriginalClassData(classDetail);
       setSelectedClass(classItem);
       setIsEditModalOpen(true);

@@ -1,0 +1,188 @@
+"filename", "language", "TypeScript", "JSON with Comments", "XML", "HTML", "JSON", "JavaScript", "TypeScript JSX", "CSS", "comment", "blank", "total"
+"e:\Workspace\Edu_Learn_Next\LMS_Cheating_Prevention_Report.md", "HTML", 0, 0, 0, 259, 0, 0, 0, 0, 0, 57, 316
+"e:\Workspace\Edu_Learn_Next\MIGRATION_SUMMARY.md", "HTML", 0, 0, 0, 192, 0, 0, 0, 0, 0, 49, 241
+"e:\Workspace\Edu_Learn_Next\NEXTJS_MIGRATION_COMPLETE.md", "HTML", 0, 0, 0, 163, 0, 0, 0, 0, 0, 30, 193
+"e:\Workspace\Edu_Learn_Next\README.md", "HTML", 0, 0, 0, 23, 0, 0, 0, 0, 0, 14, 37
+"e:\Workspace\Edu_Learn_Next\app\(root)\about\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 277, 0, 14, 15, 306
+"e:\Workspace\Edu_Learn_Next\app\(root)\events\mock_data.ts", "TypeScript", 142, 0, 0, 0, 0, 0, 0, 0, 0, 12, 154
+"e:\Workspace\Edu_Learn_Next\app\(root)\events\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 203, 0, 10, 24, 237
+"e:\Workspace\Edu_Learn_Next\app\(root)\features\[type]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 25, 0, 0, 7, 32
+"e:\Workspace\Edu_Learn_Next\app\(root)\features\constants.ts", "TypeScript", 12, 0, 0, 0, 0, 0, 0, 0, 0, 3, 15
+"e:\Workspace\Edu_Learn_Next\app\(root)\features\listening\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 520, 0, 48, 69, 637
+"e:\Workspace\Edu_Learn_Next\app\(root)\features\vocabulary\[folderId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 412, 0, 15, 35, 462
+"e:\Workspace\Edu_Learn_Next\app\(root)\features\vocabulary\flashcard\[folderId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 335, 0, 7, 33, 375
+"e:\Workspace\Edu_Learn_Next\app\(root)\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 15, 0, 0, 3, 18
+"e:\Workspace\Edu_Learn_Next\app\(root)\news\[id]\mock_data.ts", "TypeScript", 121, 0, 0, 0, 0, 0, 0, 0, 2, 13, 136
+"e:\Workspace\Edu_Learn_Next\app\(root)\news\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 186, 0, 5, 22, 213
+"e:\Workspace\Edu_Learn_Next\app\(root)\news\mock_data.ts", "TypeScript", 100, 0, 0, 0, 0, 0, 0, 0, 0, 9, 109
+"e:\Workspace\Edu_Learn_Next\app\(root)\news\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 118, 0, 2, 12, 132
+"e:\Workspace\Edu_Learn_Next\app\(root)\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 42, 0, 10, 4, 56
+"e:\Workspace\Edu_Learn_Next\app\(root)\profile\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 216, 0, 11, 29, 256
+"e:\Workspace\Edu_Learn_Next\app\admin\classes\[id]\examinate\editor\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 1338, 0, 59, 100, 1497
+"e:\Workspace\Edu_Learn_Next\app\admin\classes\[id]\examinate\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 579, 0, 10, 28, 617
+"e:\Workspace\Edu_Learn_Next\app\admin\classes\[id]\exercise-create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 505, 0, 20, 46, 571
+"e:\Workspace\Edu_Learn_Next\app\admin\classes\[id]\multiple-create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 80, 0, 0, 13, 93
+"e:\Workspace\Edu_Learn_Next\app\admin\classes\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 1798, 0, 62, 164, 2024
+"e:\Workspace\Edu_Learn_Next\app\admin\classes\[id]\single-create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 205, 0, 0, 25, 230
+"e:\Workspace\Edu_Learn_Next\app\admin\classes\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 165, 0, 10, 21, 196
+"e:\Workspace\Edu_Learn_Next\app\admin\document-crawl\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 312, 0, 19, 32, 363
+"e:\Workspace\Edu_Learn_Next\app\admin\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 96, 0, 5, 13, 114
+"e:\Workspace\Edu_Learn_Next\app\admin\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 155, 0, 4, 12, 171
+"e:\Workspace\Edu_Learn_Next\app\admin\students\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 111, 0, 11, 15, 137
+"e:\Workspace\Edu_Learn_Next\app\admin\students\handle\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 10, 0, 1, 6, 17
+"e:\Workspace\Edu_Learn_Next\app\admin\students\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 257, 0, 6, 20, 283
+"e:\Workspace\Edu_Learn_Next\app\api\v1\route.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"e:\Workspace\Edu_Learn_Next\app\auth\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 7, 0, 0, 1, 8
+"e:\Workspace\Edu_Learn_Next\app\auth\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 331, 0, 4, 41, 376
+"e:\Workspace\Edu_Learn_Next\app\components\classes\BannedListModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 174, 0, 10, 22, 206
+"e:\Workspace\Edu_Learn_Next\app\components\classes\ClassHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 31, 0, 0, 6, 37
+"e:\Workspace\Edu_Learn_Next\app\components\classes\ClassInfoCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 97, 0, 0, 9, 106
+"e:\Workspace\Edu_Learn_Next\app\components\classes\ClassStudentsTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 134, 0, 0, 9, 143
+"e:\Workspace\Edu_Learn_Next\app\components\classes\ClassesHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 36, 0, 1, 4, 41
+"e:\Workspace\Edu_Learn_Next\app\components\classes\ClassesTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 167, 0, 0, 8, 175
+"e:\Workspace\Edu_Learn_Next\app\components\classes\CreateClassModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 109, 0, 2, 15, 126
+"e:\Workspace\Edu_Learn_Next\app\components\classes\UpdateClassModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 104, 0, 0, 12, 116
+"e:\Workspace\Edu_Learn_Next\app\components\common\CSVUploadForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 370, 0, 13, 45, 428
+"e:\Workspace\Edu_Learn_Next\app\components\common\CustomCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 65, 0, 0, 6, 71
+"e:\Workspace\Edu_Learn_Next\app\components\common\DarkConfigProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 40, 0, 0, 5, 45
+"e:\Workspace\Edu_Learn_Next\app\components\common\DarkPagination.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 65, 0, 0, 5, 70
+"e:\Workspace\Edu_Learn_Next\app\components\common\ScrollAnimation.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 69, 0, 1, 12, 82
+"e:\Workspace\Edu_Learn_Next\app\components\community\CommentModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 278, 0, 9, 17, 304
+"e:\Workspace\Edu_Learn_Next\app\components\community\CommunityHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 42, 0, 0, 5, 47
+"e:\Workspace\Edu_Learn_Next\app\components\community\CommunitySearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 124, 0, 4, 10, 138
+"e:\Workspace\Edu_Learn_Next\app\components\community\CreatePostModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 90, 0, 2, 8, 100
+"e:\Workspace\Edu_Learn_Next\app\components\community\PostCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 88, 0, 0, 7, 95
+"e:\Workspace\Edu_Learn_Next\app\components\community\ShareModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 127, 0, 4, 13, 144
+"e:\Workspace\Edu_Learn_Next\app\components\content\getViewerUrl.ts", "TypeScript", 7, 0, 0, 0, 0, 0, 0, 0, 7, 3, 17
+"e:\Workspace\Edu_Learn_Next\app\components\documents\CardDocument.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 83, 0, 5, 9, 97
+"e:\Workspace\Edu_Learn_Next\app\components\documents\DocumentPreviewModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 45, 0, 5, 6, 56
+"e:\Workspace\Edu_Learn_Next\app\components\documents\DocumentSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 185, 0, 5, 14, 204
+"e:\Workspace\Edu_Learn_Next\app\components\documents\DocumentsHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 27, 0, 1, 5, 33
+"e:\Workspace\Edu_Learn_Next\app\components\documents\index.ts", "TypeScript", 4, 0, 0, 0, 0, 0, 0, 0, 3, 4, 11
+"e:\Workspace\Edu_Learn_Next\app\components\documents\useDocumentPreview.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 27, 0, 6, 9, 42
+"e:\Workspace\Edu_Learn_Next\app\components\events\EventCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 63, 0, 6, 12, 81
+"e:\Workspace\Edu_Learn_Next\app\components\events\EventDetailModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 111, 0, 0, 11, 122
+"e:\Workspace\Edu_Learn_Next\app\components\features\FeaturesHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 17, 0, 0, 3, 20
+"e:\Workspace\Edu_Learn_Next\app\components\features\listening\ListeningFeature.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 179, 0, 5, 14, 198
+"e:\Workspace\Edu_Learn_Next\app\components\features\translator\TranslatorFeature.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 215, 0, 8, 23, 246
+"e:\Workspace\Edu_Learn_Next\app\components\features\vocabulary\VocabularyFeature.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 121, 0, 4, 14, 139
+"e:\Workspace\Edu_Learn_Next\app\components\features\writing\WritingFeature.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 325, 0, 6, 14, 345
+"e:\Workspace\Edu_Learn_Next\app\components\form\FormActions.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 45, 0, 0, 4, 49
+"e:\Workspace\Edu_Learn_Next\app\components\form\PageHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 21, 0, 0, 5, 26
+"e:\Workspace\Edu_Learn_Next\app\components\home\CallToAction.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 47, 0, 1, 10, 58
+"e:\Workspace\Edu_Learn_Next\app\components\home\Events.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 103, 0, 1, 11, 115
+"e:\Workspace\Edu_Learn_Next\app\components\home\Features.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 80, 0, 1, 10, 91
+"e:\Workspace\Edu_Learn_Next\app\components\home\Hero.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 79, 0, 4, 10, 93
+"e:\Workspace\Edu_Learn_Next\app\components\home\Integrations.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 55, 0, 1, 7, 63
+"e:\Workspace\Edu_Learn_Next\app\components\home\News.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 72, 0, 1, 8, 81
+"e:\Workspace\Edu_Learn_Next\app\components\home\Stats.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 65, 0, 0, 4, 69
+"e:\Workspace\Edu_Learn_Next\app\components\home\Testimonials.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 68, 0, 2, 8, 78
+"e:\Workspace\Edu_Learn_Next\app\components\home\ValueProps.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 87, 0, 6, 7, 100
+"e:\Workspace\Edu_Learn_Next\app\components\import_export\ImportExportConfig.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 134, 0, 7, 17, 158
+"e:\Workspace\Edu_Learn_Next\app\components\layout\AIChatPanel.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 207, 0, 9, 31, 247
+"e:\Workspace\Edu_Learn_Next\app\components\layout\AdminSidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 81, 0, 3, 7, 91
+"e:\Workspace\Edu_Learn_Next\app\components\layout\DashboardFooter.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 37, 0, 1, 7, 45
+"e:\Workspace\Edu_Learn_Next\app\components\layout\Footer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 107, 0, 0, 6, 113
+"e:\Workspace\Edu_Learn_Next\app\components\layout\Header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 6, 0, 0, 3, 9
+"e:\Workspace\Edu_Learn_Next\app\components\layout\HeaderClient.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 293, 0, 9, 36, 338
+"e:\Workspace\Edu_Learn_Next\app\components\layout\NotificationPanel.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 167, 0, 5, 13, 185
+"e:\Workspace\Edu_Learn_Next\app\components\layout\ScrollProgress.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 33, 0, 3, 11, 47
+"e:\Workspace\Edu_Learn_Next\app\components\layout\SuperAdminSidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 97, 0, 4, 10, 111
+"e:\Workspace\Edu_Learn_Next\app\components\layout\UserSidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 60, 0, 3, 8, 71
+"e:\Workspace\Edu_Learn_Next\app\components\listening\LessonCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 98, 0, 4, 9, 111
+"e:\Workspace\Edu_Learn_Next\app\components\news\NewsCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 110, 0, 9, 16, 135
+"e:\Workspace\Edu_Learn_Next\app\components\news\NewsFormHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 30, 0, 0, 5, 35
+"e:\Workspace\Edu_Learn_Next\app\components\students\BannedStudentModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 101, 0, 3, 8, 112
+"e:\Workspace\Edu_Learn_Next\app\components\students\StudentDetailModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 183, 0, 8, 16, 207
+"e:\Workspace\Edu_Learn_Next\app\components\students\StudentsHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 35, 0, 1, 5, 41
+"e:\Workspace\Edu_Learn_Next\app\components\students\StudentsSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 123, 0, 4, 10, 137
+"e:\Workspace\Edu_Learn_Next\app\components\students\StudentsTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 155, 0, 0, 8, 163
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\CreateNotificationModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 107, 0, 0, 14, 121
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\EditNotificationModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 130, 0, 0, 16, 146
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\EventDetailModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 220, 0, 2, 19, 241
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\NotificationDetailModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 117, 0, 0, 19, 136
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\UpdateDocumentStatusModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 105, 0, 2, 11, 118
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\UpdateEventModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 150, 0, 2, 16, 168
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\UpdateUserStatusModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 104, 0, 2, 11, 117
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\UploadDocumentModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 150, 0, 1, 17, 168
+"e:\Workspace\Edu_Learn_Next\app\components\super-admin\UserDetailModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 180, 0, 2, 16, 198
+"e:\Workspace\Edu_Learn_Next\app\components\user\UserHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 74, 0, 3, 12, 89
+"e:\Workspace\Edu_Learn_Next\app\components\user\chat\ChatHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 23, 0, 0, 4, 27
+"e:\Workspace\Edu_Learn_Next\app\components\user\chat\ConversationItem.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 47, 0, 0, 4, 51
+"e:\Workspace\Edu_Learn_Next\app\components\user\chat\MessageBubble.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 27, 0, 0, 3, 30
+"e:\Workspace\Edu_Learn_Next\app\components\user\classes\ClassListItem.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 46, 0, 0, 5, 51
+"e:\Workspace\Edu_Learn_Next\app\components\user\classes\UpcomingClassesList.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 40, 0, 0, 5, 45
+"e:\Workspace\Edu_Learn_Next\app\components\user\dashboard\ProgressCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 0, 5, 43
+"e:\Workspace\Edu_Learn_Next\app\components\user\dashboard\QuickActionCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 15, 0, 0, 4, 19
+"e:\Workspace\Edu_Learn_Next\app\components\user\dashboard\QuickActionsGrid.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 0, 6, 44
+"e:\Workspace\Edu_Learn_Next\app\components\user\dashboard\StatCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 15, 0, 0, 4, 19
+"e:\Workspace\Edu_Learn_Next\app\components\user\dashboard\UserStatisticsCards.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 35, 0, 0, 5, 40
+"e:\Workspace\Edu_Learn_Next\app\components\user\dashboard\UserWelcomeBanner.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 19, 0, 0, 3, 22
+"e:\Workspace\Edu_Learn_Next\app\components\user\exercises\ExerciseListItem.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 0, 4, 42
+"e:\Workspace\Edu_Learn_Next\app\components\user\exercises\RecentExercisesList.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 58, 0, 0, 6, 64
+"e:\Workspace\Edu_Learn_Next\app\components\user\exercises\UserExercisesHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 42, 0, 1, 6, 49
+"e:\Workspace\Edu_Learn_Next\app\components\user\exercises\UserExercisesSearchModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 122, 0, 4, 10, 136
+"e:\Workspace\Edu_Learn_Next\app\components\user\exercises\UserExercisesTable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 98, 0, 0, 6, 104
+"e:\Workspace\Edu_Learn_Next\app\components\user\grades\GradeStatCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 40, 0, 0, 5, 45
+"e:\Workspace\Edu_Learn_Next\app\components\user\grades\UserGradesHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 60, 0, 1, 6, 67
+"e:\Workspace\Edu_Learn_Next\app\components\vocabulary\VocabularyCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 43, 0, 6, 13, 62
+"e:\Workspace\Edu_Learn_Next\app\config\api.ts", "TypeScript", 246, 0, 0, 0, 0, 0, 0, 0, 0, 45, 291
+"e:\Workspace\Edu_Learn_Next\app\globals.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 332, 14, 65, 411
+"e:\Workspace\Edu_Learn_Next\app\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 44, 0, 0, 4, 48
+"e:\Workspace\Edu_Learn_Next\app\not-found.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 88, 0, 6, 9, 103
+"e:\Workspace\Edu_Learn_Next\app\providers.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 20, 0, 0, 4, 24
+"e:\Workspace\Edu_Learn_Next\app\super-admin\accounts\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 411, 0, 16, 50, 477
+"e:\Workspace\Edu_Learn_Next\app\super-admin\accounts\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 489, 0, 16, 48, 553
+"e:\Workspace\Edu_Learn_Next\app\super-admin\all\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 329, 0, 8, 30, 367
+"e:\Workspace\Edu_Learn_Next\app\super-admin\documents-crawl\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 331, 0, 19, 38, 388
+"e:\Workspace\Edu_Learn_Next\app\super-admin\documents-user\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 349, 0, 15, 28, 392
+"e:\Workspace\Edu_Learn_Next\app\super-admin\events\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 137, 0, 8, 21, 166
+"e:\Workspace\Edu_Learn_Next\app\super-admin\events\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 517, 0, 11, 48, 576
+"e:\Workspace\Edu_Learn_Next\app\super-admin\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 88, 0, 2, 9, 99
+"e:\Workspace\Edu_Learn_Next\app\super-admin\notification\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 321, 0, 6, 26, 353
+"e:\Workspace\Edu_Learn_Next\app\super-admin\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 234, 0, 1, 16, 251
+"e:\Workspace\Edu_Learn_Next\app\super-admin\posts\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 248, 0, 0, 17, 265
+"e:\Workspace\Edu_Learn_Next\app\user\chat\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 19, 0, 0, 4, 23
+"e:\Workspace\Edu_Learn_Next\app\user\chat\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 369, 0, 17, 22, 408
+"e:\Workspace\Edu_Learn_Next\app\user\classes\[id]\announcements\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 169, 0, 9, 17, 195
+"e:\Workspace\Edu_Learn_Next\app\user\classes\[id]\documents\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 195, 0, 11, 17, 223
+"e:\Workspace\Edu_Learn_Next\app\user\classes\[id]\exams\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 86, 0, 4, 8, 98
+"e:\Workspace\Edu_Learn_Next\app\user\classes\[id]\exercises\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 82, 0, 4, 10, 96
+"e:\Workspace\Edu_Learn_Next\app\user\classes\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 333, 0, 15, 27, 375
+"e:\Workspace\Edu_Learn_Next\app\user\classes\[id]\schedule\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 242, 0, 12, 24, 278
+"e:\Workspace\Edu_Learn_Next\app\user\classes\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 170, 0, 5, 19, 194
+"e:\Workspace\Edu_Learn_Next\app\user\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 22, 0, 2, 4, 28
+"e:\Workspace\Edu_Learn_Next\app\user\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 80, 0, 4, 11, 95
+"e:\Workspace\Edu_Learn_Next\eslint.config.mjs", "JavaScript", 0, 0, 0, 0, 0, 14, 0, 0, 2, 3, 19
+"e:\Workspace\Edu_Learn_Next\interface\auth.ts", "TypeScript", 69, 0, 0, 0, 0, 0, 0, 0, 0, 9, 78
+"e:\Workspace\Edu_Learn_Next\interface\chat.ts", "TypeScript", 39, 0, 0, 0, 0, 0, 0, 0, 0, 5, 44
+"e:\Workspace\Edu_Learn_Next\interface\classes.ts", "TypeScript", 24, 0, 0, 0, 0, 0, 0, 0, 1, 3, 28
+"e:\Workspace\Edu_Learn_Next\interface\common.ts", "TypeScript", 9, 0, 0, 0, 0, 0, 0, 0, 0, 2, 11
+"e:\Workspace\Edu_Learn_Next\interface\exercises.ts", "TypeScript", 18, 0, 0, 0, 0, 0, 0, 0, 0, 3, 21
+"e:\Workspace\Edu_Learn_Next\interface\students.ts", "TypeScript", 12, 0, 0, 0, 0, 0, 0, 0, 0, 2, 14
+"e:\Workspace\Edu_Learn_Next\lib\api\auth.ts", "TypeScript", 73, 0, 0, 0, 0, 0, 0, 0, 0, 14, 87
+"e:\Workspace\Edu_Learn_Next\lib\api\classes.ts", "TypeScript", 566, 0, 0, 0, 0, 0, 0, 0, 19, 97, 682
+"e:\Workspace\Edu_Learn_Next\lib\api\documents.ts", "TypeScript", 285, 0, 0, 0, 0, 0, 0, 0, 1, 45, 331
+"e:\Workspace\Edu_Learn_Next\lib\api\events.ts", "TypeScript", 169, 0, 0, 0, 0, 0, 0, 0, 2, 28, 199
+"e:\Workspace\Edu_Learn_Next\lib\api\index.ts", "TypeScript", 4, 0, 0, 0, 0, 0, 0, 0, 1, 2, 7
+"e:\Workspace\Edu_Learn_Next\lib\api\lessons.ts", "TypeScript", 79, 0, 0, 0, 0, 0, 0, 0, 4, 12, 95
+"e:\Workspace\Edu_Learn_Next\lib\api\notifications.ts", "TypeScript", 257, 0, 0, 0, 0, 0, 0, 0, 3, 48, 308
+"e:\Workspace\Edu_Learn_Next\lib\api\stats.ts", "TypeScript", 26, 0, 0, 0, 0, 0, 0, 0, 0, 7, 33
+"e:\Workspace\Edu_Learn_Next\lib\api\users.ts", "TypeScript", 351, 0, 0, 0, 0, 0, 0, 0, 6, 53, 410
+"e:\Workspace\Edu_Learn_Next\lib\api\vocabulary.ts", "TypeScript", 110, 0, 0, 0, 0, 0, 0, 0, 7, 16, 133
+"e:\Workspace\Edu_Learn_Next\lib\utils\auth-server.ts", "TypeScript", 50, 0, 0, 0, 0, 0, 0, 0, 0, 6, 56
+"e:\Workspace\Edu_Learn_Next\lib\utils\classUtils.ts", "TypeScript", 36, 0, 0, 0, 0, 0, 0, 0, 16, 10, 62
+"e:\Workspace\Edu_Learn_Next\lib\utils\cookies.ts", "TypeScript", 37, 0, 0, 0, 0, 0, 0, 0, 16, 9, 62
+"e:\Workspace\Edu_Learn_Next\middleware.ts", "TypeScript", 61, 0, 0, 0, 0, 0, 0, 0, 8, 14, 83
+"e:\Workspace\Edu_Learn_Next\next.config.ts", "TypeScript", 54, 0, 0, 0, 0, 0, 0, 0, 0, 7, 61
+"e:\Workspace\Edu_Learn_Next\package-lock.json", "JSON", 0, 0, 0, 0, 15979, 0, 0, 0, 0, 1, 15980
+"e:\Workspace\Edu_Learn_Next\package.json", "JSON", 0, 0, 0, 0, 48, 0, 0, 0, 0, 1, 49
+"e:\Workspace\Edu_Learn_Next\postcss.config.mjs", "JavaScript", 0, 0, 0, 0, 0, 6, 0, 0, 0, 2, 8
+"e:\Workspace\Edu_Learn_Next\public\data\preview.document.html", "HTML", 0, 0, 0, 693, 0, 0, 0, 0, 0, 45, 738
+"e:\Workspace\Edu_Learn_Next\public\file.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Next\public\globe.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Next\public\next.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Next\public\vercel.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Next\public\window.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"e:\Workspace\Edu_Learn_Next\tsconfig.json", "JSON with Comments", 0, 34, 0, 0, 0, 0, 0, 0, 0, 1, 35
+"Total", "-", 2961, 34, 5, 1330, 16027, 20, 22239, 332, 849, 2968, 46765

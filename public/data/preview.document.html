@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview Đề Thi Azota Style</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --primary-color: #0056b3;
+        --bg-body: #f4f7f6;
+        --card-bg: #ffffff;
+        --text-color: #333333;
+        --border-color: #e0e0e0;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background-color: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        margin: 0;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+      }
+      .header p {
+        margin: 5px 0 0;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .loading {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #6b7280;
+        margin-top: 50px;
+      }
+
+      .section-header {
+        background-color: #e0f2fe;
+        color: #0c4a6e;
+        padding: 15px;
+        margin: 30px 0 20px 0;
+        border-radius: 8px;
+        border-left: 5px solid #0284c7;
+      }
+      .section-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+      }
+
+      .question-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+      }
+
+      .question-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .question-header {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: 15px;
+      }
+
+      .question-number {
+        font-weight: 700;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        margin-right: 10px;
+        min-width: 60px;
+      }
+
+      .question-content {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #2c3e50;
+        width: 100%;
+      }
+
+      .question-content img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin: 10px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .options-list {
+        margin-top: 20px;
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      @media (min-width: 700px) {
+        .options-list {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .option-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 12px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fafafa;
+      }
+      .option-item:hover {
+        background-color: #e3f2fd;
+        border-color: var(--primary-color);
+      }
+
+      .option-key {
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-right: 12px;
+        user-select: none;
+      }
+      .option-content-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: start;
+        flex-direction: column;
+      }
+      .option-value {
+        display: block;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .badge-true {
+        background-color: #dcfce7;
+        color: #15803d;
+        border: 1px solid #86efac;
+      }
+      .badge-false {
+        background-color: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fca5a5;
+      }
+
+      .correct-answer {
+        background-color: #f0fdf4 !important;
+        border-color: #86efac !important;
+      }
+
+      mjx-container {
+        font-size: 110% !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Đề Thi (Preview)</h1>
+        <p>File này hoạt động Offline (Không cần Server)</p>
+      </div>
+
+      <div id="content-area"></div>
+    </div>
+
+    <script>
+      // --- EMBEDDED DATA START ---
+      const QUESTIONS_DATA = [
+        {
+          name: "PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn.",
+          questions: [
+            {
+              id: "1",
+              question: "Mệnh đề toán học nào sau đây là mệnh đề sai?",
+              answers: [
+                { key: "A", content: "Số 2 là số nguyên." },
+                { key: "B", content: "Số 2 là số hữu tỉ." },
+                { key: "C", content: "Số 2 là số hữu tỉ dương." },
+                { key: "D", content: "Số 2 không là số nguyên tố." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "2",
+              question: "Cho hai tập hợp [:$mathm2_1$] và [:$mathm2_2$]. Tập hợp [:$mathm2_3$] là",
+              answers: [
+                { key: "A", content: "tập hợp tất cả các phần tử thuộc [:$mathm2_4$] hoặc thuộc [:$mathm2_5$]." },
+                { key: "B", content: "tập hợp tất cả các phần tử vừa thuộc [:$mathm2_6$] vừa thuộc [:$mathm2_7$]." },
+                { key: "C", content: "tập hợp các phần tử thuộc [:$mathm2_8$] nhưng không thuộc [:$mathm2_9$]." },
+                { key: "D", content: "tập hợp tất cả các phần tử thuộc [:$mathm2_10$] nhưng không thuộc [:$mathm2_11$]." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "3",
+              question: "Tập hợp rỗng là",
+              answers: [
+                { key: "A", content: "tập hợp có đúng 1 phần tử." },
+                { key: "B", content: "tập hợp có đúng 2 phần tử." },
+                { key: "C", content: "tập hợp có vô số phần tử." },
+                { key: "D", content: "tập hợp không có phần tử nào." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "4",
+              question:
+                "Cho hai tập hợp [:$mathm4_1$] và [:$mathm4_2$] khác [:$mathm4_3$]. Tập hợp [:$mathm4_4$] là tập hợp con của tập hợp [:$mathm4_5$] khi và chỉ khi",
+              answers: [
+                { key: "A", content: "có một phần tử của [:$mathm4_6$] là phần tử của [:$mathm4_7$]." },
+                { key: "B", content: "mọi phần tử của [:$mathm4_8$] đều là phần tử của [:$mathm4_9$]." },
+                { key: "C", content: "mọi phần tử của [:$mathm4_10$] đều là phần tử của [:$mathm4_11$]." },
+                { key: "D", content: "hiệu của [:$mathm4_12$] và [:$mathm4_13$] là tập hợp khác rỗng." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "5",
+              question: "Phát biểu nào nào sau đây là đúng?",
+              answers: [
+                { key: "A", content: "Với hai vectơ bất kì [:$mathm5_1$] và số thực [:$mathm5_2$], ta có: [:$mathm5_3$]." },
+                { key: "B", content: "Với hai vectơ bất kì [:$mathm5_4$] và số thực [:$mathm5_5$], ta có: [:$mathm5_6$]." },
+                { key: "C", content: "Với hai vectơ bất kì [:$mathm5_7$] và số thực [:$mathm5_8$], ta có: [:$mathm5_9$]." },
+                { key: "D", content: "Với hai vectơ bất kì [:$mathm5_10$] và số thực [:$mathm5_11$], ta có: [:$mathm5_12$]." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "6",
+              question: "Cho góc nhọn [:$mathm6_1$] tùy ý. Phát biểu nào sau đây là đúng?",
+              answers: [
+                { key: "A", content: "[:$mathm6_2$]." },
+                { key: "B", content: "[:$mathm6_3$]." },
+                { key: "C", content: "[:$mathm6_4$]." },
+                { key: "D", content: "[:$mathm6_5$]." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "7",
+              question: "Cho góc nhọn [:$mathm7_1$] tùy ý. Phát biểu nào sau đây là đúng?",
+              answers: [
+                { key: "A", content: "[:$mathm7_2$]." },
+                { key: "B", content: "[:$mathm7_3$]." },
+                { key: "C", content: "[:$mathm7_4$]." },
+                { key: "D", content: "[:$mathm7_5$]." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "8",
+              question: "Cho [:$mathm8_1$] là trọng tâm [:$mathm8_2$] và điểm [:$mathm8_3$] tùy ý. Phát biểu nào sau đây là đúng?",
+              answers: [
+                { key: "A", content: "[:$mathm8_4$]." },
+                { key: "B", content: "[:$mathm8_5$]." },
+                { key: "C", content: "[:$mathm8_6$]." },
+                { key: "D", content: "[:$mathm8_7$]." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "9",
+              question: "Cho tam giác nhọn [:$mathm9_1$] nội tiếp đường tròn bán kính [:$mathm9_2$]. Phát biểu nào sau đây là đúng?",
+              answers: [
+                { key: "A", content: "[:$mathm9_3$]." },
+                { key: "B", content: "[:$mathm9_4$]." },
+                { key: "C", content: "[:$mathm9_5$]." },
+                { key: "D", content: "[:$mathm9_6$]." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "10",
+              question: "Cho tam giác [:$mathm10_1$]. Phát biểu nào sau đây là đúng?",
+              answers: [
+                { key: "A", content: "[:$mathm10_2$]" },
+                { key: "B", content: "[:$mathm10_3$]" },
+                { key: "C", content: "[:$mathm10_4$]" },
+                { key: "D", content: "[:$mathm10_5$]" },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "11",
+              question:
+                "Cho đoạn thẳng [:$mathm11_1$] và hai điểm [:$mathm11_2$] thuộc đoạn thẳng [:$mathm11_3$] sao cho: [:$mathm11_4$]. Phát biểu nào sau đây là đúng?",
+              answers: [
+                { key: "A", content: "[:$mathm11_5$]." },
+                { key: "B", content: "[:$mathm11_6$]." },
+                { key: "C", content: "[:$mathm11_7$]." },
+                { key: "D", content: "[:$mathm11_8$]." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+            {
+              id: "12",
+              question:
+                "Cho hệ bất phương trình bậc nhất hai ẩn\n[:$mathm12_1$]\ncó miền nghiệm được biểu diễn là hình tứ giác [:$mathm12_2$] (tham khảo hình vẽ).\n\\includegraphics[max width=\\linewidth,keepaspectratio]{media/image31.jpeg}\nGiá trị lớn nhất của biểu thức [:$mathm12_3$] bằng bao nhiêu?",
+              answers: [
+                { key: "A", content: "6 ." },
+                { key: "B", content: "7 ." },
+                { key: "C", content: "8 ." },
+                { key: "D", content: "5 ." },
+              ],
+              correct_answer: { A: false, B: false, C: false, D: false },
+            },
+          ],
+        },
+        {
+          name: "PHẦN II. Câu trắc nghiệm đúng sai.",
+          questions: [
+            {
+              id: "1",
+              question:
+                "Một cuộc thi bắn cung có 20 người tham gia. Trong lần bắn đầu tiên có 18 người bắn trúng mục tiêu. Trong lần bắn thứ hai có 15 người bắn trúng mục tiêu. Trong lần bắn thứ ba chỉ còn 10 người bắn trúng mục tiêu.",
+              answers: [
+                { key: "A", content: "Số người bắn trượt mục tiêu trong lần đầu tiên là 2 ." },
+                { key: "B", content: "Số người bắn trượt mục tiêu trong lần bắn thứ hai là 6 ." },
+                { key: "C", content: "Số người bắn trượt mục tiêu trong lần bắn thứ nhất và thứ hai nhiều nhất là 8 ." },
+                { key: "D", content: "Số người bắn trúng mục tiêu trong cả ba lần bắn ít nhất là 3." },
+              ],
+              correct_answer: { B: false, C: false },
+            },
+            {
+              id: "2",
+              question:
+                "Cho tứ giác [:$mathm14_1$] có [:$mathm14_2$] lần lượt là trung điểm của các cạnh [:$mathm14_3$]. Gọi [:$mathm14_4$] là trung điểm của đoạn thẳng [:$mathm14_5$] và [:$mathm14_6$] là trọng tâm tam giác [:$mathm14_7$].",
+              answers: [
+                { key: "A", content: "[:$mathm14_8$]." },
+                { key: "B", content: "[:$mathm14_9$]." },
+                { key: "C", content: "[:$mathm14_10$]." },
+                { key: "D", content: "[:$mathm14_11$]." },
+              ],
+              correct_answer: { B: false, C: false, D: false },
+            },
+            {
+              id: "3",
+              question:
+                "Cho hình bình hành [:$mathm15_1$]. Gọi [:$mathm15_2$] là giao điểm của [:$mathm15_3$] và [:$mathm15_4$] (Hình bên).\n\\includegraphics[max width=\\linewidth,keepaspectratio]{media/image48.jpeg}",
+              answers: [
+                { key: "A", content: "[:$mathm15_5$] và [:$mathm15_6$] là hai vectơ đối nhau." },
+                { key: "B", content: "[:$mathm15_7$] và [:$mathm15_8$] là hai vectơ đối nhau." },
+                { key: "C", content: "[:$mathm15_9$]." },
+                { key: "D", content: "[:$mathm15_10$]." },
+              ],
+              correct_answer: { B: false },
+            },
+            {
+              id: "4",
+              question: "Lớp 10A có 40 học sinh, trong đó có 27 học sinh tham gia câu lạc bộ bóng rổ và 25 học sinh tham gia câu lạc bộ bóng đá.",
+              answers: [
+                { key: "A", content: "Số học sinh tham gia câu lạc bộ bóng rổ hoặc tham gia câu lạc bộ bóng đá nhiều nhất là 40." },
+                { key: "B", content: "Số học sinh tham gia cả hai câu lạc bộ bóng rổ và bóng đá ít nhất là 10." },
+                { key: "C", content: "Số học sinh không tham gia cả hai câu lạc bộ bóng rổ và bóng đá ít nhất là 1." },
+                { key: "D", content: "Số học sinh không tham gia cả hai câu lạc bộ bóng rổ và bóng đá nhiều nhất là 10." },
+              ],
+              correct_answer: { B: false, C: false, D: false },
+            },
+          ],
+        },
+        {
+          name: "PHẦN III. Câu trắc nghiệm trả lời ngắn.",
+          questions: [
+            {
+              id: "1",
+              question: "Cho hình chữ nhật [:$mathm17_1$] có [:$mathm17_2$]. Độ dài của vectơ [:$mathm17_3$] bằng bao nhiêu?",
+              answers: [{ key: "A", content: "10" }],
+              correct_answer: { A: false },
+            },
+            {
+              id: "2",
+              question:
+                "Để đo khoảng cách từ vị trí [:$mathm18_1$] đến vị trí [:$mathm18_2$] ở hai bên bờ hồ, bạn Hà tiến hành đo khoảng cách [:$mathm18_3$] và các góc [:$mathm18_4$]. Kết quả nhận được là: [:$mathm18_5$] và [:$mathm18_6$] (Hình bên). Khoảng cách từ vị trí [:$mathm18_7$] đến vị trí [:$mathm18_8$] là bao nhiêu mét (làm tròn kết quả đến hàng đơn vị của mét)?\n\\includegraphics[max width=\\linewidth,keepaspectratio]{media/image66.jpeg}",
+              answers: [{ key: "A", content: "31" }],
+              correct_answer: { A: false },
+            },
+            {
+              id: "3",
+              question:
+                "Hai tàu đánh cá cùng xuất phát từ bến [:$mathm19_1$] và đi về hai vùng biển khác nhau theo hai nửa đường thẳng tạo với nhau một góc [:$mathm19_2$]. Tàu thứ nhất chạy với tốc độ 8 hải lí một giờ và tàu thứ hai chạy với tốc độ 12 hải lí một giờ. Sau đúng 2 giờ thì khoảng cách giữa hai tàu là bao nhiêu hải lí (làm tròn kết quả đến hàng đơn vị của hải lí)?",
+              answers: [{ key: "A", content: "21" }],
+              correct_answer: { A: false },
+            },
+            {
+              id: "4",
+              question:
+                "Có 100 tấm thẻ được đánh số thứ tự từ 1 đến 100 và được đặt ngửa trên bàn. Người ta lật ngược các tấm thẻ như sau:\nLần thứ nhất, lật ngược tất cả các tấm thẻ có số thứ tự chia hết cho 2.\nLần thứ hai, lật ngược tất cả các tấm thẻ có số thứ tự chia hết cho 5 .\nHỏi sau lần thứ hai, có bao nhiêu tấm thẻ được đặt sấp. Biết rằng, khi bị lật ngược, thẻ đang ngửa sẽ thành sấp và thẻ đang sấp sẽ thành ngửa.",
+              answers: [{ key: "A", content: "50" }],
+              correct_answer: { A: false },
+            },
+            {
+              id: "5",
+              question:
+                "Để chế biến một hộp thực phẩm [:$mathm21_1$] cần [:$mathm21_2$] cà chua và [:$mathm21_3$] thịt; một hộp thực phẩm [:$mathm21_4$] cần [:$mathm21_5$] cà chua và [:$mathm21_6$] thịt. Lợi nhuận thu được từ 1 hộp thực phẩm [:$mathm21_7$] và 1 hộp thực phẩm [:$mathm21_8$] lần lượt là 4000 đồng và 5000 đồng. Chị Hoa có [:$mathm21_9$] cà chua và [:$mathm21_10$] thịt để sản xuất các hộp thực phẩm [:$mathm21_11$] và [:$mathm21_12$]. Với lượng nguyên liệu như trên, lợi nhuận lớn nhất chị Hoa có thể thu được là bao nhiêu nghìn đồng?",
+              answers: [{ key: "A", content: "45" }],
+              correct_answer: { A: false },
+            },
+            {
+              id: "6",
+              question:
+                "Một xưởng sản xuất bàn và ghế. Thời gian để một công nhân hoàn thiện 1 chiếc bàn và 1 chiếc ghế lần lượt là 120 phút và 30 phút. Xưởng có 4 công nhân, mỗi công nhân làm việc không quá 6 tiếng mỗi ngày. Biết rằng sản phẩm của xưởng luôn được tiêu thụ hết, mỗi chiếc bàn lãi 200 nghì đồng, mỗi chiếc ghế lãi 75 nghì đồng và số ghế không vượt quá 4 lần số bàn. Trong một ngày sản xuất, xưởng có thể thu được lợi nhuận lớn nhất là bao nhiêu tiền? Viết câu trả lời theo đơn vị triệu đồng.",
+              answers: [{ key: "A", content: "3" }],
+              correct_answer: { A: false },
+            },
+          ],
+        },
+      ];
+      const MATH_DATA = {
+        mathm10_1: "\\text{ABC}",
+        mathm10_2: "BC^2 = AB^2 + AC^2 + 2AB \\cdot AC \\cdot \\cos A",
+        mathm10_3: "BC^2 = AB^2 + AC^2 - 2AB \\cdot AC \\cdot \\cos A",
+        mathm10_4: "BC^2 = AB^2 + AC^2 + 2AB \\cdot AC \\sin A",
+        mathm10_5: "BC^2 = AB^2 + AC^2 - 2 \\cdot AB \\cdot AC \\cdot \\sin A",
+        mathm11_1: "<b>AB</b>",
+        mathm11_2: "M, N",
+        mathm11_3: "<b>AB</b>",
+        mathm11_4: "2MA = 3MB",
+        mathm11_5: "2\\overrightarrow{MA} = 3\\overrightarrow{MB}",
+        mathm11_6: "2\\overrightarrow{MA} = -3\\overrightarrow{MB}",
+        mathm11_7: "2\\overrightarrow{AB} = 3\\overrightarrow{AM}",
+        mathm11_8: "\\overrightarrow{3BM} = \\overrightarrow{BA}",
+        mathm12_1: "\\begin{cases}\nx - y \\geq 0 \\\\\nx - y \\leq 2 \\\\\nx + y \\geq 0 \\\\\nx + y \\leq 4\n\\end{cases}",
+        mathm12_2: "\\text{OABC}",
+        mathm12_3: "L = 2x + y",
+        mathm14_1: "<b>ABCD</b>",
+        mathm14_10: "\\overrightarrow{DA} + \\overrightarrow{DB} + \\overrightarrow{DC} = 2 \\overrightarrow{DG}",
+        mathm14_11: "\\overrightarrow{DO} = 2 \\overrightarrow{DG}",
+        mathm14_2: "M, N",
+        mathm14_3: "AB, CD",
+        mathm14_4: "<b>O</b>",
+        mathm14_5: "<b>MN</b>",
+        mathm14_6: "\\text{G}",
+        mathm14_7: "\\text{ABC}",
+        mathm14_8: "\\overrightarrow{DA} + \\overrightarrow{DB} = 2 \\overrightarrow{DM}",
+        mathm14_9: "\\overrightarrow{DA} + \\overrightarrow{DB} + \\overrightarrow{DC} = 2 \\overrightarrow{DO}",
+        mathm15_1: "<b>ABCD</b>",
+        mathm15_10:
+          "\\overrightarrow{OA} + \\overrightarrow{OB} + \\overrightarrow{OC} + \\overrightarrow{OD} = \\overrightarrow{AD} + \\overrightarrow{CB}",
+        mathm15_2: "<b>O</b>",
+        mathm15_3: "\\text{AC}",
+        mathm15_4: "<b>BD</b>",
+        mathm15_5: "\\overrightarrow{OA}",
+        mathm15_6: "\\overrightarrow{oc}",
+        mathm15_7: "\\overrightarrow{OB}",
+        mathm15_8: "\\overrightarrow{D0}",
+        mathm15_9: "\\overrightarrow{OA} + \\overrightarrow{OC} = \\overrightarrow{OB} + \\overrightarrow{OD}",
+        mathm17_1: "<b>ABCD</b>",
+        mathm17_2: "AB = 4, AD = 6",
+        mathm17_3: "\\vec{u} = \\overline{AB} + \\overline{AC}",
+        mathm18_1: "\\text{A}",
+        mathm18_2: "<b>B</b>",
+        mathm18_3: "\\text{AC}",
+        mathm18_4: "\\overline{BAC}, \\overline{BCA}",
+        mathm18_5: "AC = 21   \\text{m}, \\overline{BAC} = 58^\\circ",
+        mathm18_6: "\\overline{BCA} = 80^\\circ",
+        mathm18_7: "\\text{A}",
+        mathm18_8: "<b>B</b>",
+        mathm19_1: "\\text{A}",
+        mathm19_2: "60°",
+        mathm21_1: "<b>A</b>",
+        mathm21_10: "2   \\text{kg}",
+        mathm21_11: "<b>A</b>",
+        mathm21_12: "<b>B</b>",
+        mathm21_2: "0,2   \\text{kg}",
+        mathm21_3: "0,1   \\text{kg}",
+        mathm21_4: "<b>B</b>",
+        mathm21_5: "0,2   \\text{kg}",
+        mathm21_6: "0,3   \\text{kg}",
+        mathm21_7: "<b>A</b>",
+        mathm21_8: "<b>B</b>",
+        mathm21_9: "2   \\text{kg}",
+        mathm2_1: "\\text{A}",
+        mathm2_10: "\\text{B}",
+        mathm2_11: "\\text{A}",
+        mathm2_2: "\\text{B}",
+        mathm2_3: "A \\cap B",
+        mathm2_4: "\\text{A}",
+        mathm2_5: "\\text{B}",
+        mathm2_6: "\\text{A}",
+        mathm2_7: "\\text{B}",
+        mathm2_8: "\\text{A}",
+        mathm2_9: "\\text{B}",
+        mathm4_1: "\\text{A}",
+        mathm4_10: "\\text{A}",
+        mathm4_11: "\\text{B}",
+        mathm4_12: "\\text{A}",
+        mathm4_13: "\\text{B}",
+        mathm4_2: "\\text{B}",
+        mathm4_3: "\\varnothing",
+        mathm4_4: "\\text{A}",
+        mathm4_5: "\\text{B}",
+        mathm4_6: "\\text{A}",
+        mathm4_7: "\\text{B}",
+        mathm4_8: "\\text{B}",
+        mathm4_9: "\\text{A}",
+        mathm5_1: "\\overrightarrow{a},\\overrightarrow{b}",
+        mathm5_10: "\\overrightarrow{a},\\overrightarrow{b}",
+        mathm5_11: "\\text{k}",
+        mathm5_12: "k(\\overrightarrow{a} + \\overrightarrow{b}) = k\\overrightarrow{a} + k\\overrightarrow{b}",
+        mathm5_2: "\\text{k}",
+        mathm5_3: "k(\\overrightarrow{a} + \\overrightarrow{b}) = k\\overrightarrow{a} + k\\overrightarrow{b}",
+        mathm5_4: "\\overrightarrow{a},\\overrightarrow{b}",
+        mathm5_5: "\\text{k}",
+        mathm5_6: "k(\\overrightarrow{a} + \\overrightarrow{b}) = k\\overrightarrow{a} + k\\overrightarrow{b}",
+        mathm5_7: "\\overrightarrow{a},\\overrightarrow{b}",
+        mathm5_8: "\\text{k}",
+        mathm5_9: "k(\\overrightarrow{a} + \\overrightarrow{b}) = k\\overrightarrow{a} + k\\overrightarrow{b}",
+        mathm6_1: "\\alpha",
+        mathm6_2: "\\sin(90^\\circ - \\alpha) = \\cos \\alpha",
+        mathm6_3: "\\sin(90^\\circ - \\alpha) = \\sin \\alpha",
+        mathm6_4: "\\sin(90^\\circ - \\alpha) = -\\sin \\alpha",
+        mathm6_5: "\\sin(90^\\circ - \\alpha) = -\\cos \\alpha",
+        mathm7_1: "\\alpha",
+        mathm7_2: "\\cos(180^\\circ - \\alpha) = \\cos \\alpha",
+        mathm7_3: "\\cos(180^\\circ - \\alpha) = \\sin \\alpha",
+        mathm7_4: "\\cos(180^\\circ - \\alpha) = -\\cos \\alpha",
+        mathm7_5: "\\cos(180^\\circ - \\alpha) = -\\sin \\alpha",
+        mathm8_1: "\\text{G}",
+        mathm8_2: "\\bigtriangleup ABC",
+        mathm8_3: "\\text{M}",
+        mathm8_4: "\\overrightarrow{MA} + \\overrightarrow{MB} + \\overrightarrow{MC} = \\overrightarrow{0}",
+        mathm8_5: "\\overrightarrow{MA} + \\overrightarrow{MB} + \\overrightarrow{MC} = \\overrightarrow{MG}",
+        mathm8_6: "\\overrightarrow{MA} + \\overrightarrow{MB} + \\overrightarrow{MC} = 2 \\overrightarrow{MG}",
+        mathm8_7: "\\overrightarrow{MA} + \\overrightarrow{MB} + \\overrightarrow{MC} = 3MG",
+        mathm9_1: "\\text{ABC}",
+        mathm9_2: "\\text{R}",
+        mathm9_3: "\\frac{BC}{\\sin A} = 2R",
+        mathm9_4: "\\frac{BC}{\\cos A} = 2R",
+        mathm9_5: "\\frac{AB}{\\cos A} = 2R",
+        mathm9_6: "\\frac{AB}{\\sin A} = 2R",
+      };
+      const MEDIA_PATH = "media/";
+      // --- EMBEDDED DATA END ---
+
+      function init() {
+        const contentArea = document.getElementById("content-area");
+        if (!QUESTIONS_DATA || QUESTIONS_DATA.length === 0) {
+          contentArea.innerHTML = '<div class="loading">Không có dữ liệu câu hỏi.</div>';
+          return;
+        }
+        renderQuestions(QUESTIONS_DATA, contentArea);
+      }
+
+      function renderQuestions(sections, container) {
+        container.innerHTML = "";
+        let htmlBuffer = "";
+
+        if (Array.isArray(sections) && sections.length > 0 && sections[0].questions) {
+          // New Section Format found
+          for (const section of sections) {
+            htmlBuffer += `<div class="section-header"><h2>${section.name}</h2></div>`;
+
+            for (const q of section.questions) {
+              htmlBuffer += renderSingleQuestion(q);
+            }
+          }
+        } else {
+          // Fallback for flat list
+          const flatList = sections;
+          for (const q of flatList) {
+            htmlBuffer += renderSingleQuestion(q);
+          }
+        }
+
+        container.innerHTML = htmlBuffer;
+
+        if (window.MathJax) {
+          // Only typeset the container, not the whole document (prevents format issues)
+          MathJax.typesetPromise([container]).catch(function (err) {
+            console.error("MathJax typeset error:", err);
+          });
+        }
+      }
+
+      function renderSingleQuestion(q) {
+        // Use q.question instead of q.content
+        const contentHtml = parseContent(q.question || q.content);
+
+        let optionsHtml = "";
+        // Use q.answers instead of q.options. Support both for backward compatibility or transition.
+        const answers = q.answers || q.options;
+
+        if (answers && answers.length) {
+          optionsHtml = '<div class="options-list">';
+          for (const opt of answers) {
+            // Use opt.content instead of opt.value
+            const optContent = parseContent(opt.content || opt.value);
+
+            // Logic to determine status based on q.correct_answer
+            let isTrue = false;
+            let isFalse = false;
+
+            if (q.correct_answer) {
+              if (typeof q.correct_answer === "string") {
+                // MCQ style: "A" - chỉ hiển thị "Đúng" cho đáp án đúng
+                if (q.correct_answer === opt.key) isTrue = true;
+              } else if (typeof q.correct_answer === "object") {
+                // Map style: { "A": true, "B": false }
+                // Kiểm tra xem có đáp án đúng nào không
+                const hasTrueAnswer = Object.values(q.correct_answer).some((v) => v === true);
+
+                if (q.correct_answer[opt.key] === true) {
+                  isTrue = true;
+                } else if (q.correct_answer[opt.key] === false && hasTrueAnswer) {
+                  // Chỉ hiển thị "Sai" nếu có ít nhất một đáp án đúng
+                  // Điều này phân biệt câu hỏi Đúng/Sai (có đáp án đúng) với MCQ không xác định được đáp án đúng
+                  // Với MCQ chuẩn nếu tất cả đều false (không xác định được đáp án đúng), không hiển thị badge "Sai"
+                  isFalse = true;
+                }
+                // Nếu tất cả đều false (hasTrueAnswer = false), không hiển thị badge nào
+              }
+            }
+
+            // Badge logic
+            let badge = "";
+            if (isTrue) {
+              badge = '<span class="badge badge-true">Đúng</span>';
+            } else if (isFalse) {
+              badge = '<span class="badge badge-false">Sai</span>';
+            }
+            // Với MCQ không xác định được đáp án đúng (tất cả false), không hiển thị badge
+
+            optionsHtml += `
+                    <div class="option-item ${isTrue ? "correct-answer" : ""}">
+                        <span class="option-key">${opt.key}.</span>
+                        <div class="option-content-wrapper">
+                            ${badge}
+                            <span class="option-value">${optContent}</span>
+                        </div>
+                    </div>
+                `;
+          }
+          optionsHtml += "</div>";
+        }
+
+        return `
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-number">Câu ${q.id}</div>
+                    <div class="question-content">${contentHtml}</div>
+                </div>
+                ${optionsHtml}
+            </div>
+        `;
+      }
+
+      function parseContent(text) {
+        if (!text) return "";
+
+        // Images
+        // Remove pandocbounded wrapper
+        text = text.replace(/\\pandocbounded\{([^}]+)\}/g, "$1");
+
+        // Handle \includegraphics[options]{path} - improved pattern to match correctly
+        // Pattern: \includegraphics[optional options]{media/path or path}
+        text = text.replace(/\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}/g, (m, path) => {
+          // Remove 'media/' prefix if present, we'll add it via MEDIA_PATH
+          let filename = path.replace(/^media[\\\/]/, "");
+          // Clean up any escaped slashes
+          filename = filename.replace(/\\\//g, "/");
+          // Return HTML img tag with proper styling
+          // Use string concatenation to avoid f-string variable interpolation
+          return (
+            '<img src="' + MEDIA_PATH + filename + '" loading="lazy" style="max-width: 100%; height: auto; display: block; margin: 10px auto;" />'
+          );
+        });
+
+        // Math Placeholders [:$mathname$]
+        const regex = /\[:\$([^$]+)\$\]/g;
+
+        text = text.replace(regex, (m, name) => {
+          const latex = MATH_DATA[name];
+          if (latex) {
+            // If the content looks like HTML (starts with <), do NOT wrap in math delimiters
+            if (latex.trim().startsWith("<") || latex.includes("<b>") || latex.includes("<i>")) {
+              return latex;
+            }
+            // If it already has delimiters, return as is
+            if (latex.trim().startsWith("$") || latex.trim().startsWith("\\(")) {
+              return latex;
+            }
+            // Output `\(` and `\)` for MathJax
+            // In Python: need 4 backslashes \\( to output 2 backslashes \( in JS string
+            // In JS: \( becomes \( in HTML output, which MathJax recognizes as math inline
+            // In JS: \( becomes ( in HTML (no escape), MathJax won't recognize it as math
+            // Use string concatenation to avoid f-string template literal escaping issues
+            return "\\( " + latex + " \\)";
+          }
+          return `[Missing: ${name}]`;
+        });
+
+        // Remove newlines/BR immediately after table (user request: "sau table ko cần xuống dòng nữa")
+        // Use [\r\n]+ to match newlines in regex (escaped for JavaScript)
+        text = text.replace(/<\/table>[\s\r\n]*/g, "</table>");
+        text = text.replace(/<\/table>\s*<br\s*\/?>/gi, "</table>");
+
+        // Newlines to BR
+        text = text.replace(/\n/g, "<br>");
+
+        return text;
+      }
+
+      window.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>

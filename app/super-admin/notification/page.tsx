@@ -82,7 +82,7 @@ export default function SuperAdminNotifications() {
         title: notif.title,
         message: notif.message,
         scope: notif.scope,
-        scope_id: notif.scope_id,
+        scope_id: notif.scope_id === null ? null : (typeof notif.scope_id === "string" ? Number(notif.scope_id) : notif.scope_id),
         createdAt: formatDate(notif.created_at),
       }));
 
@@ -128,7 +128,7 @@ export default function SuperAdminNotifications() {
       title: created.title,
       message: created.message,
       scope: created.scope,
-      scope_id: created.scope_id,
+      scope_id: created.scope_id === null ? null : (typeof created.scope_id === "string" ? Number(created.scope_id) : created.scope_id),
       createdAt: formatDate(created.created_at),
     };
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { App, Spin, Tabs } from "antd";
+import { FileTextOutlined, BellOutlined, UserOutlined, ExperimentOutlined } from "@ant-design/icons";
 import StudentDetailModal from "@/app/components/students/StudentDetailModal";
 import BannedStudentModal from "@/app/components/students/BannedStudentModal";
 import ClassHeader from "@/app/components/classes/ClassHeader";
@@ -10,20 +11,22 @@ import ClassInfoCard from "@/app/components/classes/ClassInfoCard";
 import ClassStudentsTable from "@/app/components/classes/ClassStudentsTable";
 import UpdateClassModal from "@/app/components/classes/UpdateClassModal";
 import BannedListModal from "@/app/components/classes/BannedListModal";
+import ClassExercisesTab from "@/app/components/classes/ClassExercisesTab";
+import ClassNotificationsTab from "@/app/components/classes/ClassNotificationsTab";
+import ClassExamsTab from "@/app/components/classes/ClassExamsTab";
 import {
   getClassById,
   removeStudentFromClass,
   deleteClass,
   updateClassStudentStatus,
   getClassStudentId,
-  getBannedStudents,
   getClassStudentsByClass,
   type ClassDetailResponse,
   type ClassStudentRecord,
 } from "@/lib/api/classes";
 import type { StudentItem } from "@/interface/students";
-import { ensureMinLoadingTime, STUDENT_STATUS_MAP, CLASS_STATUS_MAP, formatStudentId } from "@/lib/utils/classUtils";
-import { FileTextOutlined, BellOutlined, FileOutlined, UserOutlined, ExperimentOutlined } from "@ant-design/icons";
+import { ensureMinLoadingTime, CLASS_STATUS_MAP, formatStudentId } from "@/lib/utils/classUtils";
+import { getUserIdFromCookie } from "@/lib/utils/cookies";
 
 export default function ClassDetail() {
   const router = useRouter();
@@ -56,6 +59,15 @@ export default function ClassDetail() {
   const [originalClassData, setOriginalClassData] = useState<ClassDetailResponse | null>(null);
   const [isBannedListModalOpen, setIsBannedListModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("students");
+  const [exerciseSearchQuery, setExerciseSearchQuery] = useState("");
+  const [exercisePage, setExercisePage] = useState(1);
+  const exercisePageSize = 4;
+  const [notificationSearchQuery, setNotificationSearchQuery] = useState("");
+  const [notificationPage, setNotificationPage] = useState(1);
+  const notificationPageSize = 4;
+  const [examSearchQuery, setExamSearchQuery] = useState("");
+  const [examPage, setExamPage] = useState(1);
+  const examPageSize = 4;
 
   // Map ClassStudentRecord to StudentItem
   const mapStudentRecordToItem = useCallback((record: ClassStudentRecord, className: string): StudentItem => {
@@ -65,7 +77,7 @@ export default function ClassDetail() {
 
     // Lấy userId từ student.user_id (vì API trả về user_id trong object student)
     const userId = record.student.user_id || record.user_id;
-    
+
     const displayStatus = record.status === "banned" ? "Bị cấm" : "Đang học";
 
     return {
@@ -83,37 +95,48 @@ export default function ClassDetail() {
   }, []);
 
   // Fetch class information (separate from students)
-  const fetchClassInfo = useCallback(async (showLoading: boolean = true): Promise<string> => {
-    const currentClassId = classIdRef.current;
-    if (!currentClassId) return "";
+  const fetchClassInfo = useCallback(
+    async (showLoading: boolean = true): Promise<string> => {
+      const currentClassId = classIdRef.current;
+      if (!currentClassId) return "";
 
-    try {
-      const data = await getClassById(currentClassId);
+      try {
+        const userId = getUserIdFromCookie();
+        if (!userId) {
+          throw new Error("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.");
+        }
+        const numericUserId = typeof userId === "string" ? Number(userId) : userId;
+        if (isNaN(numericUserId)) {
+          throw new Error("User ID không hợp lệ");
+        }
+        const data = await getClassById(currentClassId, numericUserId);
 
-      // Map class data
-      const mappedClassData = {
-        id: String(data.class_id),
-        name: data.name,
-        code: data.code,
-        students: data.student_count,
-        status: (data.status === "active" ? CLASS_STATUS_MAP.active : CLASS_STATUS_MAP.inactive) as "Đang hoạt động" | "Tạm dừng",
-      };
+        // Map class data
+        const mappedClassData = {
+          id: String(data.class_id),
+          name: data.name,
+          code: data.code,
+          students: data.student_count,
+          status: (data.status === "active" ? CLASS_STATUS_MAP.active : CLASS_STATUS_MAP.inactive) as "Đang hoạt động" | "Tạm dừng",
+        };
 
-      setClassData(mappedClassData);
-      setOriginalClassData(data); // Lưu original data để dùng cho update
-      classNameRef.current = data.name; // Store className in ref
-      return data.name; // Return className for use in fetchClassStudents
-    } catch (error: any) {
-      if (showLoading) {
-        message.error(error?.message || "Không thể tải thông tin lớp học");
+        setClassData(mappedClassData);
+        setOriginalClassData(data); // Lưu original data để dùng cho update
+        classNameRef.current = data.name; // Store className in ref
+        return data.name; // Return className for use in fetchClassStudents
+      } catch (error: any) {
+        if (showLoading) {
+          message.error(error?.message || "Không thể tải thông tin lớp học");
+        }
+        // Chỉ set null nếu showLoading = true để tránh mất dữ liệu khi refresh ngầm
+        if (showLoading) {
+          setClassData(null);
+        }
+        throw error;
       }
-      // Chỉ set null nếu showLoading = true để tránh mất dữ liệu khi refresh ngầm
-      if (showLoading) {
-        setClassData(null);
-      }
-      throw error;
-    }
-  }, [message]);
+    },
+    [message]
+  );
 
   // Fetch class students (separate from class info)
   const fetchClassStudents = useCallback(
@@ -460,9 +483,14 @@ export default function ClassDetail() {
               </span>
             ),
             children: (
-              <div className="bg-white rounded-lg p-6 border border-gray-200">
-                <p className="text-gray-500 text-center py-8">Danh sách bài tập sẽ được hiển thị ở đây</p>
-              </div>
+              <ClassExercisesTab
+                classId={classId}
+                searchQuery={exerciseSearchQuery}
+                onSearchChange={setExerciseSearchQuery}
+                currentPage={exercisePage}
+                pageSize={exercisePageSize}
+                onPageChange={setExercisePage}
+              />
             ),
           },
           {
@@ -474,23 +502,14 @@ export default function ClassDetail() {
               </span>
             ),
             children: (
-              <div className="bg-white rounded-lg p-6 border border-gray-200">
-                <p className="text-gray-500 text-center py-8">Danh sách thông báo sẽ được hiển thị ở đây</p>
-              </div>
-            ),
-          },
-          {
-            key: "documents",
-            label: (
-              <span>
-                <FileOutlined className="mr-2" />
-                Tài liệu
-              </span>
-            ),
-            children: (
-              <div className="bg-white rounded-lg p-6 border border-gray-200">
-                <p className="text-gray-500 text-center py-8">Danh sách tài liệu sẽ được hiển thị ở đây</p>
-              </div>
+              <ClassNotificationsTab
+                classId={classId}
+                searchQuery={notificationSearchQuery}
+                onSearchChange={setNotificationSearchQuery}
+                currentPage={notificationPage}
+                pageSize={notificationPageSize}
+                onPageChange={setNotificationPage}
+              />
             ),
           },
           {
@@ -498,13 +517,18 @@ export default function ClassDetail() {
             label: (
               <span>
                 <ExperimentOutlined className="mr-2" />
-                Kỳ thi
+                Kiểm tra
               </span>
             ),
             children: (
-              <div className="bg-white rounded-lg p-6 border border-gray-200">
-                <p className="text-gray-500 text-center py-8">Danh sách kỳ thi sẽ được hiển thị ở đây</p>
-              </div>
+              <ClassExamsTab
+                classId={classId}
+                searchQuery={examSearchQuery}
+                onSearchChange={setExamSearchQuery}
+                currentPage={examPage}
+                pageSize={examPageSize}
+                onPageChange={setExamPage}
+              />
             ),
           },
         ]}

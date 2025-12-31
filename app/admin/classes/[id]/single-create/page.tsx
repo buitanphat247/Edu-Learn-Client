@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getStudents, type StudentResponse } from "@/lib/api/users";
 import { addStudentToClass, getClassById } from "@/lib/api/classes";
+import { getUserIdFromCookie } from "@/lib/utils/cookies";
 import type { ColumnsType } from "antd/es/table";
 import { ensureMinLoadingTime, calculatePaginationAdjustment } from "@/lib/utils/classUtils";
 
@@ -32,7 +33,9 @@ export default function AddSingleStudentPage() {
 
     const fetchClassInfo = async () => {
       try {
-        const data = await getClassById(classId);
+        const userId = getUserIdFromCookie();
+        const numericUserId = userId ? (typeof userId === "string" ? Number(userId) : userId) : undefined;
+        const data = await getClassById(classId, numericUserId);
         setClassInfo({ name: data.name, code: data.code });
       } catch (error: any) {
         message.error(error?.message || "Không thể tải thông tin lớp học");

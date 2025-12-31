@@ -12,7 +12,17 @@ export const getCookie = (name: string): string | null => {
   const parts = value.split(`; ${name}=`);
   
   if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
+    const cookieValue = parts.pop()?.split(";").shift() || null;
+    if (cookieValue) {
+      try {
+        // Decode URL-encoded cookie value
+        return decodeURIComponent(cookieValue);
+      } catch (error) {
+        // If decode fails, return original value
+        return cookieValue;
+      }
+    }
+    return null;
   }
   
   return null;

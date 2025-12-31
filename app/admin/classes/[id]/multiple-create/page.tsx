@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { App } from "antd";
 import type { UploadFile } from "antd";
 import { addStudentToClass, getClassById, type AddStudentToClassParams } from "@/lib/api/classes";
+import { getUserIdFromCookie } from "@/lib/utils/cookies";
 import CSVUploadForm from "@/app/components/common/CSVUploadForm";
 import { useEffect } from "react";
 
@@ -23,7 +24,9 @@ export default function MultipleCreateStudentPage() {
 
     const fetchClassInfo = async () => {
       try {
-        const data = await getClassById(classId);
+        const userId = getUserIdFromCookie();
+        const numericUserId = userId ? (typeof userId === "string" ? Number(userId) : userId) : undefined;
+        const data = await getClassById(classId, numericUserId);
         setClassInfo({ name: data.name, code: data.code });
       } catch (error: any) {
         message.error(error?.message || "Không thể tải thông tin lớp học");

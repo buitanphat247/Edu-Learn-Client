@@ -23,15 +23,17 @@ export default function ClassesHeader({ searchValue, onSearchChange, onAddClick 
           onChange={(e) => onSearchChange?.(e.target.value)}
           allowClear
         />
-        <Button
-          type="default"
-          icon={<PlusOutlined />}
-          size="middle"
-          className="bg-white border-gray-300 hover:bg-gray-50 shadow-sm"
-          onClick={onAddClick}
-        >
-          Thêm lớp học
-        </Button>
+        {onAddClick && (
+          <Button
+            type="default"
+            icon={<PlusOutlined />}
+            size="middle"
+            className="bg-white border-gray-300 hover:bg-gray-50 shadow-sm"
+            onClick={onAddClick}
+          >
+            Thêm lớp học
+          </Button>
+        )}
       </div>
     </div>
   );

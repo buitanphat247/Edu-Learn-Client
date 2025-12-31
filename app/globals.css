@@ -57,6 +57,8 @@ body {
   z-index: 2;
 }
 
+/* Style cho user sidebar active state - background xanh cho icon */
+
 /* Style cho dropdown menu đổi màu sidebar */
 .sidebar-color-dropdown .ant-dropdown-menu {
   border-radius: 8px;
@@ -146,6 +148,14 @@ body {
 .news-table .ant-table-tbody > tr.group:hover {
   transform: translateX(4px);
   box-shadow: -4px 0 0 0 rgba(59, 130, 246, 0.3);
+}
+
+.news-table .ant-table-measure-row {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* Search Modal Style - Command Palette Style */

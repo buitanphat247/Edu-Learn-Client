@@ -43,6 +43,8 @@ export interface OptionCardProps {
   onUpdate: (partIndex: number, questionId: string, answerIndex: number, field: string, value: any) => void;
   onRemove: (partIndex: number, questionId: string, answerIndex: number) => void;
   onSelect: (partIndex: number, questionId: string, answerIndex: number) => void;
+  onMathClick?: (key: string, isRaw: boolean) => void;
+  mathData?: Record<string, string>;
 }
 
 export interface QuestionCardProps {
@@ -56,6 +58,8 @@ export interface QuestionCardProps {
   onUpdateAnswer: (partIndex: number, questionId: string, answerIndex: number, field: string, value: any) => void;
   onRemoveAnswer: (partIndex: number, questionId: string, answerIndex: number) => void;
   onSelectAnswer: (partIndex: number, questionId: string, answerIndex: number) => void;
+  onMathClick?: (key: string, isRaw: boolean) => void;
+  mathData?: Record<string, string>;
 }
 
 export interface GeneralConfigProps {
@@ -78,5 +82,6 @@ export interface LatexEditorProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   onLineNumbersScroll: () => void;
   onTextareaScroll: () => void;
+  onCursorChange?: (lineNumber: number) => void;
+  onMathSelect?: (key: string, isKey: boolean) => void;
 }
-

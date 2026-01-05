@@ -7,16 +7,81 @@ import { LatexEditorProps } from "./types";
 
 // Memoized LaTeX Editor Component
 export const LatexEditor = memo<LatexEditorProps>(
-  ({ latexSource, latexLines, totalLines, onLatexChange, lineNumbersRef, textareaRef, onLineNumbersScroll, onTextareaScroll }) => {
+  ({
+    latexSource,
+    latexLines,
+    totalLines,
+    onLatexChange,
+    lineNumbersRef,
+    textareaRef,
+    onLineNumbersScroll,
+    onTextareaScroll,
+    onCursorChange,
+    onMathSelect,
+  }) => {
     const handleLatexChange = useCallback(
       (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         onLatexChange(e.target.value);
+        if (onCursorChange) {
+          const currentValue = e.target.value;
+          const selectionStart = e.target.selectionStart;
+          const lineNumber = currentValue.substring(0, selectionStart).split("\n").length;
+          onCursorChange(lineNumber);
+        }
       },
-      [onLatexChange]
+      [onLatexChange, onCursorChange]
+    );
+
+    const handleCursorMove = useCallback(
+      (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+        const textarea = e.currentTarget;
+        const currentValue = textarea.value;
+        const selectionStart = textarea.selectionStart;
+
+        // 1. Line Sync
+        if (onCursorChange) {
+          const lineNumber = currentValue.substring(0, selectionStart).split("\n").length;
+          onCursorChange(lineNumber);
+        }
+
+        // 2. Math Click Detection
+        if (onMathSelect && e.type === "click") {
+          const textLeft = currentValue.slice(0, selectionStart);
+          const textRight = currentValue.slice(selectionStart);
+
+          // Check for [:$key$]
+          // We look backwards for "[:$" and forwards for "$]"
+          const lastOpen = textLeft.lastIndexOf("[:$");
+
+          if (lastOpen !== -1) {
+            // Ensure we haven't encountered a closing "$]" since the opening "[:$" (which would mean we are outside)
+            const textAfterOpen = textLeft.slice(lastOpen);
+            if (textAfterOpen.indexOf("$]") === -1) {
+              // We are potentially inside. Look for closest closing "$]"
+              const nextClose = textRight.indexOf("$]");
+              if (nextClose !== -1) {
+                // Check for any nested openers that might invalidate this being a simple token
+                const textInBetween = textRight.slice(0, nextClose);
+                if (textInBetween.indexOf("[:$") === -1) {
+                  // Valid match found: [:$...$]
+                  const key = textAfterOpen.slice(3) + textInBetween;
+
+                  // Check requirement: "có tên biến mathm"
+                  if (key.startsWith("mathm")) {
+                    onMathSelect(key, true);
+                    return;
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      [onCursorChange, onMathSelect]
     );
 
     return (
-      <div className="h-full overflow-y-auto flex flex-col">
+      <div className="h-full overflow-hidden flex flex-col">
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col h-full">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50 shrink-0">
             <div className="flex items-center gap-2">
@@ -33,7 +98,7 @@ export const LatexEditor = memo<LatexEditorProps>(
             <div
               ref={lineNumbersRef}
               onScroll={onLineNumbersScroll}
-              className="bg-gray-50 text-gray-600 px-3 py-2 text-right select-none border-r border-gray-200 shrink-0 overflow-y-auto custom-scrollbar"
+              className="bg-gray-50 text-gray-600 px-3 py-2 text-right select-none border-r border-gray-200 shrink-0 overflow-y-auto no-scrollbar"
               style={{ maxHeight: "100%" }}
             >
               {latexLines.map((_, index) => (
@@ -48,7 +113,10 @@ export const LatexEditor = memo<LatexEditorProps>(
                 onScroll={onTextareaScroll}
                 value={latexSource}
                 onChange={handleLatexChange}
-                className="absolute inset-0 w-full h-full p-2 m-0 font-mono text-xs text-gray-800 bg-white border-none outline-none resize-none leading-6 custom-scrollbar overflow-y-auto"
+                onClick={handleCursorMove}
+                onKeyUp={handleCursorMove}
+                onSelect={handleCursorMove}
+                className="absolute inset-0 w-full h-full p-2 m-0 font-mono text-xs text-gray-800 bg-white border-none outline-none resize-none leading-6 custom-scrollbar overflow-y-auto whitespace-pre-wrap break-words"
               />
             </div>
           </div>
@@ -66,4 +134,3 @@ export const LatexEditor = memo<LatexEditorProps>(
 );
 
 LatexEditor.displayName = "LatexEditor";
-

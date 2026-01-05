@@ -473,7 +473,7 @@ export default function WritingPracticePage() {
                               `}
                             >
                               <div
-                                className={`text-base leading-relaxed break-words ${
+                                className={`text-base leading-relaxed wrap-break-word ${
                                   isActive ? "text-slate-100" : isCompleted ? "text-slate-300" : "text-slate-500"
                                 }`}
                               >
@@ -558,7 +558,7 @@ export default function WritingPracticePage() {
                         >
                           {isCurrent && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>}
 
-                          <div className={`text-lg font-medium leading-relaxed font-sans break-words ${isCurrent ? "text-blue-300" : "text-slate-500"}`}>
+                          <div className={`text-lg font-medium leading-relaxed font-sans wrap-break-word ${isCurrent ? "text-blue-300" : "text-slate-500"}`}>
                             <span className={`text-sm font-bold mr-2 ${isCurrent ? "text-blue-400" : "text-slate-500"}`}>
                               {speaker}:
                             </span>

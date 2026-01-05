@@ -11,7 +11,7 @@ import { getQuestionType, hasMathPlaceholder } from "./utils";
 
 // Memoized Question Card Component
 export const QuestionCard = memo<QuestionCardProps>(
-  ({ question, partIndex, partName, questionIndex, onUpdate, onDelete, onAddAnswer, onUpdateAnswer, onRemoveAnswer, onSelectAnswer }) => {
+  ({ question, partIndex, partName, questionIndex, onUpdate, onDelete, onAddAnswer, onUpdateAnswer, onRemoveAnswer, onSelectAnswer, onMathClick, mathData }) => {
     const handleQuestionChange = useCallback(
       (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         onUpdate(partIndex, question.id, "question", e.target.value);
@@ -121,6 +121,8 @@ export const QuestionCard = memo<QuestionCardProps>(
                     onUpdate={onUpdateAnswer}
                     onRemove={onRemoveAnswer}
                     onSelect={onSelectAnswer}
+                    onMathClick={onMathClick}
+                    mathData={mathData}
                   />
                 );
               })}
@@ -137,7 +139,7 @@ export const QuestionCard = memo<QuestionCardProps>(
             <label className="block text-sm font-medium text-gray-700 mb-2">Đáp án đúng:</label>
             {question.answers[0]?.content && hasMathPlaceholder(question.answers[0].content) ? (
               <div className="text-sm leading-relaxed text-gray-700 py-2">
-                <ParsedMathContent text={question.answers[0].content} />
+                <ParsedMathContent text={question.answers[0].content} onMathClick={onMathClick} mathData={mathData} />
               </div>
             ) : (
               <Input
@@ -170,6 +172,8 @@ export const QuestionCard = memo<QuestionCardProps>(
                     onUpdate={onUpdateAnswer}
                     onRemove={onRemoveAnswer}
                     onSelect={onSelectAnswer}
+                    onMathClick={onMathClick}
+                    mathData={mathData}
                   />
                 );
               })}
@@ -209,11 +213,12 @@ export const QuestionCard = memo<QuestionCardProps>(
               <Button type="text" icon={<InfoCircleOutlined />} size="small" />
               <Button type="text" danger icon={<DeleteOutlined />} size="small" onClick={handleDelete} />
             </div>
+
           </div>
           <div>
             {question.question && hasMathPlaceholder(question.question) ? (
               <div className="text-base leading-relaxed text-gray-700 py-2">
-                <ParsedMathContent text={question.question} />
+                <ParsedMathContent text={question.question} onMathClick={onMathClick} mathData={mathData} />
               </div>
             ) : (
               <Input.TextArea value={question.question} onChange={handleQuestionChange} placeholder="Nhập câu hỏi..." rows={3} className="text-base" />

@@ -11,7 +11,6 @@ import AIChatPanel from "../components/layout/AIChatPanel";
 const pageTitles: Record<string, string> = {
   "/super-admin": "Dashboard",
   "/super-admin/documents-crawl": "Quản lý tài liệu Crawl",
-  "/super-admin/documents-user": "Quản lý tài liệu User",
   "/super-admin/accounts": "Quản lý tài khoản",
   "/super-admin/notification": "Quản lý thông báo",
   "/super-admin/posts": "Quản lý tin tức",

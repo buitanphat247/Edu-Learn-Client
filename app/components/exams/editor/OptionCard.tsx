@@ -9,7 +9,7 @@ import { hasMathPlaceholder } from "./utils";
 
 // Memoized Option Card Component
 export const OptionCard = memo<OptionCardProps>(
-  ({ answer, answerIndex, questionId, partIndex, canDelete, questionType, isCorrect, correctAnswer, onUpdate, onRemove, onSelect }) => {
+  ({ answer, answerIndex, questionId, partIndex, canDelete, questionType, isCorrect, correctAnswer, onUpdate, onRemove, onSelect, onMathClick, mathData }) => {
     const handleClick = useCallback(
       (e: React.MouseEvent) => {
         if (
@@ -74,7 +74,7 @@ export const OptionCard = memo<OptionCardProps>(
         <div className="flex-1 flex flex-col min-w-0">
           {answer.content && hasMathPlaceholder(answer.content) ? (
             <div className="text-sm leading-relaxed text-gray-700 py-1">
-              <ParsedMathContent text={answer.content} />
+              <ParsedMathContent text={answer.content} onMathClick={onMathClick} mathData={mathData} />
             </div>
           ) : (
             <Input.TextArea

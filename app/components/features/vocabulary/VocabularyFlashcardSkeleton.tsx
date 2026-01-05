@@ -14,15 +14,15 @@ export default function VocabularyFlashcardSkeleton() {
         <div className="container mx-auto px-4">
           {/* Header & Breadcrumb Skeleton */}
           <div className="mb-8">
-            <div className="mb-6 bg-[#1e293b] rounded-xl px-6 py-4 h-14 w-96 animate-pulse" />
+            <div className="mb-6 bg-[#1e293b] border border-slate-700/50 rounded-xl px-6 py-4 h-14 w-full animate-pulse" />
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-3">
-                <div className="h-10 w-64 bg-slate-700/50 rounded-lg animate-pulse" />
+                <div className="h-10 w-80 md:w-96 bg-slate-700/50 rounded-lg animate-pulse" />
                 <div className="h-5 w-48 bg-slate-800 rounded animate-pulse" />
               </div>
 
-              <div className="w-36 h-9 bg-linear-to-r from-slate-700 to-slate-800 rounded-lg animate-pulse shadow-lg" />
+              <div className="w-40 h-9 bg-slate-800 rounded-lg animate-pulse border border-slate-700/50 shadow-lg" />
             </div>
           </div>
 
@@ -30,7 +30,7 @@ export default function VocabularyFlashcardSkeleton() {
           <div className="flex flex-col items-center">
             {/* Main Card Skeleton */}
             <div className="w-full max-w-3xl mb-10 h-[450px] relative">
-              <div className="absolute inset-0 bg-[#1e293b] rounded-3xl shadow-2xl border border-slate-700/50 p-8 flex flex-col items-center justify-center">
+              <div className="absolute inset-0 bg-[#1e293b] rounded-3xl shadow-2xl border border-slate-700 p-8 flex flex-col items-center justify-center">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="h-14 w-48 bg-slate-700 rounded-lg animate-pulse" />
                   <div className="h-10 w-10 bg-slate-800 rounded-full animate-pulse" />
@@ -46,18 +46,18 @@ export default function VocabularyFlashcardSkeleton() {
             <div className="w-full max-w-3xl">
               {/* Navigation Skeleton */}
               <div className="flex justify-around items-center mb-8">
-                <div className="w-24 h-12 bg-[#1e293b] rounded-lg animate-pulse border border-slate-800" />
+                <div className="w-24 h-12 bg-[#1e293b] rounded-lg animate-pulse border border-slate-700" />
                 <div className="w-16 h-5 bg-slate-800 rounded animate-pulse" />
-                <div className="w-24 h-12 bg-[#1e293b] rounded-lg animate-pulse border border-slate-800" />
+                <div className="w-24 h-12 bg-[#1e293b] rounded-lg animate-pulse border border-slate-700" />
               </div>
 
               {/* Difficulty Skeleton */}
               <div className="flex flex-col items-center gap-3">
                 <div className="h-4 w-32 bg-slate-800 rounded animate-pulse" />
                 <div className="flex gap-3">
-                  <div className="w-20 h-10 bg-[#1e293b] rounded-lg animate-pulse border border-slate-800" />
-                  <div className="w-24 h-10 bg-[#1e293b] rounded-lg animate-pulse border border-slate-800" />
-                  <div className="w-20 h-10 bg-[#1e293b] rounded-lg animate-pulse border border-slate-800" />
+                  <div className="w-20 h-10 bg-[#1e293b] rounded-lg animate-pulse border border-slate-700" />
+                  <div className="w-24 h-10 bg-[#1e293b] rounded-lg animate-pulse border border-slate-700" />
+                  <div className="w-20 h-10 bg-[#1e293b] rounded-lg animate-pulse border border-slate-700" />
                 </div>
               </div>
             </div>

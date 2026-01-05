@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   HomeOutlined,
   SettingOutlined,
-  ReadOutlined,
   BellOutlined,
   UserOutlined,
   FileTextOutlined,
@@ -17,7 +16,6 @@ import {
 const menuItems = [
   { path: "/super-admin", icon: HomeOutlined, label: "Trang chủ" },
   { path: "/super-admin/documents-crawl", icon: CloudDownloadOutlined, label: "Tài liệu Crawl" },
-  { path: "/super-admin/documents-user", icon: ReadOutlined, label: "Tài liệu User" },
   { path: "/super-admin/accounts", icon: UserOutlined, label: "Quản lý tài khoản" },
   { path: "/super-admin/notification", icon: BellOutlined, label: "Quản lý thông báo" },
   { path: "/super-admin/posts", icon: FileTextOutlined, label: "Quản lý tin tức" },

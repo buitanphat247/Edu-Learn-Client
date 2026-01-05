@@ -107,12 +107,6 @@ export default function EventDetailModal({ open, event, onCancel }: EventDetailM
               </h3>
               <p className="text-slate-400 leading-relaxed text-base">{event.description}</p>
             </div>
-
-            <div className="pt-4 border-t border-slate-700">
-              <p className="text-sm text-slate-500 flex items-center gap-2">
-                Số lượng tham gia: <span className="font-semibold text-slate-300 text-base">{event.participants}</span>
-              </p>
-            </div>
           </div>
         )}
       </Modal>

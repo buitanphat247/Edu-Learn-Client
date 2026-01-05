@@ -1,6 +1,6 @@
 // MATH_DATA constant for math formula rendering
 export const MATH_DATA: Record<string, string> = {
-  mathm10_1: "\\text{ABC}",
+  mathm10_1: "ABC",
   mathm10_2: "BC^2 = AB^2 + AC^2 + 2AB \\cdot AC \\cdot \\cos A",
   mathm10_3: "BC^2 = AB^2 + AC^2 - 2AB \\cdot AC \\cdot \\cos A",
   mathm10_4: "BC^2 = AB^2 + AC^2 + 2 \\cdot AB \\cdot AC \\cdot \\sin A",
@@ -14,7 +14,7 @@ export const MATH_DATA: Record<string, string> = {
   mathm11_7: "2 \\overrightarrow{AB} = 3 \\overrightarrow{AM}",
   mathm11_8: "\\overrightarrow{3BM} = \\overrightarrow{BA}",
   mathm12_1: "\\begin{cases}\nx - y \\geq 0 \\\\\nx - y \\leq 2 \\\\\nx + y \\geq 0 \\\\\nx + y \\leq 4\n\\end{cases}",
-  mathm12_2: "\\text{OABC}",
+  mathm12_2: "<b>OABC</b>",
   mathm12_3: "L = 2x + y",
   mathm14_1: "<b>ABCD</b>",
   mathm14_10: "\\overrightarrow{DA} + \\overrightarrow{DB} + \\overrightarrow{DC} = 2 \\overrightarrow{DG}",
@@ -28,7 +28,8 @@ export const MATH_DATA: Record<string, string> = {
   mathm14_8: "\\overrightarrow{DA} + \\overrightarrow{DB} = 2 \\overrightarrow{DM}",
   mathm14_9: "\\overrightarrow{DA} + \\overrightarrow{DB} + \\overrightarrow{DC} = 2 \\overrightarrow{DO}",
   mathm15_1: "<b>ABCD</b>",
-  mathm15_10: "\\overrightarrow{OA} + \\overrightarrow{OB} + \\overrightarrow{OC} + \\overrightarrow{OD} = \\overrightarrow{AD} + \\overrightarrow{CB}",
+  mathm15_10:
+    "\\overrightarrow{OA} + \\overrightarrow{OB} + \\overrightarrow{OC} + \\overrightarrow{OD} = \\overrightarrow{AD} + \\overrightarrow{CB}",
   mathm15_2: "\\text{O}",
   mathm15_3: "\\text{AC}",
   mathm15_4: "<b>BD</b>",
@@ -115,7 +116,7 @@ export const MATH_DATA: Record<string, string> = {
   mathm8_5: "\\overrightarrow{MA} + \\overrightarrow{MB} + \\overrightarrow{MC} = \\overrightarrow{MG}",
   mathm8_6: "\\overrightarrow{MA} + \\overrightarrow{MB} + \\overrightarrow{MC} = 2 \\overrightarrow{MG}",
   mathm8_7: "\\overrightarrow{MA} + \\overrightarrow{MB} + \\overrightarrow{MC} = 3MG",
-  mathm9_1: "\\text{ABC}",
+  mathm9_1: "ABC",
   mathm9_2: "\\text{R}",
   mathm9_3: "\\frac{BC}{\\sin A} = 2R",
   mathm9_4: "\\frac{BC}{\\cos A} = 2R",
@@ -124,6 +125,5 @@ export const MATH_DATA: Record<string, string> = {
 };
 
 // Compiled regex for better performance
-export const MATH_PLACEHOLDER_REGEX = /\[:\$([^$]+)\$\]/g;
-export const HAS_MATH_REGEX = /\[:\$[^$]+\$\]/;
-
+export const MATH_PLACEHOLDER_REGEX = /\[:\$([^$]+)\$\]|\$((?:\\.|[^$])+)\$/g;
+export const HAS_MATH_REGEX = /\[:\$[^$]+\$\]|\$[^$]+\$/;

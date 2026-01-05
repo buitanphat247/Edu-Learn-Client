@@ -2,15 +2,17 @@
 
 import { memo, useMemo } from "react";
 import { MATH_DATA, MATH_PLACEHOLDER_REGEX } from "./constants";
-import { renderKaTeX } from "./utils";
+import { renderKaTeX, stripBoldTags } from "./utils";
 import "katex/dist/katex.min.css";
 
 interface ParsedMathContentProps {
   text: string;
+  mathData?: Record<string, string>;
+  onMathClick?: (key: string, isRaw: boolean) => void;
 }
 
 // Memoized component for parsed math content
-export const ParsedMathContent = memo<ParsedMathContentProps>(({ text }) => {
+export const ParsedMathContent = memo<ParsedMathContentProps>(({ text, mathData = MATH_DATA, onMathClick }) => {
   const parsedContent = useMemo(() => {
     if (!text) return [];
 
@@ -30,26 +32,109 @@ export const ParsedMathContent = memo<ParsedMathContentProps>(({ text }) => {
       }
 
       // Replace placeholder with KaTeX or HTML
-      const mathKey = match[1];
-      const mathValue = MATH_DATA[mathKey];
-      const uniqueKey = `math-${mathKey}-${keyCounter++}`;
+      const placeholderKey = match[1];
+      const rawLatex = match[2];
+      const uniqueKey = `math-${placeholderKey || "raw"}-${keyCounter++}`;
 
-      if (mathValue) {
-        // If it's HTML (contains <b>, <i>, etc.), render as HTML
-        if (mathValue.trim().startsWith("<") || mathValue.includes("<b>") || mathValue.includes("<i>")) {
-          parts.push(<span key={uniqueKey} dangerouslySetInnerHTML={{ __html: mathValue }} />);
-        } else {
-          // Render as KaTeX inline math with caching
-          const html = renderKaTeX(mathValue);
-          if (html) {
-            parts.push(<span key={uniqueKey} dangerouslySetInnerHTML={{ __html: html }} />);
+      if (placeholderKey) {
+        let mathValue = mathData[placeholderKey];
+        if (mathValue) {
+          // Strip <b> tags first
+          mathValue = stripBoldTags(mathValue);
+
+          const handleClick = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            // placeholderKey is a key in mathMap, pass false to indicate it's a key (not raw LaTeX)
+            onMathClick?.(placeholderKey, false); // false = it's a key in mathMap, not raw LaTeX
+          };
+
+          // Check if it's HTML (contains <i>, etc. - but <b> already stripped)
+          if (mathValue.trim().startsWith("<") || mathValue.includes("<i>")) {
+            // Render as HTML (for italic or other HTML tags)
+            parts.push(
+              <span
+                key={uniqueKey}
+                dangerouslySetInnerHTML={{ __html: mathValue }}
+                onClick={handleClick}
+                className="cursor-pointer hover:bg-blue-100 rounded px-0.5 transition-colors"
+                title="Click to edit"
+              />
+            );
           } else {
-            parts.push(<span key={uniqueKey} className="text-red-500">[Math Error: {mathKey}]</span>);
+            // Check if it contains LaTeX commands (starts with \ or contains math symbols)
+            const hasLaTeXCommands = /\\[a-zA-Z]+|[\^_\\{}]/.test(mathValue);
+            
+            if (!hasLaTeXCommands && mathValue.trim()) {
+              // Plain text after stripping <b> tags - render directly
+              parts.push(
+                <span
+                  key={uniqueKey}
+                  onClick={handleClick}
+                  className="cursor-pointer hover:bg-blue-100 rounded px-0.5 transition-colors"
+                  title="Click to edit"
+                >
+                  {mathValue}
+                </span>
+              );
+            } else {
+              // Render as KaTeX inline math with caching
+              const html = renderKaTeX(mathValue);
+              if (html) {
+                parts.push(
+                  <span
+                    key={uniqueKey}
+                    dangerouslySetInnerHTML={{ __html: html }}
+                    onClick={handleClick}
+                    className="cursor-pointer hover:bg-blue-100 rounded px-0.5 transition-colors inline-block"
+                    title="Click to edit formula"
+                  />
+                );
+              } else {
+                parts.push(
+                  <span key={uniqueKey} className="text-red-500">
+                    [Math Error: {placeholderKey}]
+                  </span>
+                );
+              }
+            }
           }
+        } else {
+          // If not found, show placeholder
+          parts.push(
+            <span key={uniqueKey} className="text-yellow-600">
+              [Missing: {placeholderKey}]
+            </span>
+          );
         }
-      } else {
-        // If not found, show placeholder
-        parts.push(<span key={uniqueKey} className="text-yellow-600">[Missing: {mathKey}]</span>);
+      } else if (rawLatex) {
+        // Render raw LaTeX
+        // For raw latex, we might want to edit the raw content.
+        // We pass the raw content as key? Or a special indicator?
+        // Let's pass the raw latex string.
+        const handleClick = (e: React.MouseEvent) => {
+          e.stopPropagation();
+          // rawLatex is raw LaTeX string, pass true to indicate it's raw LaTeX (not a key in mathMap)
+          onMathClick?.(rawLatex, true); // true = raw LaTeX string, not a key
+        };
+
+        const html = renderKaTeX(rawLatex);
+        if (html) {
+          parts.push(
+            <span
+              key={uniqueKey}
+              dangerouslySetInnerHTML={{ __html: html }}
+              onClick={handleClick}
+              className="cursor-pointer hover:bg-blue-100 rounded px-0.5 transition-colors inline-block"
+              title="Click to edit LaTeX"
+            />
+          );
+        } else {
+          parts.push(
+            <span key={uniqueKey} className="text-red-500">
+              [Math Error]
+            </span>
+          );
+        }
       }
 
       lastIndex = regex.lastIndex;
@@ -69,10 +154,9 @@ export const ParsedMathContent = memo<ParsedMathContentProps>(({ text }) => {
     }
 
     return parts;
-  }, [text]);
+  }, [text, mathData, onMathClick]); // Depend on mathData
 
   return <>{parsedContent}</>;
 });
 
 ParsedMathContent.displayName = "ParsedMathContent";
-

@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ReadOutlined,
   BellOutlined,
   UserOutlined,
   FileTextOutlined,
@@ -26,15 +25,6 @@ const dashboardItems = [
     iconBg: "bg-blue-100",
     iconColor: "text-blue-600",
     path: "/super-admin/documents-crawl",
-  },
-  {
-    icon: ReadOutlined,
-    title: "Tài liệu User",
-    description: "Quản lý tài liệu được người dùng upload lên hệ thống",
-    gradient: "from-cyan-500 to-cyan-600",
-    iconBg: "bg-cyan-100",
-    iconColor: "text-cyan-600",
-    path: "/super-admin/documents-user",
   },
   {
     icon: UserOutlined,

@@ -39,3 +39,11 @@ export const hasMathPlaceholder = (text: string): boolean => {
   return HAS_MATH_REGEX.test(text);
 };
 
+// Helper function to strip <b> tags from text
+// Converts <b>ABCD</b> to ABCD
+export const stripBoldTags = (text: string): string => {
+  if (!text) return text;
+  // Remove opening <b> and closing </b> tags (case-insensitive)
+  return text.replace(/<\/?b>/gi, "");
+};
+

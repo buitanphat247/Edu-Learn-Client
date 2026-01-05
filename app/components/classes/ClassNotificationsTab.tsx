@@ -293,7 +293,14 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
           {displayNotifications.map((notification) => (
             <div
               key={notification.id}
-              className="bg-white rounded-lg border-l-4 border-blue-500 border-t border-r border-b p-6 hover:shadow-md transition-shadow duration-200"
+              className="bg-white rounded-lg border-l-4 border-blue-500 border-t border-r border-b p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+              onClick={() => {
+                const fullNotification = notifications.find((n) => String(n.notification_id) === notification.id);
+                if (fullNotification) {
+                  setSelectedNotification(fullNotification);
+                  setIsDetailModalOpen(true);
+                }
+              }}
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-start justify-between gap-4">
@@ -315,14 +322,22 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
                         }}
                         trigger={["click"]}
                       >
-                        <Button type="text" icon={<MoreOutlined />} className="shrink-0" />
+                        <Button
+                          type="text"
+                          icon={<MoreOutlined />}
+                          className="shrink-0"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent card click when clicking dropdown
+                          }}
+                        />
                       </Dropdown>
                     ) : (
                       <Button
                         type="text"
                         icon={<MoreOutlined />}
                         className="shrink-0"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click when clicking button
                           const fullNotification = notifications.find((n) => String(n.notification_id) === notification.id);
                           if (fullNotification) {
                             setSelectedNotification(fullNotification);

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Input, Button } from "antd";
+import { Input, Button, Modal } from "antd";
 import DarkConfigProvider from "@/app/components/common/DarkConfigProvider";
+import SettingsTab from "@/app/components/social/SettingsTab";
 import {
   SearchOutlined,
   UserAddOutlined,
@@ -24,6 +25,8 @@ import {
   ContactsOutlined,
   MessageOutlined,
   BellOutlined,
+  CloseOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
 
 interface Conversation {
@@ -70,6 +73,8 @@ export default function SocialPage() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>("2");
   const [message, setMessage] = useState("");
   const [bottomTab, setBottomTab] = useState<"messages" | "contacts" | "cloud" | "settings">("messages");
+  const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   // Mock conversations data theo mô tả
   const conversations: Conversation[] = [
@@ -203,11 +208,65 @@ export default function SocialPage() {
 
   const activeConversation = conversations.find((c) => c.id === selectedConversation);
 
+  // Mock data for add friend modal
+  const recentSearchResults = [
+    {
+      id: "r1",
+      name: "Như Quỳnh | Cao Thiên I",
+      phone: "(+84) 0936 774 373",
+      avatar: "N",
+    },
+    {
+      id: "r2",
+      name: "Feli Home",
+      phone: "(+84) 0707 175 937",
+      avatar: "F",
+    },
+    {
+      id: "r3",
+      name: "Tam X",
+      phone: "(+84) 0347 979 595",
+      avatar: "T",
+    },
+  ];
+
+  const suggestedFriends = [
+    {
+      id: "s1",
+      name: "An Mmo",
+      avatar: "A",
+    },
+    {
+      id: "s2",
+      name: "Bảo Trâm",
+      avatar: "B",
+    },
+    {
+      id: "s3",
+      name: "Clone Tiktok Job SII",
+      avatar: "C",
+    },
+  ];
+
   const handleSendMessage = () => {
     if (message.trim()) {
       // Handle send message logic here
       setMessage("");
     }
+  };
+
+  const handleAddFriendClick = () => {
+    setIsAddFriendModalOpen(true);
+  };
+
+  const handleSearchFriend = () => {
+    // Handle search friend logic here
+    console.log("Searching for:", phoneNumber);
+  };
+
+  const handleAddFriendFromSuggestion = (friendId: string) => {
+    // Handle add friend from suggestion
+    console.log("Adding friend:", friendId);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -243,6 +302,7 @@ export default function SocialPage() {
                 size="small"
                 icon={<UserAddOutlined className="text-sm" style={{ color: "white" }} />}
                 className="rounded-lg hover:bg-slate-800 [&_.anticon]:text-white!"
+                onClick={handleAddFriendClick}
               />
               <Button
                 size="small"
@@ -348,15 +408,10 @@ export default function SocialPage() {
                   </Button>
                 </div>
               </div>
-            ) : bottomTab === "settings" ? (
+            ) : // Settings Content
+            bottomTab === "settings" ? (
               // Settings Content
-              <div className="px-4 py-4">
-                <div className="text-center py-8">
-                  <SettingOutlined className="text-5xl mb-4" style={{ color: "white" }} />
-                  <h3 className="text-lg font-semibold text-slate-200 mb-2">Cài đặt</h3>
-                  <p className="text-sm text-slate-400">Tùy chỉnh cài đặt của bạn</p>
-                </div>
-              </div>
+              <SettingsTab />
             ) : bottomTab === "messages" || bottomTab === null ? (
               // Conversations List (default for messages)
               conversations.map((conversation) => (
@@ -487,18 +542,7 @@ export default function SocialPage() {
                 style={{ color: "white" }}
               />
             </button>
-            <button
-              onClick={() => setBottomTab("cloud")}
-              title="Cloud của tôi"
-              className={`p-2 rounded-lg transition-all duration-200 border-none cursor-pointer flex items-center justify-center ${
-                bottomTab === "cloud" ? "bg-blue-500! shadow-md scale-105" : "hover:bg-slate-800 bg-transparent"
-              }`}
-            >
-              <CloudOutlined
-                className={`text-lg transition-all duration-200 ${bottomTab === "cloud" ? "scale-110" : ""}`}
-                style={{ color: "white" }}
-              />
-            </button>
+
             <button
               onClick={() => setBottomTab("settings")}
               title="Cài đặt"
@@ -522,14 +566,14 @@ export default function SocialPage() {
               <header className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900 sticky top-0 z-10">
                 <div className="flex items-center gap-4">
                   {activeConversation.isGroup ? (
-                    <div className="grid grid-cols-2 gap-0.5 w-12 h-12 rounded-lg overflow-hidden ring-1 ring-slate-700">
+                    <div className="grid grid-cols-2 gap-0.5 w-8 h-8  rounded-lg overflow-hidden ring-1 ring-slate-700">
                       <div className="bg-blue-500"></div>
                       <div className="bg-green-500"></div>
                       <div className="bg-yellow-500"></div>
                       <div className="bg-slate-700 flex items-center justify-center text-[8px] font-bold text-white">+2</div>
                     </div>
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold text-lg">
+                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold text-lg">
                       {activeConversation.name.charAt(0)}
                     </div>
                   )}
@@ -543,26 +587,30 @@ export default function SocialPage() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-1 text-slate-400">
                   <Button
                     type="text"
-                    icon={<UserAddOutlined className="text-lg" style={{ color: "white" }} />}
-                    className="p-2 rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
+                    size="small"
+                    icon={<UserAddOutlined className="text-[16px]" style={{ color: "white" }} />}
+                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
                   />
                   <Button
                     type="text"
-                    icon={<SearchOutlined className="text-lg" style={{ color: "white" }} />}
-                    className="p-2 rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
+                    size="small"
+                    icon={<SearchOutlined className="text-[16px]" style={{ color: "white" }} />}
+                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
                   />
                   <Button
                     type="text"
-                    icon={<VideoCameraOutlined className="text-lg" style={{ color: "white" }} />}
-                    className="p-2 rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
+                    size="small"
+                    icon={<VideoCameraOutlined className="text-[16px]" style={{ color: "white" }} />}
+                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
                   />
                   <Button
                     type="text"
-                    icon={<MoreOutlined className="text-lg" style={{ color: "white" }} />}
-                    className="p-2 rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
+                    size="small"
+                    icon={<MoreOutlined className="text-[16px]" style={{ color: "white" }} />}
+                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
                   />
                 </div>
               </header>
@@ -720,6 +768,113 @@ export default function SocialPage() {
             </div>
           )}
         </main>
+
+        {/* Add Friend Modal */}
+        <Modal
+          open={isAddFriendModalOpen}
+          onCancel={() => setIsAddFriendModalOpen(false)}
+          footer={null}
+          closeIcon={null}
+          width={400}
+          centered
+          styles={{
+            mask: {
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              backdropFilter: "blur(2px)",
+            },
+          }}
+          className="add-friend-modal"
+        >
+          <div className="flex flex-col h-full text-slate-200">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-white leading-none mb-0 tracking-tight">Thêm Bạn</h2>
+              <button
+                onClick={() => setIsAddFriendModalOpen(false)}
+                className="flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-all border-none bg-transparent cursor-pointer"
+              >
+                <CloseOutlined className="text-sm" />
+              </button>
+            </div>
+
+            <div>
+              {/* Search Input */}
+              <div className="mb-4">
+                <Input
+                  prefix={<SearchOutlined className="text-slate-400 text-base mr-2" />}
+                  placeholder="Tìm kiếm"
+                  value={phoneNumber}
+                  size="small"
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="bg-[#303134] hover:bg-[#303134] focus:bg-[#303134] border-none text-white placeholder:text-slate-400 text-[14px] [&>input]:text-white [&>input]:bg-transparent px-4 shadow-inner"
+                />
+              </div>
+
+              <div className="space-y-4">
+                {/* Recent Results */}
+                {recentSearchResults.length > 0 && (
+                  <div>
+                    <h3 className="text-[13px] font-bold text-slate-400 mb-2">Kết quả gần nhất</h3>
+                    <div className="space-y-0.5">
+                      {recentSearchResults.map((result) => (
+                        <div
+                          key={result.id}
+                          className="group flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-200"
+                        >
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md shrink-0 ${
+                              result.avatar === "N" ? "bg-blue-600" : result.avatar === "F" ? "bg-purple-600" : "bg-indigo-600"
+                            }`}
+                          >
+                            {result.avatar}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-[14px] font-medium text-white group-hover:text-blue-400 transition-colors truncate mb-0 leading-tight">
+                              {result.name}
+                            </h4>
+                            <p className="text-[12px] text-slate-400 mb-0 leading-tight mt-1">{result.phone}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Suggested Friends */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <UserAddOutlined className="text-slate-400 text-sm" />
+                    <h3 className="text-[13px] font-bold text-slate-400 mb-0">Có thể bạn quen</h3>
+                  </div>
+                  <div className="space-y-0.5">
+                    {suggestedFriends.map((friend) => (
+                      <div
+                        key={friend.id}
+                        className="group flex items-center justify-between p-2 -mx-2 rounded-lg hover:bg-white/5 transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md shrink-0 ${
+                              friend.avatar === "A" ? "bg-violet-600" : friend.avatar === "B" ? "bg-pink-600" : "bg-cyan-600"
+                            }`}
+                          >
+                            {friend.avatar}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-[14px] font-medium text-white group-hover:text-blue-400 transition-colors truncate mb-0 leading-tight">
+                              {friend.name}
+                            </h4>
+                            <p className="text-[12px] text-slate-400 mb-0 leading-tight mt-1 ">Từ gợi ý kết bạn</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Modal>
       </div>
     </DarkConfigProvider>
   );

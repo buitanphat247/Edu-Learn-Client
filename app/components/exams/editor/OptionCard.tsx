@@ -5,7 +5,6 @@ import { Button, Input, Radio } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { OptionCardProps } from "./types";
 import { ParsedMathContent } from "./ParsedMathContent";
-import { hasMathPlaceholder } from "./utils";
 
 // Memoized Option Card Component
 export const OptionCard = memo<OptionCardProps>(
@@ -25,12 +24,6 @@ export const OptionCard = memo<OptionCardProps>(
       [isCorrect, partIndex, questionId, answerIndex, questionType, onSelect]
     );
 
-    const handleContentChange = useCallback(
-      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onUpdate(partIndex, questionId, answerIndex, "content", e.target.value);
-      },
-      [partIndex, questionId, answerIndex, onUpdate]
-    );
 
     const handleDelete = useCallback(
       (e: React.MouseEvent) => {
@@ -72,22 +65,9 @@ export const OptionCard = memo<OptionCardProps>(
           {answer.key}
         </div>
         <div className="flex-1 flex flex-col min-w-0">
-          {answer.content && hasMathPlaceholder(answer.content) ? (
-            <div className="text-sm leading-relaxed text-gray-700 py-1">
-              <ParsedMathContent text={answer.content} onMathClick={onMathClick} mathData={mathData} />
-            </div>
-          ) : (
-            <Input.TextArea
-              value={answer.content}
-              onChange={handleContentChange}
-              placeholder="Nhập nội dung đáp án..."
-              bordered={false}
-              autoSize={{ minRows: 1, maxRows: 5 }}
-              className="shadow-none px-0 bg-transparent hover:bg-transparent focus:bg-transparent resize-none! text-sm leading-5 py-0"
-              style={{ padding: 0, height: "auto", minHeight: "auto", maxHeight: "none" }}
-              onClick={(e) => e.stopPropagation()}
-            />
-          )}
+          <div className="text-sm leading-relaxed text-gray-700 py-1">
+            <ParsedMathContent text={answer.content || ""} onMathClick={onMathClick} mathData={mathData} />
+          </div>
         </div>
         {questionType === "true_false" && (
           <div className="true-false-radio shrink-0" onClick={(e) => e.stopPropagation()}>

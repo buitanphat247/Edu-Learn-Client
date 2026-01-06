@@ -56,7 +56,7 @@ export const ParsedMathContent = memo<ParsedMathContentProps>(({ text, mathData 
                 key={uniqueKey}
                 dangerouslySetInnerHTML={{ __html: mathValue }}
                 onClick={handleClick}
-                className="cursor-pointer hover:bg-blue-100 rounded px-0.5 transition-colors"
+                className="cursor-pointer bg-blue-200 hover:bg-blue-300 rounded px-1 py-0.5 transition-colors"
                 title="Click to edit"
               />
             );
@@ -70,7 +70,7 @@ export const ParsedMathContent = memo<ParsedMathContentProps>(({ text, mathData 
                 <span
                   key={uniqueKey}
                   onClick={handleClick}
-                  className="cursor-pointer hover:bg-blue-100 rounded px-0.5 transition-colors"
+                  className="cursor-pointer bg-blue-200 hover:bg-blue-300 rounded px-1 py-0.5 transition-colors"
                   title="Click to edit"
                 >
                   {mathValue}
@@ -85,7 +85,7 @@ export const ParsedMathContent = memo<ParsedMathContentProps>(({ text, mathData 
                     key={uniqueKey}
                     dangerouslySetInnerHTML={{ __html: html }}
                     onClick={handleClick}
-                    className="cursor-pointer hover:bg-blue-100 rounded px-0.5 transition-colors inline-block"
+                    className="cursor-pointer bg-blue-200 hover:bg-blue-300 rounded px-1 py-0.5 transition-colors inline-block"
                     title="Click to edit formula"
                   />
                 );
@@ -124,7 +124,7 @@ export const ParsedMathContent = memo<ParsedMathContentProps>(({ text, mathData 
               key={uniqueKey}
               dangerouslySetInnerHTML={{ __html: html }}
               onClick={handleClick}
-              className="cursor-pointer hover:bg-blue-100 rounded px-0.5 transition-colors inline-block"
+              className="cursor-pointer bg-blue-200 hover:bg-blue-300 rounded px-1 py-0.5 transition-colors inline-block"
               title="Click to edit LaTeX"
             />
           );

@@ -361,8 +361,22 @@ export default function ExamEditorPage() {
   const [partsData, setPartsData] = useState<PartData[]>(() => getInitialPartsData());
 
   const handleSave = useCallback(() => {
+    // Prepare exam data
+    const examData = {
+      examTitle,
+      timeMinutes,
+      maxScore,
+      totalQuestions,
+      status,
+      partsData,
+      mathMap,
+    };
+    
+    // Console log data as JSON
+    console.log("Exam Data:", JSON.stringify(examData, null, 2));
+    
     message.success("Lưu đề thi thành công!");
-  }, [message]);
+  }, [message, examTitle, timeMinutes, maxScore, totalQuestions, status, partsData, mathMap]);
 
   const handleCancel = useCallback(() => {
     router.push(`/admin/classes/${classId}/examinate`);

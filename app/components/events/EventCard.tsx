@@ -15,20 +15,20 @@ export default function EventCard({ id, title, date, time, location, status, col
   
   const getStatusStyles = (color: string) => {
     switch (color) {
-      case 'blue': return "bg-blue-50 text-blue-700 border-blue-200";
-      case 'green': return "bg-emerald-50 text-emerald-700 border-emerald-200";
-      default: return "bg-gray-100 text-gray-600 border-gray-200";
+      case 'blue': return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+      case 'green': return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+      default: return "bg-slate-700 text-slate-200 border-slate-600";
     }
   };
 
   const statusStyle = getStatusStyles(color);
   
   // Side accent color
-  const accentColorClass = color === 'blue' ? 'bg-blue-500' : (color === 'green' ? 'bg-emerald-500' : 'bg-gray-400');
+  const accentColorClass = color === 'blue' ? 'bg-blue-500' : (color === 'green' ? 'bg-emerald-500' : 'bg-slate-600');
 
   return (
     <div 
-      className="group relative bg-white rounded-3xl overflow-hidden shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-gray-100 cursor-pointer"
+      className="group relative bg-[#1e293b] rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-slate-700 cursor-pointer"
       onClick={onDetailClick}
     >
       {/* Side Accent Line */}
@@ -38,39 +38,39 @@ export default function EventCard({ id, title, date, time, location, status, col
         
         {/* Header: Status & Icon */}
         <div className="flex justify-between items-start mb-5">
-           <span className={`px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wide backdrop-blur-sm ${statusStyle}`}>
+           <span className={`px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wide ${statusStyle}`}>
               {status}
            </span>
-           <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors duration-300">
+           <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
               <CalendarOutlined className="text-lg"/>
            </div>
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 mb-4 leading-snug group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 min-h-[3.5rem]">
+        <h3 className="text-xl font-bold text-white mb-4 leading-snug group-hover:text-blue-400 transition-colors duration-200 line-clamp-2 min-h-[3.5rem]">
           {title}
         </h3>
 
         {/* Details Grid */}
-        <div className="space-y-3 mb-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100/50">
-          <div className="flex items-center gap-3 text-gray-500 text-sm">
-             <CalendarOutlined className="text-blue-500"/>
-             <span className="font-semibold text-gray-700">{date}</span>
+        <div className="space-y-3 mb-6 bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+          <div className="flex items-center gap-3 text-slate-400 text-sm">
+             <CalendarOutlined className="text-blue-400"/>
+             <span className="font-semibold text-slate-300">{date}</span>
           </div>
-           <div className="flex items-center gap-3 text-gray-500 text-sm">
-             <ClockCircleOutlined className="text-gray-400"/>
+           <div className="flex items-center gap-3 text-slate-400 text-sm">
+             <ClockCircleOutlined className="text-slate-500"/>
              <span>{time}</span>
           </div>
-           <div className="flex items-center gap-3 text-gray-500 text-sm">
-             <EnvironmentOutlined className="text-gray-400"/>
+           <div className="flex items-center gap-3 text-slate-400 text-sm">
+             <EnvironmentOutlined className="text-slate-500"/>
              <span className="line-clamp-1">{location}</span>
           </div>
         </div>
 
         {/* Action */}
-        <div className="mt-auto flex items-center justify-between text-sm font-semibold text-gray-900 pt-2">
-            <span className="group-hover:text-blue-600 transition-colors">Xem chi tiết</span>
-            <div className="w-8 h-8 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300 transform group-hover:translate-x-1">
+        <div className="mt-auto flex items-center justify-between text-sm font-semibold text-white pt-2">
+            <span className="group-hover:text-blue-400 transition-colors">Xem chi tiết</span>
+            <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300 transform group-hover:translate-x-1">
                <ArrowRightOutlined />
             </div>
         </div>

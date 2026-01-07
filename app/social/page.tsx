@@ -1,10 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Input, Button, Modal } from "antd";
+import { Input, Button, Modal, Select, message as antMessage } from "antd";
 import DarkConfigProvider from "@/app/components/common/DarkConfigProvider";
-import SettingsTab from "@/app/components/social/SettingsTab";
+import NavigationRail from "@/app/components/social/NavigationRail";
+import SocialSidebar from "@/app/components/social/SocialSidebar";
+import ChatArea from "@/app/components/social/ChatArea";
+import ContactsContent from "@/app/components/social/ContactsContent";
+import { Conversation, Message, Contact } from "@/app/components/social/types";
+import {
+  friendSocketClient,
+  sendFriendRequest,
+  acceptFriendRequest as acceptFriendRequestSocket,
+  rejectFriendRequest as rejectFriendRequestSocket,
+  onFriendRequestReceived,
+  onFriendRequestAccepted,
+  onFriendRequestRejected,
+  onFriendError,
+} from "@/lib/socket";
+import { getFriendRequests, getFriends, acceptFriendRequest, rejectFriendRequest, type FriendRequestResponse } from "@/lib/api/friends";
+import { getUserIdFromCookie } from "@/lib/utils/cookies";
 import {
   SearchOutlined,
   UserAddOutlined,
@@ -29,44 +45,6 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 
-interface Conversation {
-  id: string;
-  name: string;
-  lastMessage: string;
-  time: string;
-  unread?: number;
-  avatar?: string;
-  isGroup?: boolean;
-  isCloud?: boolean;
-  isNotification?: boolean;
-  members?: number;
-  lastAccess?: string;
-  isOwn?: boolean;
-}
-
-interface Message {
-  id: string;
-  sender: string;
-  senderAvatar?: string;
-  content: string;
-  time: string;
-  isOwn: boolean;
-  fileAttachment?: {
-    name: string;
-    size: string;
-    type: string;
-  };
-}
-
-interface Contact {
-  id: string;
-  name: string;
-  avatar?: string;
-  status?: "online" | "offline" | "away";
-  mutualFriends?: number;
-  isFriend?: boolean;
-}
-
 export default function SocialPage() {
   const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState<"all" | "unread" | "categorized">("all");
@@ -74,7 +52,29 @@ export default function SocialPage() {
   const [message, setMessage] = useState("");
   const [bottomTab, setBottomTab] = useState<"messages" | "contacts" | "cloud" | "settings">("messages");
   const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
+  const [contactSubTab, setContactSubTab] = useState<"friends" | "groups" | "requests" | "sent_requests">("friends");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [inputType, setInputType] = useState<"phone" | "email">("phone");
+  const [countryCode, setCountryCode] = useState("+84");
+  const [friendRequests, setFriendRequests] = useState<FriendRequestResponse[]>([]);
+  const [loadingFriendRequests, setLoadingFriendRequests] = useState(false);
+  const [sendingRequest, setSendingRequest] = useState(false);
+
+  // Filter: Only show friend requests where current user is the addressee (received requests)
+  // Don't show requests where current user is the requester (sent requests)
+  const currentUserId = getUserIdFromCookie();
+  const currentUserIdNumber =
+    typeof currentUserId === "string" ? parseInt(currentUserId, 10) : typeof currentUserId === "number" ? currentUserId : null;
+  const receivedFriendRequests = useMemo(() => {
+    if (currentUserIdNumber === null) return [];
+    return friendRequests.filter((request) => String(request.addressee_id) === String(currentUserIdNumber));
+  }, [friendRequests, currentUserIdNumber]);
+
+  const sentFriendRequests = useMemo(() => {
+    if (currentUserIdNumber === null) return [];
+    return friendRequests.filter((request) => String(request.requester_id) === String(currentUserIdNumber));
+  }, [friendRequests, currentUserIdNumber]);
 
   // Mock conversations data theo mô tả
   const conversations: Conversation[] = [
@@ -167,44 +167,15 @@ export default function SocialPage() {
     },
   ];
 
-  // Mock contacts data
+  // Create a state for friends list to replace mock data
+  const [contacts, setContacts] = useState<Contact[]>([]);
+
+  // Mock contacts data removed as requested
+  /* 
   const contacts: Contact[] = [
-    {
-      id: "c1",
-      name: "Trần Văn A",
-      status: "online",
-      mutualFriends: 5,
-      isFriend: true,
-    },
-    {
-      id: "c2",
-      name: "Phạm Thị B",
-      status: "offline",
-      mutualFriends: 3,
-      isFriend: false,
-    },
-    {
-      id: "c3",
-      name: "Lê Văn C",
-      status: "online",
-      mutualFriends: 8,
-      isFriend: true,
-    },
-    {
-      id: "c4",
-      name: "Nguyễn Thị D",
-      status: "away",
-      mutualFriends: 2,
-      isFriend: false,
-    },
-    {
-      id: "c5",
-      name: "Hoàng Văn E",
-      status: "online",
-      mutualFriends: 12,
-      isFriend: true,
-    },
+    ... removed mock data ...
   ];
+  */
 
   const activeConversation = conversations.find((c) => c.id === selectedConversation);
 
@@ -259,15 +230,340 @@ export default function SocialPage() {
     setIsAddFriendModalOpen(true);
   };
 
-  const handleSearchFriend = () => {
-    // Handle search friend logic here
-    console.log("Searching for:", phoneNumber);
+  const handleSendFriendRequest = async () => {
+    const userId = getUserIdFromCookie();
+    if (!userId) {
+      antMessage.error("Vui lòng đăng nhập để gửi lời mời kết bạn");
+      return;
+    }
+
+    if (inputType === "phone") {
+      if (!phoneNumber.trim()) {
+        antMessage.warning("Vui lòng nhập số điện thoại");
+        return;
+      }
+    } else {
+      if (!email.trim()) {
+        antMessage.warning("Vui lòng nhập email");
+        return;
+      }
+    }
+
+    setSendingRequest(true);
+    try {
+      const userIdNumber = typeof userId === "string" ? parseInt(userId, 10) : userId;
+      if (isNaN(userIdNumber)) {
+        throw new Error("User ID không hợp lệ");
+      }
+
+      const requestData = {
+        requester_id: userIdNumber,
+        ...(inputType === "phone" ? { phone: phoneNumber.trim() } : { email: email.trim() }),
+      };
+
+      await sendFriendRequest(requestData);
+
+      antMessage.success("Đã gửi lời mời kết bạn thành công!");
+
+      // Reset form
+      setPhoneNumber("");
+      setEmail("");
+      setIsAddFriendModalOpen(false);
+
+      // Refresh friend requests list
+      fetchFriendRequests();
+    } catch (error: any) {
+      console.error("Error sending friend request:", error);
+      antMessage.error(error.message || "Không thể gửi lời mời kết bạn. Vui lòng thử lại.");
+    } finally {
+      setSendingRequest(false);
+    }
   };
 
   const handleAddFriendFromSuggestion = (friendId: string) => {
     // Handle add friend from suggestion
     console.log("Adding friend:", friendId);
   };
+
+  // Fetch friend requests
+  const fetchFriendRequests = useCallback(async () => {
+    const userId = getUserIdFromCookie();
+    if (!userId) {
+      console.warn("No user ID found, skipping friend requests fetch");
+      return;
+    }
+
+    setLoadingFriendRequests(true);
+    try {
+      const userIdNumber = typeof userId === "string" ? parseInt(userId, 10) : userId;
+      if (isNaN(userIdNumber)) {
+        throw new Error("User ID không hợp lệ");
+      }
+
+      console.log("Fetching friend requests for userId:", userIdNumber);
+      const result = await getFriendRequests({ userId: userIdNumber, limit: 50 });
+      console.log("Friend requests result:", result);
+      setFriendRequests(result.requests || []);
+
+      if (result.requests && result.requests.length > 0) {
+        console.log("Loaded", result.requests.length, "friend requests");
+      } else {
+        console.log("No friend requests found");
+      }
+    } catch (error: any) {
+      console.error("Error fetching friend requests:", error);
+      const errorMessage = error?.message || "Không thể tải danh sách lời mời kết bạn";
+      // Don't show error message if it's just an empty result
+      if (!errorMessage.includes("endpoint không tồn tại") && !errorMessage.includes("404")) {
+        antMessage.error(errorMessage);
+      }
+      // Also log to console for debugging
+      if (error?.response) {
+      }
+    } finally {
+      setLoadingFriendRequests(false);
+    }
+  }, []);
+
+  // Fetch friends list
+  const fetchContacts = useCallback(async () => {
+    const userId = getUserIdFromCookie();
+    if (!userId) return;
+
+    try {
+      const response = await getFriends({ userId });
+
+      // Map friend data to Contact interface
+      const mappedContacts: Contact[] = response.data.map((friend) => {
+        const userIdStr = String(userId);
+        const isRequester = String(friend.requester_id) === userIdStr;
+        const friendUser = isRequester ? friend.addressee : friend.requester;
+
+        return {
+          id: String(friendUser?.user_id),
+          name: friendUser?.fullname || friendUser?.username || "Unknown",
+          avatar: friendUser?.avatar || undefined,
+          status: (friendUser?.status as any) || "offline",
+          isFriend: true,
+        };
+      });
+
+      setContacts(mappedContacts);
+    } catch (error) {
+      console.error("Error fetching friends:", error);
+    }
+  }, []);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchContacts();
+  }, [fetchContacts]);
+
+  // Handle accept friend request (using socket)
+  const handleAcceptFriendRequest = async (friendRequestId: number) => {
+    const userId = getUserIdFromCookie();
+    if (!userId) {
+      antMessage.error("Vui lòng đăng nhập");
+      return;
+    }
+
+    try {
+      const userIdNumber = typeof userId === "string" ? parseInt(userId, 10) : userId;
+      if (isNaN(userIdNumber)) {
+        throw new Error("User ID không hợp lệ");
+      }
+
+      // Find the friend request to get requester_id for validation
+      const friendRequest = friendRequests.find((req) => req.id === friendRequestId);
+      if (!friendRequest) {
+        throw new Error("Không tìm thấy lời mời kết bạn");
+      }
+
+      // Verify that current user is the addressee (receiver) - only addressee can accept
+      if (String(friendRequest.addressee_id) !== String(userIdNumber)) {
+        throw new Error("Bạn không có quyền chấp nhận lời mời này");
+      }
+
+      // Backend expects requester_id (the person who sent the request) for validation
+      // But user_id should be the addressee (current user) who is accepting
+      const requesterId = friendRequest.requester_id || friendRequest.requester?.user_id;
+      if (!requesterId) {
+        throw new Error("Không tìm thấy thông tin người gửi lời mời");
+      }
+
+      // Use socket to accept friend request
+      // Backend validates that user_id === addressee_id of the friend request
+      await acceptFriendRequestSocket({
+        user_id: userIdNumber, // Current user (addressee)
+        friend_id: friendRequestId, // Friend request ID
+        requester_id: requesterId, // Person who sent the request (for backend validation)
+      });
+      antMessage.success("Đã chấp nhận lời mời kết bạn");
+
+      // Remove from pending list
+      setFriendRequests((prev) => prev.filter((req) => req.id !== friendRequestId));
+    } catch (error: any) {
+      console.error("Error accepting friend request:", error);
+      antMessage.error(error.message || "Không thể chấp nhận lời mời kết bạn");
+    }
+  };
+
+  // Handle reject friend request (using socket)
+  const handleRejectFriendRequest = async (friendRequestId: number) => {
+    const userId = getUserIdFromCookie();
+    if (!userId) {
+      antMessage.error("Vui lòng đăng nhập");
+      return;
+    }
+
+    try {
+      const userIdNumber = typeof userId === "string" ? parseInt(userId, 10) : userId;
+      if (isNaN(userIdNumber)) {
+        throw new Error("User ID không hợp lệ");
+      }
+
+      // Find the friend request to get requester_id for validation
+      const friendRequest = friendRequests.find((req) => req.id === friendRequestId);
+      if (!friendRequest) {
+        throw new Error("Không tìm thấy lời mời kết bạn");
+      }
+
+      // Verify that current user is related to the request
+      if (String(friendRequest.addressee_id) !== String(userIdNumber) && String(friendRequest.requester_id) !== String(userIdNumber)) {
+        throw new Error("Bạn không có quyền từ chối hoặc hủy lời mời này");
+      }
+
+      // Backend expects requester_id (the person who sent the request) for validation
+      // But user_id should be the addressee (current user) who is rejecting
+      const requesterId = friendRequest.requester_id || friendRequest.requester?.user_id;
+      if (!requesterId) {
+        throw new Error("Không tìm thấy thông tin người gửi lời mời");
+      }
+
+      // Use socket to reject friend request
+      // Backend validates that user_id === addressee_id of the friend request
+      await rejectFriendRequestSocket({
+        user_id: userIdNumber, // Current user (addressee)
+        friend_id: friendRequestId, // Friend request ID
+        requester_id: requesterId, // Person who sent the request (for backend validation)
+      });
+
+      const isRevoke = String(friendRequest.requester_id) === String(userIdNumber);
+      antMessage.success(isRevoke ? "Đã thu hồi lời mời kết bạn" : "Đã từ chối lời mời kết bạn");
+
+      // Remove from pending list
+      setFriendRequests((prev) => prev.filter((req) => req.id !== friendRequestId));
+    } catch (error: any) {
+      console.error("Error rejecting friend request:", error);
+      antMessage.error(error.message || "Không thể thực hiện hành động này");
+    }
+  };
+
+  // Fetch friend requests when component mounts or when switching to contacts tab
+  useEffect(() => {
+    if (bottomTab === "contacts") {
+      fetchFriendRequests();
+    }
+  }, [bottomTab, fetchFriendRequests]);
+
+  // Setup socket connection and listeners
+  useEffect(() => {
+    // Connect to friend socket namespace
+    friendSocketClient.connect();
+
+    // Listen for friend request received (new request)
+    const unsubscribeReceived = onFriendRequestReceived((payload) => {
+      console.log("Friend request received:", payload);
+
+      // Map socket friend data to FriendRequestResponse
+      const newRequest: FriendRequestResponse = {
+        id: payload.friend.id,
+        requester_id: payload.friend.requester_id,
+        addressee_id: payload.friend.addressee_id,
+        status: payload.friend.status === "blocked" ? "pending" : (payload.friend.status as "pending" | "accepted" | "rejected"),
+        created_at: payload.friend.created_at,
+        accepted_at: payload.friend.accepted_at || null,
+        requester: payload.friend.requester
+          ? {
+              user_id: payload.friend.requester.user_id,
+              username: payload.friend.requester.username,
+              fullname: payload.friend.requester.fullname,
+              email: payload.friend.requester.email || "",
+              phone: payload.friend.requester.phone || null,
+              avatar: payload.friend.requester.avatar || null,
+            }
+          : undefined,
+        addressee: payload.friend.addressee
+          ? {
+              user_id: payload.friend.addressee.user_id,
+              username: payload.friend.addressee.username,
+              fullname: payload.friend.addressee.fullname,
+              email: payload.friend.addressee.email || "",
+              phone: payload.friend.addressee.phone || null,
+              avatar: payload.friend.addressee.avatar || null,
+            }
+          : undefined,
+      };
+
+      // Add to friend requests list if not already exists
+      setFriendRequests((prev) => {
+        const exists = prev.some((req) => req.id === newRequest.id);
+        if (!exists) {
+          return [newRequest, ...prev];
+        }
+        return prev;
+      });
+
+      antMessage.info(`Bạn có lời mời kết bạn mới từ ${payload.friend.requester?.fullname || "ai đó"}`);
+    });
+
+    // Listen for friend request accepted
+    const unsubscribeAccepted = onFriendRequestAccepted((payload) => {
+      console.log("Friend request accepted:", payload);
+
+      // Remove from pending list if it's a request we sent (not received)
+      // Or if we accepted it, it will be removed when we handle accept action
+      setFriendRequests((prev) => prev.filter((req) => req.id !== payload.friend.id));
+
+      // Only show notification if we are the requester (the one who sent the invite)
+      // If we are the addressee (the one accepting), we already see the button action feedback
+      const userId = getUserIdFromCookie();
+      const userIdNum = typeof userId === "string" ? parseInt(userId, 10) : userId;
+
+      if (userIdNum === payload.friend.requester_id) {
+        antMessage.success(`${payload.friend.addressee?.fullname || "Ai đó"} đã chấp nhận lời mời kết bạn của bạn`);
+      }
+
+      // Refresh friends list for both users
+      fetchContacts();
+    });
+
+    // Listen for friend request rejected
+    const unsubscribeRejected = onFriendRequestRejected((payload) => {
+      console.log("Friend request rejected:", payload);
+
+      // Remove from pending list
+      setFriendRequests((prev) => prev.filter((req) => req.id !== payload.friend_id));
+
+      // Message removed or optional
+      // antMessage.info(`${payload.requester_id ? "Lời mời đã bị từ chối" : "Đã từ chối lời mời"}`);
+    });
+
+    // Listen for friend request errors
+    const unsubscribeError = onFriendError((payload) => {
+      console.error("Friend request error:", payload);
+      // antMessage.error(payload.error || "Có lỗi xảy ra"); // Removed to prevent duplicate toasts since actions have their own handlers
+    });
+
+    // Cleanup
+    return () => {
+      unsubscribeReceived();
+      unsubscribeAccepted();
+      unsubscribeRejected();
+      unsubscribeError();
+      // Don't disconnect socket here - keep it connected while component is mounted
+    };
+  }, []);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -287,485 +583,41 @@ export default function SocialPage() {
     <DarkConfigProvider>
       <div className="flex h-full bg-[#0f172a] overflow-hidden">
         {/* Left Sidebar */}
-        <aside className="w-[360px] flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 h-full overflow-hidden">
-          {/* Header với Search và Icons */}
-          <div className="px-2 py-4 border-b border-slate-800">
-            <div className="flex items-center gap-1">
-              <Input
-                prefix={<SearchOutlined style={{ color: "white" }} />}
-                placeholder="Tìm kiếm"
-                className="flex-1 rounded-lg [&_.anticon]:text-white!"
-                size="small"
-              />
-              <Button
-                type="text"
-                size="small"
-                icon={<UserAddOutlined className="text-sm" style={{ color: "white" }} />}
-                className="rounded-lg hover:bg-slate-800 [&_.anticon]:text-white!"
-                onClick={handleAddFriendClick}
-              />
-              <Button
-                size="small"
-                type="text"
-                icon={<TeamOutlined className="text-lg" style={{ color: "white" }} />}
-                className="rounded-lg hover:bg-slate-800 [&_.anticon]:text-white!"
-              />
-            </div>
-          </div>
+        <NavigationRail bottomTab={bottomTab} setBottomTab={setBottomTab} />
 
-          {/* Conversations List or Contacts List */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden">
-            {bottomTab === "contacts" ? (
-              // Contacts List
-              <div className="px-4 py-2">
-                <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-slate-200 mb-2">Bạn bè</h3>
-                  {contacts
-                    .filter((c) => c.isFriend)
-                    .map((contact) => (
-                      <div
-                        key={contact.id}
-                        className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 cursor-pointer transition-colors"
-                        onClick={() => {
-                          // Tìm conversation với contact này hoặc tạo mới
-                          const existingConv = conversations.find((c) => c.name === contact.name);
-                          if (existingConv) {
-                            setSelectedConversation(existingConv.id);
-                            setBottomTab("messages"); // Switch back to messages tab
-                          }
-                        }}
-                      >
-                        <div className="relative shrink-0">
-                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold">
-                            {contact.name.charAt(0)}
-                          </div>
-                          {contact.status === "online" && (
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                          )}
-                          {contact.status === "away" && (
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-yellow-500 border-2 border-white rounded-full"></div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-200 truncate">{contact.name}</p>
-                          {contact.mutualFriends && <p className="text-xs text-slate-400">{contact.mutualFriends} bạn chung</p>}
-                        </div>
-                        <Button
-                          type="text"
-                          size="small"
-                          className="text-blue-400 hover:text-blue-300 hover:bg-slate-800"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle message
-                          }}
-                        >
-                          Nhắn tin
-                        </Button>
-                      </div>
-                    ))}
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-200 mb-2">Gợi ý kết bạn</h3>
-                  {contacts
-                    .filter((c) => !c.isFriend)
-                    .map((contact) => (
-                      <div key={contact.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
-                        <div className="relative shrink-0">
-                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white font-semibold">
-                            {contact.name.charAt(0)}
-                          </div>
-                          {contact.status === "online" && (
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-200 truncate">{contact.name}</p>
-                          {contact.mutualFriends && <p className="text-xs text-slate-400">{contact.mutualFriends} bạn chung</p>}
-                        </div>
-                        <Button
-                          type="primary"
-                          size="small"
-                          className="bg-blue-500 hover:bg-blue-600"
-                          onClick={() => {
-                            // Handle add friend
-                          }}
-                        >
-                          Kết bạn
-                        </Button>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            ) : bottomTab === "cloud" ? (
-              // Cloud Content
-              <div className="px-4 py-4">
-                <div className="text-center py-8">
-                  <CloudOutlined className="text-5xl mb-4" style={{ color: "white" }} />
-                  <h3 className="text-lg font-semibold text-slate-200 mb-2">Cloud của tôi</h3>
-                  <p className="text-sm text-slate-400 mb-4">Lưu trữ file quan trọng của bạn</p>
-                  <Button type="primary" className="bg-blue-500 hover:bg-blue-600">
-                    Tải file lên
-                  </Button>
-                </div>
-              </div>
-            ) : // Settings Content
-            bottomTab === "settings" ? (
-              // Settings Content
-              <SettingsTab />
-            ) : bottomTab === "messages" || bottomTab === null ? (
-              // Conversations List (default for messages)
-              conversations.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  className={`group flex items-center gap-3 p-3 mx-2 my-1 rounded-xl cursor-pointer transition-all duration-200 ${
-                    conversation.id === selectedConversation ? "bg-slate-800 shadow-md shadow-slate-900/50" : "hover:bg-slate-800/50"
-                  }`}
-                  onClick={() => setSelectedConversation(conversation.id)}
-                >
-                  {/* Avatar/Icon */}
-                  <div className="relative shrink-0">
-                    {conversation.isCloud ? (
-                      <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <CloudOutlined className="text-xl text-white" />
-                      </div>
-                    ) : conversation.isNotification ? (
-                      <div className="w-12 h-12 rounded-full bg-linear-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                        <BellOutlined className="text-xl text-white" />
-                      </div>
-                    ) : conversation.isGroup ? (
-                      <div className="relative w-12 h-12">
-                        {/* Group Avatar Composition */}
-                        <div className="absolute top-0 left-0 w-8 h-8 rounded-full bg-blue-500 border-2 border-slate-900 z-20 flex items-center justify-center text-white text-xs font-bold">
-                          {conversation.name.charAt(0)}
-                        </div>
-                        <div className="absolute top-0 right-0 w-8 h-8 rounded-full bg-indigo-500 border-2 border-slate-900 z-10 flex items-center justify-center text-white text-xs font-bold">
-                          M
-                        </div>
-                        <div className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-slate-700 border-2 border-slate-900 z-0 flex items-center justify-center text-white text-[10px] font-bold">
-                          +3
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="relative">
-                        <div className="w-12 h-12 rounded-full bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-lg shadow-lg shadow-purple-500/20">
-                          {conversation.name.charAt(0)}
-                        </div>
-                        {conversation.id === "3" && ( // Mock online status logic
-                          <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+        <SocialSidebar
+          bottomTab={bottomTab}
+          contactSubTab={contactSubTab}
+          setContactSubTab={setContactSubTab}
+          conversations={conversations}
+          selectedConversation={selectedConversation}
+          setSelectedConversation={setSelectedConversation}
+          receivedFriendRequestsCount={receivedFriendRequests.length}
+          handleAddFriendClick={handleAddFriendClick}
+        />
 
-                  {/* Content */}
-                  <div className="flex flex-col flex-1 min-w-0 relative">
-                    <div className="flex justify-between items-center mb-1">
-                      <p
-                        className={`text-[15px] font-semibold truncate ${conversation.id === selectedConversation ? "text-white" : "text-slate-200"}`}
-                      >
-                        {conversation.name}
-                      </p>
-                      {conversation.time && (
-                        <p className={`text-[11px] ${conversation.id === selectedConversation ? "text-blue-400" : "text-slate-500"}`}>
-                          {conversation.time}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center h-5">
-                      <p className={`text-sm truncate pr-8 ${conversation.unread ? "font-medium text-slate-300" : "text-slate-500"}`}>
-                        {conversation.isOwn ? "Bạn: " : ""}
-                        {conversation.lastMessage}
-                      </p>
-
-                      {/* Action Area - Absolute positioned */}
-                      <div className="absolute right-0 bottom-0 flex items-center justify-end h-5 z-10">
-                        {conversation.unread ? (
-                          <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-blue-500 text-white text-[10px] font-bold rounded-full shadow-lg shadow-blue-500/30">
-                            {conversation.unread}
-                          </span>
-                        ) : (
-                          // Always render button but control visibility to prevent any possible layout thrashing
-                          <Button
-                            type="text"
-                            size="small"
-                            icon={<MoreOutlined />}
-                            className={`text-slate-400 hover:text-white hover:bg-slate-700/50 min-w-[24px] w-6 h-6 flex items-center justify-center transition-all duration-200 ${
-                              conversation.id === selectedConversation
-                                ? "opacity-100 visible"
-                                : "opacity-0 invisible group-hover:visible group-hover:opacity-100"
-                            }`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Handle more options
-                            }}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : null}
-          </div>
-
-          {/* Bottom Sidebar */}
-          <div className="px-4 py-3 border-t border-slate-800 bg-slate-900 flex items-center justify-center gap-2">
-            <button
-              onClick={() => router.push("/")}
-              title="Trang chủ"
-              className="p-2 rounded-lg hover:bg-slate-800 transition-all duration-200 border-none bg-transparent cursor-pointer flex items-center justify-center"
-            >
-              <HomeOutlined className="text-lg" style={{ color: "white" }} />
-            </button>
-            <button
-              onClick={() => setBottomTab("messages")}
-              title="Tin nhắn"
-              className={`p-2 rounded-lg transition-all duration-200 border-none cursor-pointer flex items-center justify-center ${
-                bottomTab === "messages" ? "bg-blue-500! shadow-md scale-105" : "hover:bg-slate-800 bg-transparent"
-              }`}
-            >
-              <MessageOutlined
-                className={`text-lg transition-all duration-200 ${bottomTab === "messages" ? "scale-110" : ""}`}
-                style={{ color: "white" }}
-              />
-            </button>
-            <button
-              onClick={() => setBottomTab("contacts")}
-              title="Danh bạ"
-              className={`p-2 rounded-lg transition-all duration-200 border-none cursor-pointer flex items-center justify-center ${
-                bottomTab === "contacts" ? "bg-blue-500! shadow-md scale-105" : "hover:bg-slate-800 bg-transparent"
-              }`}
-            >
-              <ContactsOutlined
-                className={`text-lg transition-all duration-200 ${bottomTab === "contacts" ? "scale-110" : ""}`}
-                style={{ color: "white" }}
-              />
-            </button>
-
-            <button
-              onClick={() => setBottomTab("settings")}
-              title="Cài đặt"
-              className={`p-2 rounded-lg transition-all duration-200 border-none cursor-pointer flex items-center justify-center ${
-                bottomTab === "settings" ? "bg-blue-500! shadow-md scale-105" : "hover:bg-slate-800 bg-transparent"
-              }`}
-            >
-              <SettingOutlined
-                className={`text-lg transition-all duration-200 ${bottomTab === "settings" ? "scale-110" : ""}`}
-                style={{ color: "white" }}
-              />
-            </button>
-          </div>
-        </aside>
-
-        {/* Main Chat Area */}
         <main className="flex-1 flex flex-col min-w-0 bg-slate-900 relative h-full overflow-hidden">
-          {activeConversation ? (
-            <>
-              {/* Chat Header */}
-              <header className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900 sticky top-0 z-10">
-                <div className="flex items-center gap-4">
-                  {activeConversation.isGroup ? (
-                    <div className="grid grid-cols-2 gap-0.5 w-8 h-8  rounded-lg overflow-hidden ring-1 ring-slate-700">
-                      <div className="bg-blue-500"></div>
-                      <div className="bg-green-500"></div>
-                      <div className="bg-yellow-500"></div>
-                      <div className="bg-slate-700 flex items-center justify-center text-[8px] font-bold text-white">+2</div>
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold text-lg">
-                      {activeConversation.name.charAt(0)}
-                    </div>
-                  )}
-                  <div>
-                    <h2 className="text-base font-bold text-slate-200 leading-tight">{activeConversation.name}</h2>
-                    {activeConversation.isGroup && activeConversation.members && (
-                      <p className="text-xs text-slate-400">
-                        {activeConversation.members} thành viên
-                        {activeConversation.lastAccess && ` • ${activeConversation.lastAccess}`}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 text-slate-400">
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<UserAddOutlined className="text-[16px]" style={{ color: "white" }} />}
-                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
-                  />
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<SearchOutlined className="text-[16px]" style={{ color: "white" }} />}
-                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
-                  />
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<VideoCameraOutlined className="text-[16px]" style={{ color: "white" }} />}
-                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
-                  />
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<MoreOutlined className="text-[16px]" style={{ color: "white" }} />}
-                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
-                  />
-                </div>
-              </header>
-
-              {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-6 flex flex-col gap-4 bg-[#0f172a]">
-                {/* Today separator */}
-                <div className="flex justify-center">
-                  <span className="text-xs font-medium text-slate-400 bg-slate-800 px-3 py-1 rounded-full">Hôm nay</span>
-                </div>
-
-                {/* Messages */}
-                {messages.map((msg) => (
-                  <div key={msg.id} className={`flex gap-3 max-w-[75%] ${msg.isOwn ? "flex-row-reverse self-end" : ""}`}>
-                    {!msg.isOwn && (
-                      <div className="shrink-0 flex flex-col justify-end">
-                        <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold">
-                          {msg.sender.charAt(0)}
-                        </div>
-                      </div>
-                    )}
-                    {msg.isOwn && <div className="shrink-0 w-8"></div>}
-                    <div className={`flex flex-col gap-1 ${msg.isOwn ? "items-end" : ""}`}>
-                      {!msg.isOwn && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold text-slate-200">{msg.sender}</span>
-                          <span className="text-[10px] text-slate-400">{msg.time}</span>
-                        </div>
-                      )}
-                      {msg.isOwn && (
-                        <div className="flex items-center gap-2 flex-row-reverse">
-                          <span className="text-[10px] text-slate-400">{msg.time}</span>
-                        </div>
-                      )}
-                      {msg.fileAttachment ? (
-                        <div className="p-3 rounded-lg bg-slate-800 border border-slate-700 shadow-sm">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-red-900 rounded flex items-center justify-center">
-                              <FileTextOutlined className="text-lg" style={{ color: "white" }} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-slate-200 truncate">{msg.fileAttachment.name}</p>
-                              <p className="text-xs text-slate-400">{msg.fileAttachment.size}</p>
-                            </div>
-                            <Button
-                              type="text"
-                              icon={<DownloadOutlined style={{ color: "white" }} />}
-                              className="p-1 hover:bg-slate-700 [&_.anticon]:text-white!"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          className={`p-3 rounded-lg shadow-sm text-sm leading-relaxed ${
-                            msg.isOwn ? "bg-blue-500 text-white rounded-br-sm" : "bg-slate-800 rounded-bl-sm border border-slate-700 text-slate-200"
-                          }`}
-                        >
-                          <p>{msg.content}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Input Area */}
-              <div className="px-6 py-5 bg-slate-900 border-t border-slate-800 shrink-0 relative z-20">
-                <div className="bg-slate-800 rounded-2xl border border-slate-700/50 focus-within:border-blue-500/50 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-200 flex flex-col">
-                  {/* Text Input Section */}
-                  <div className="px-4 py-3">
-                    <textarea
-                      className="w-full bg-transparent border-none p-0 text-slate-200 placeholder-slate-500 focus:ring-0 focus:outline-none resize-none text-base leading-relaxed custom-scrollbar"
-                      placeholder="Nhập tin nhắn..."
-                      rows={1}
-                      value={message}
-                      onChange={handleTextareaChange}
-                      onKeyDown={handleKeyPress}
-                      style={{ minHeight: "24px", maxHeight: "150px" }}
-                    />
-                  </div>
-
-                  {/* Toolbar Section (Bottom) */}
-                  <div className="flex items-center justify-between px-2 pb-2 pt-1 border-t border-slate-700/30">
-                    <div className="flex items-center gap-1">
-                      {/* Attachments Group */}
-                      <button
-                        type="button"
-                        className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-slate-700/50 rounded-lg transition-all active:scale-95"
-                        title="Đính kèm file"
-                      >
-                        <PaperClipOutlined className="text-xl" />
-                      </button>
-                      <button
-                        type="button"
-                        className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-slate-700/50 rounded-lg transition-all active:scale-95"
-                        title="Hình ảnh"
-                      >
-                        <PictureOutlined className="text-xl" />
-                      </button>
-
-                      <div className="w-px h-5 bg-slate-700/50 mx-1"></div>
-
-                      {/* Rich Text / Other Tools */}
-                      <button
-                        type="button"
-                        className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-slate-700/50 rounded-lg transition-all active:scale-95"
-                        title="Link"
-                      >
-                        <LinkOutlined className="text-xl" />
-                      </button>
-                      <button
-                        type="button"
-                        className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-slate-700/50 rounded-lg transition-all active:scale-95"
-                        title="Tài liệu"
-                      >
-                        <FileTextOutlined className="text-xl" />
-                      </button>
-
-                      <div className="w-px h-5 bg-slate-700/50 mx-1"></div>
-
-                      <button
-                        type="button"
-                        className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-yellow-400 hover:bg-slate-700/50 rounded-lg transition-all active:scale-95"
-                        title="Emoji"
-                      >
-                        <SmileOutlined className="text-xl" />
-                      </button>
-                      <button
-                        type="button"
-                        className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-slate-700/50 rounded-lg transition-all active:scale-95 font-bold"
-                        title="Mention"
-                      >
-                        @
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={handleSendMessage}
-                        disabled={!message.trim()}
-                        className="px-5 h-10 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all flex items-center gap-2 font-medium text-sm active:scale-95"
-                      >
-                        <SendOutlined />
-                        <span>Gửi</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
+          {bottomTab === "messages" ? (
+            <ChatArea
+              activeConversation={activeConversation}
+              messages={messages}
+              message={message}
+              handleTextareaChange={handleTextareaChange}
+              handleKeyPress={handleKeyPress}
+              handleSendMessage={handleSendMessage}
+            />
+          ) : bottomTab === "contacts" ? (
+            <ContactsContent
+              contactSubTab={contactSubTab}
+              receivedFriendRequests={receivedFriendRequests}
+              sentFriendRequests={sentFriendRequests}
+              contacts={contacts}
+              loadingFriendRequests={loadingFriendRequests}
+              handleAcceptFriendRequest={handleAcceptFriendRequest}
+              handleRejectFriendRequest={handleRejectFriendRequest}
+            />
           ) : (
-            <div className="flex-1 flex items-center justify-center text-slate-400">
-              <p>Chọn một cuộc trò chuyện để bắt đầu</p>
-            </div>
+            <div className="flex-1 bg-slate-900" />
           )}
         </main>
 
@@ -775,7 +627,7 @@ export default function SocialPage() {
           onCancel={() => setIsAddFriendModalOpen(false)}
           footer={null}
           closeIcon={null}
-          width={400}
+          width={360}
           centered
           styles={{
             mask: {
@@ -785,94 +637,78 @@ export default function SocialPage() {
           }}
           className="add-friend-modal"
         >
-          <div className="flex flex-col h-full text-slate-200">
+          <div className="flex flex-col text-slate-200">
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-white leading-none mb-0 tracking-tight">Thêm Bạn</h2>
+              <h2 className="font-bold text-white leading-none mb-0 tracking-tight text-base">Thêm Bạn</h2>
               <button
                 onClick={() => setIsAddFriendModalOpen(false)}
-                className="flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-all border-none bg-transparent cursor-pointer"
+                className="flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-all border-none bg-transparent cursor-pointer w-7 h-7"
               >
-                <CloseOutlined className="text-sm" />
+                <CloseOutlined className="text-xs" />
               </button>
             </div>
 
-            <div>
-              {/* Search Input */}
-              <div className="mb-4">
-                <Input
-                  prefix={<SearchOutlined className="text-slate-400 text-base mr-2" />}
-                  placeholder="Tìm kiếm"
-                  value={phoneNumber}
-                  size="small"
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="bg-[#303134] hover:bg-[#303134] focus:bg-[#303134] border-none text-white placeholder:text-slate-400 text-[14px] [&>input]:text-white [&>input]:bg-transparent px-4 shadow-inner"
-                />
-              </div>
-
-              <div className="space-y-4">
-                {/* Recent Results */}
-                {recentSearchResults.length > 0 && (
-                  <div>
-                    <h3 className="text-[13px] font-bold text-slate-400 mb-2">Kết quả gần nhất</h3>
-                    <div className="space-y-0.5">
-                      {recentSearchResults.map((result) => (
-                        <div
-                          key={result.id}
-                          className="group flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-200"
-                        >
-                          <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md shrink-0 ${
-                              result.avatar === "N" ? "bg-blue-600" : result.avatar === "F" ? "bg-purple-600" : "bg-indigo-600"
-                            }`}
-                          >
-                            {result.avatar}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-[14px] font-medium text-white group-hover:text-blue-400 transition-colors truncate mb-0 leading-tight">
-                              {result.name}
-                            </h4>
-                            <p className="text-[12px] text-slate-400 mb-0 leading-tight mt-1">{result.phone}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Suggested Friends */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <UserAddOutlined className="text-slate-400 text-sm" />
-                    <h3 className="text-[13px] font-bold text-slate-400 mb-0">Có thể bạn quen</h3>
-                  </div>
-                  <div className="space-y-0.5">
-                    {suggestedFriends.map((friend) => (
-                      <div
-                        key={friend.id}
-                        className="group flex items-center justify-between p-2 -mx-2 rounded-lg hover:bg-white/5 transition-all duration-200"
-                      >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md shrink-0 ${
-                              friend.avatar === "A" ? "bg-violet-600" : friend.avatar === "B" ? "bg-pink-600" : "bg-cyan-600"
-                            }`}
-                          >
-                            {friend.avatar}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-[14px] font-medium text-white group-hover:text-blue-400 transition-colors truncate mb-0 leading-tight">
-                              {friend.name}
-                            </h4>
-                            <p className="text-[12px] text-slate-400 mb-0 leading-tight mt-1 ">Từ gợi ý kết bạn</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+            {/* Input Type Toggle */}
+            <div className="flex gap-1.5 mb-3  bg-slate-800 rounded-lg">
+              <button
+                onClick={() => setInputType("phone")}
+                className={`flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all ${
+                  inputType === "phone" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white hover:bg-slate-700"
+                }`}
+              >
+                Số điện thoại
+              </button>
+              <button
+                onClick={() => setInputType("email")}
+                className={`flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all ${
+                  inputType === "email" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white hover:bg-slate-700"
+                }`}
+              >
+                Email
+              </button>
             </div>
+
+            {/* Input Field */}
+            <div className="mb-3">
+              {inputType === "phone" ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="Nhập số điện thoại"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    size="small"
+                    className="flex-1 bg-[#303134] hover:bg-[#303134] focus:bg-[#303134] border-none text-white placeholder:text-slate-400 text-sm [&>input]:text-white [&>input]:bg-transparent [&>input]:text-sm"
+                    onPressEnter={handleSendFriendRequest}
+                  />
+                </div>
+              ) : (
+                <Input
+                  type="email"
+                  placeholder="Nhập email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  size="small"
+                  className="w-full bg-[#303134] hover:bg-[#303134] focus:bg-[#303134] border-none text-white placeholder:text-slate-400 text-sm [&>input]:text-white [&>input]:bg-transparent [&>input]:text-sm"
+                  onPressEnter={handleSendFriendRequest}
+                />
+              )}
+            </div>
+
+            {/* Send Button */}
+            <Button
+              type="primary"
+              size="small"
+              block
+              onClick={handleSendFriendRequest}
+              disabled={inputType === "phone" ? !phoneNumber.trim() : !email.trim() || sendingRequest}
+              loading={sendingRequest}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium mb-3 text-sm"
+            >
+              {sendingRequest ? "Đang gửi..." : "Gửi lời mời kết bạn"}
+            </Button>
+
+            {/* Friend Requests List removed from modal as requested */}
           </div>
         </Modal>
       </div>

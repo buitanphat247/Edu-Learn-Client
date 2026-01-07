@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:1611/api";
 
     return [
-      // Note: /api-proxy/assignment-attachments/* and /api-proxy/writing-chat-bot/* routes 
-      // are handled by API route handlers (to connect to Flask backend). Only rewrite other /api-proxy routes.
+      // Note: /api-proxy/assignment-attachments/*, /api-proxy/writing-chat-bot/*, and /api-proxy/friends/* routes
+      // are handled by API route handlers (to connect to Flask/backend). Only rewrite other /api-proxy routes.
       {
         source: "/api-proxy/:path((?!assignment-attachments|writing-chat-bot).*)",
         destination: `${apiUrl}/:path*`,
@@ -52,22 +52,19 @@ const nextConfig: NextConfig = {
           }
         : false,
   },
-  
+
   // Suppress source map warnings in development
   webpack: (config: any, { dev }: { dev: boolean }) => {
     if (dev) {
       // Suppress source map warnings
-      config.ignoreWarnings = [
-        { module: /node_modules\/next\/dist/ },
-        { file: /\.next\/dev\/server\/chunks/ },
-      ];
+      config.ignoreWarnings = [{ module: /node_modules\/next\/dist/ }, { file: /\.next\/dev\/server\/chunks/ }];
     }
     return config;
   },
 
   // Turbopack configuration (empty for now, using webpack for production builds)
   turbopack: {},
-  
+
   // Suppress logging for incoming requests and body size warnings
   logging: {
     fetches: {
@@ -83,7 +80,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "500MB", // Increase body size limit for large file uploads (must be uppercase MB)
     },
   },
-  
+
   // Use standalone output for Docker/production builds
   output: "standalone",
 };

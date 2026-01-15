@@ -11,6 +11,7 @@ import {
   DatabaseOutlined,
   CalendarOutlined,
   CloudDownloadOutlined,
+  SafetyCertificateOutlined,
 } from "@ant-design/icons";
 
 const menuItems = [
@@ -20,6 +21,7 @@ const menuItems = [
   { path: "/super-admin/notification", icon: BellOutlined, label: "Quản lý thông báo" },
   { path: "/super-admin/posts", icon: FileTextOutlined, label: "Quản lý tin tức" },
   { path: "/super-admin/events", icon: CalendarOutlined, label: "Quản lý toàn bộ sự kiện" },
+  { path: "/super-admin/permissions", icon: SafetyCertificateOutlined, label: "Phân quyền" },
   { path: "/super-admin/all", icon: DatabaseOutlined, label: "Quản lý toàn bộ" },
 ];
 
@@ -52,10 +54,8 @@ export default function SuperAdminSidebar() {
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isExactMatch = item.path === "/super-admin";
-          const isActive = isExactMatch 
-            ? pathname === "/super-admin"
-            : pathname?.startsWith(item.path);
-          
+          const isActive = isExactMatch ? pathname === "/super-admin" : pathname?.startsWith(item.path);
+
           return (
             <Link
               key={item.path}
@@ -105,4 +105,3 @@ export default function SuperAdminSidebar() {
     </aside>
   );
 }
-

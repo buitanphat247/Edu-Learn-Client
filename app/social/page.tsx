@@ -7,107 +7,86 @@ import { Conversation, Message } from "@/app/components/social/types";
 import { useSocial } from "./SocialContext";
 
 export default function SocialPage() {
-  const { receivedFriendRequests } = useSocial();
-  const [selectedConversation, setSelectedConversation] = useState<string | null>("2");
+  const {
+    receivedFriendRequests,
+    conversations,
+    activeConversationId,
+    setActiveConversationId,
+    messages,
+    fetchFriendRequests,
+    sendMessage,
+    markConversationAsRead,
+    loadingMessages,
+    loadingConversations,
+    lastReadMessageIds,
+
+    deleteConversation,
+    isSettingsOpen,
+    isProfileOpen,
+    isAddFriendOpen,
+    setIsAddFriendOpen,
+    contacts,
+    currentUser,
+  } = useSocial();
+
   const [message, setMessage] = useState("");
 
-  // Mock conversations data
-  const conversations: Conversation[] = [
-    {
-      id: "2",
-      name: "Team Marketing",
-      lastMessage: "Bạn: File thiết kế mới nhất...",
-      time: "10:30 AM",
-      isGroup: true,
-      members: 5,
-      lastAccess: "Vừa truy cập",
-    },
-    {
-      id: "3",
-      name: "Nguyễn Văn B",
-      lastMessage: "Ok, để mình check nhé.",
-      time: "5 phút",
-      unread: 1,
-    },
-    {
-      id: "4",
-      name: "Lê Thị C",
-      lastMessage: "Đã gửi một ảnh.",
-      time: "Hôm qua",
-    },
-    {
-      id: "5",
-      name: "Dev Team",
-      lastMessage: "Project Manager: Deadline vào th...",
-      time: "Hôm qua",
-      isGroup: true,
-    },
-    {
-      id: "6",
-      name: "Thông báo HR",
-      lastMessage: "Lịch nghỉ lễ sắp tới",
-      time: "20/10",
-      isNotification: true,
-    },
-    {
-      id: "1",
-      name: "Cloud của tôi",
-      lastMessage: "File lưu trữ",
-      time: "",
-      isCloud: true,
-      isGroup: false,
-    },
-  ];
+  let activeConversation = conversations.find((c) => c.id === activeConversationId);
 
-  // Mock messages data
-  const messages: Message[] = [
-    {
-      id: "1",
-      sender: "Nguyễn Văn B",
-      content: "Chào mọi người, mình vừa cập nhật file thiết kế Landing Page mới. Mọi người xem qua và feedback giúp mình nhé.",
-      time: "10:30 AM",
-      isOwn: false,
-    },
-    {
-      id: "2",
-      sender: "Nguyễn Văn B",
-      content: "",
-      time: "10:30 AM",
-      isOwn: false,
-      fileAttachment: {
-        name: "Landing_Page_V2.pdf",
-        size: "2.4 MB",
-        type: "pdf",
-      },
-    },
-    {
-      id: "3",
-      sender: "You",
-      content: "Tuyệt vời! Để mình check nhé.",
-      time: "10:35 AM",
-      isOwn: true,
-    },
-    {
-      id: "4",
-      sender: "You",
-      content: "Phần header nhìn thoáng hơn bản cũ nhiều đó 👍",
-      time: "10:36 AM",
-      isOwn: true,
-    },
-    {
-      id: "5",
-      sender: "Lê Thị C",
-      content: "@Nguyễn Văn B phần footer màu có vẻ hơi tối không nhỉ?",
-      time: "10:40 AM",
-      isOwn: false,
-    },
-  ];
+  // Fallback: Create virtual conversation for UI if using Temp ID (Lazy Creation)
+  if (!activeConversation && activeConversationId?.startsWith("temp_")) {
+    const friendId = activeConversationId.split("_")[1];
+    const friend = contacts.find((c) => String(c.id) === friendId);
+    if (friend) {
+      activeConversation = {
+        id: activeConversationId,
+        name: friend.name,
+        avatar: friend.avatar,
+        lastMessage: "Bắt đầu cuộc trò chuyện",
+        time: "",
+        unread: 0,
+        isGroup: false,
+        memberIds: [Number(currentUser?.id), Number(friend.id)],
+        isEmpty: true,
+      };
+    }
+  }
 
-  const activeConversation = conversations.find((c) => c.id === selectedConversation);
+  // Filter hidden conversations (empty ones), unless active (Sender sees it, Receiver doesn't until msg sent)
+  const displayedConversations = conversations.filter((c) => !c.isEmpty || String(c.id) === String(activeConversationId));
+  // const displayedConversations = conversations;
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      setMessage("");
+  const partnerLastReadId = activeConversationId ? lastReadMessageIds[activeConversationId] : undefined;
+
+  // Handle interaction (scroll/focus) to mark as read
+  const handleInteraction = () => {
+    // If settings or profile modal is open, DO NOT mark as read
+    if (isSettingsOpen || isProfileOpen || isAddFriendOpen) return;
+
+    if (activeConversationId && activeConversation && (activeConversation.unread || 0) > 0) {
+      markConversationAsRead(activeConversationId);
+    }
+  };
+
+  // Local handler to wrap sendMessage
+  const handleSendMessage = async () => {
+    const content = message.trim();
+    if (!content) return;
+
+    // Optimistic Clear to prevent duplicate sends/Enter spam
+    setMessage("");
+
+    // Reset height manually since we cleared value
+    const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+    if (textarea) textarea.style.height = "auto"; // let it maintain default size (padding + 1 row)
+
+    try {
+      await sendMessage(content);
+    } catch (e) {
+      // If failed, restore message? Or just notify?
+      // Restoring might be annoying if user started typing next message.
+      // Just rely on SocialContext error notification.
+      console.error("Failed to send", e);
     }
   };
 
@@ -129,13 +108,15 @@ export default function SocialPage() {
     <>
       <SocialSidebar
         bottomTab="messages"
-        contactSubTab="friends" // Not used in messages mode but TS might require it if optional not handled? Checked prop types in next step if needed.
+        contactSubTab="friends"
         setContactSubTab={() => {}}
-        conversations={conversations}
-        selectedConversation={selectedConversation}
-        setSelectedConversation={setSelectedConversation}
+        conversations={displayedConversations}
+        selectedConversation={activeConversationId}
+        setSelectedConversation={setActiveConversationId}
         receivedFriendRequestsCount={receivedFriendRequests.length}
-        handleAddFriendClick={() => {}} // Not used in messages
+        handleAddFriendClick={() => setIsAddFriendOpen(true)}
+        isLoading={loadingConversations}
+        onDeleteConversation={deleteConversation}
       />
 
       <main className="flex-1 flex flex-col min-w-0 bg-slate-900 relative h-full overflow-hidden">
@@ -146,6 +127,9 @@ export default function SocialPage() {
           handleTextareaChange={handleTextareaChange}
           handleKeyPress={handleKeyPress}
           handleSendMessage={handleSendMessage}
+          onInteraction={handleInteraction}
+          partnerLastReadMessageId={partnerLastReadId}
+          partnerAvatar={activeConversation?.avatar}
         />
       </main>
     </>

@@ -1,17 +1,35 @@
+import React, { useState } from "react";
 import { Input, Button } from "antd";
+import { showConfirmModal } from "./SocialHelpers";
+import {
+  UserAddOutlined,
+  ContactsOutlined,
+  SearchOutlined,
+  TeamOutlined,
+  MessageOutlined,
+  DeleteOutlined,
+  SendOutlined,
+  StopOutlined,
+  UnlockOutlined,
+} from "@ant-design/icons";
 import Swal from "sweetalert2";
-import { UserAddOutlined, ContactsOutlined, SearchOutlined, TeamOutlined, MessageOutlined, DeleteOutlined, SendOutlined } from "@ant-design/icons";
 import { FriendRequestResponse, Contact } from "./types";
 
 interface ContactsContentProps {
-  contactSubTab: "friends" | "groups" | "requests" | "sent_requests";
+  contactSubTab: "friends" | "groups" | "requests" | "sent_requests" | "blocked";
   receivedFriendRequests: FriendRequestResponse[];
   sentFriendRequests: FriendRequestResponse[];
   contacts: Contact[];
+  blockedUsers: any[]; // UserBlock[]
+  blockedUserIds: Set<string>;
+  blockedByUserIds: Set<string>;
   loadingFriendRequests: boolean;
   handleAcceptFriendRequest: (id: number) => void;
   handleRejectFriendRequest: (id: number) => void;
   handleRemoveFriend: (id: string) => void;
+  handleStartChat: (id: string) => void;
+  handleUnblockUser: (id: string) => void;
+  handleBlockUser: (id: string) => void;
 }
 
 export default function ContactsContent({
@@ -19,15 +37,31 @@ export default function ContactsContent({
   receivedFriendRequests,
   sentFriendRequests,
   contacts,
+  blockedUsers,
+  blockedUserIds,
+  blockedByUserIds,
   loadingFriendRequests,
   handleAcceptFriendRequest,
   handleRejectFriendRequest,
   handleRemoveFriend,
+  handleStartChat,
+  handleUnblockUser,
+  handleBlockUser,
 }: ContactsContentProps) {
+  const [friendSearchQuery, setFriendSearchQuery] = useState("");
+
+  const filteredContacts = contacts.filter((c) => {
+    if (!c.isFriend) return false;
+    if (!friendSearchQuery.trim()) return true;
+    return c.name.toLowerCase().includes(friendSearchQuery.toLowerCase());
+  });
+
   return (
     <div className="flex-1 overflow-y-auto bg-slate-900 p-8">
+      {/* Existing tabs... */}
       {contactSubTab === "sent_requests" && (
-        <div>
+        // ... (sent_requests UI)
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
             <SendOutlined /> Lời mời đã gửi ({sentFriendRequests.length})
           </h2>
@@ -80,7 +114,7 @@ export default function ContactsContent({
       )}
 
       {contactSubTab === "requests" && (
-        <div>
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
             <UserAddOutlined /> Lời mời kết bạn ({receivedFriendRequests.length})
           </h2>
@@ -140,9 +174,9 @@ export default function ContactsContent({
       )}
 
       {contactSubTab === "friends" && (
-        <div>
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-            <ContactsOutlined /> Danh sách bạn bè ({contacts.filter((c) => c.isFriend).length})
+            <ContactsOutlined /> Danh sách bạn bè ({filteredContacts.length})
           </h2>
           {/* Search bar inside Friends view */}
           <div className="mb-6">
@@ -152,17 +186,18 @@ export default function ContactsContent({
               placeholder="Tìm bạn bè..."
               className="bg-slate-800 border-slate-700 text-white rounded-xl"
               variant="filled"
+              value={friendSearchQuery}
+              onChange={(e) => setFriendSearchQuery(e.target.value)}
             />
           </div>
 
           <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
-            {contacts.filter((c) => c.isFriend).length > 0 ? (
-              contacts
-                .filter((c) => c.isFriend)
+            {filteredContacts.length > 0 ? (
+              filteredContacts
                 .map((contact, index) => (
                   <div
                     key={contact.id}
-                    className={`flex items-center gap-4 p-2 hover:bg-slate-700/50 transition-colors cursor-pointer ${
+                    className={`flex items-center gap-4 p-4 hover:bg-slate-700/50 transition-colors cursor-pointer ${
                       index !== 0 ? "border-t border-slate-700" : ""
                     }`}
                   >
@@ -175,39 +210,93 @@ export default function ContactsContent({
                       )}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-white font-medium text-base">{contact.name}</h3>
-                      {contact.mutualFriends && <p className="text-slate-400 text-sm">{contact.mutualFriends} bạn chung</p>}
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-white font-medium text-base mb-0">{contact.name}</h3>
+                        {blockedUserIds.has(contact.id) && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30 uppercase tracking-wider">
+                            Đã chặn
+                          </span>
+                        )}
+                        {blockedByUserIds.has(contact.id) && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30 uppercase tracking-wider">
+                            Bị Block
+                          </span>
+                        )}
+                      </div>
+                      {contact.mutualFriends && <p className="text-slate-400 text-sm mb-0">{contact.mutualFriends} bạn chung</p>}
                     </div>
                     <div className="flex gap-2">
-                      <Button icon={<MessageOutlined />} size="small" type="text" className="text-slate-400 hover:text-white hover:bg-slate-600" />
+                      <Button
+                        icon={<MessageOutlined />}
+                        size="small"
+                        type="text"
+                        className="text-slate-400 hover:text-white hover:bg-slate-600"
+                        onClick={() => handleStartChat(contact.id)}
+                      />
+                      {blockedUserIds.has(contact.id) ? (
+                         <Button
+                          icon={<UnlockOutlined />}
+                          size="small"
+                          type="text"
+                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                          title="Gỡ chặn"
+                          onClick={() => {
+                            Swal.fire({
+                              title: "Bỏ chặn người dùng?",
+                              text: `Bạn sẽ có thể nhận tin nhắn từ ${contact.name}.`,
+                              icon: "question",
+                              showCancelButton: true,
+                              confirmButtonColor: "#3b82f6",
+                              cancelButtonColor: "#64748b",
+                              confirmButtonText: "Đồng ý",
+                              cancelButtonText: "Hủy",
+                              background: "#1e293b",
+                              color: "#f1f5f9",
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                handleUnblockUser(contact.id);
+                              }
+                            });
+                          }}
+                        />
+                      ) : (
+                        <Button
+                          icon={<StopOutlined />}
+                          size="small"
+                          type="text"
+                          className="text-slate-400 hover:text-red-500 hover:bg-red-500/10"
+                          title="Chặn"
+                          onClick={() => {
+                            Swal.fire({
+                              title: "Chặn người dùng này?",
+                              text: `Bạn sẽ không thể nhận tin nhắn từ ${contact.name}.`,
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonColor: "#ef4444",
+                              cancelButtonColor: "#64748b",
+                              confirmButtonText: "Chặn ngay",
+                              cancelButtonText: "Hủy",
+                              background: "#1e293b",
+                              color: "#f1f5f9",
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                handleBlockUser(contact.id);
+                              }
+                            });
+                          }}
+                        />
+                      )}
                       <Button
                         icon={<DeleteOutlined />}
                         size="small"
                         type="text"
                         className="text-slate-400 hover:text-red-500 hover:bg-red-500/10"
                         onClick={() => {
-                          Swal.fire({
+                          showConfirmModal({
                             title: "Hủy kết bạn?",
                             html: `<div style="color: #94a3b8">Bạn có chắc chắn muốn hủy kết bạn với <span style="color: #fff; font-weight: 600">${contact.name}</span>?</div>`,
-                            icon: "warning",
-                            background: "#1e293b",
-                            color: "#fff",
-                            showCancelButton: true,
-                            confirmButtonColor: "#dc2626",
-                            cancelButtonColor: "#334155",
                             confirmButtonText: "Xóa bạn bè",
-                            cancelButtonText: "Hủy",
-                            focusCancel: true,
-                            customClass: {
-                              popup: "rounded-2xl border border-slate-700 shadow-xl",
-                              title: "text-xl font-bold text-white",
-                              confirmButton: "rounded-xl px-6 py-2.5 font-medium shadow-lg shadow-red-600/20 text-sm",
-                              cancelButton: "rounded-xl px-6 py-2.5 font-medium hover:bg-slate-600 text-white text-sm",
-                            },
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleRemoveFriend(contact.id);
-                            }
+                            onConfirm: () => handleRemoveFriend(contact.id),
                           });
                         }}
                       />
@@ -231,6 +320,64 @@ export default function ContactsContent({
           </div>
           <h2 className="text-xl font-bold text-white mb-2">Danh sách nhóm</h2>
           <p className="text-slate-400 text-center max-w-md">Tính năng này đang được phát triển. Bạn sẽ sớm có thể tạo và tham gia các nhóm chat.</p>
+        </div>
+      )}
+
+      {contactSubTab === "blocked" && (
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <StopOutlined /> Danh sách chặn ({blockedUsers.length})
+          </h2>
+          
+          <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+            {blockedUsers.length > 0 ? (
+              blockedUsers.map((block, index) => (
+                <div
+                  key={block.id}
+                  className={`flex items-center gap-4 p-4 hover:bg-slate-700/50 transition-colors ${
+                    index !== 0 ? "border-t border-slate-700" : ""
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 font-bold text-lg">
+                    {block.blocked?.fullname?.charAt(0) || block.blocked?.username?.charAt(0) || "?"}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium text-base">{block.blocked?.fullname || block.blocked?.username}</h3>
+                    <p className="text-slate-400 text-sm">Đã chặn vào {new Date(block.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <Button
+                    size="small"
+                    className="bg-transparent hover:bg-blue-600/10 text-blue-400 border border-slate-600 font-medium rounded-lg hover:border-blue-500 hover:text-blue-500 transition-all"
+                    onClick={() => {
+                      Swal.fire({
+                        title: "Bỏ chặn người dùng?",
+                        text: `Bạn sẽ có thể nhận tin nhắn từ ${block.blocked?.fullname || block.blocked?.username}.`,
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3b82f6",
+                        cancelButtonColor: "#64748b",
+                        confirmButtonText: "Đồng ý",
+                        cancelButtonText: "Hủy",
+                        background: "#1e293b",
+                        color: "#f1f5f9",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          handleUnblockUser(String(block.blocked_id));
+                        }
+                      });
+                    }}
+                  >
+                    Bỏ chặn
+                  </Button>
+                </div>
+              ))
+            ) : (
+              <div className="py-12 flex flex-col items-center justify-center text-slate-400">
+                <StopOutlined className="text-4xl mb-4 opacity-50" />
+                <p>Bạn chưa chặn ai</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

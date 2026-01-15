@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { Button } from "antd";
 import {
   UserAddOutlined,
+  UserOutlined,
   SearchOutlined,
+  StopOutlined,
+  PhoneOutlined,
   VideoCameraOutlined,
   MoreOutlined,
   FileTextOutlined,
   DownloadOutlined,
   SendOutlined,
 } from "@ant-design/icons";
+import Swal from "sweetalert2";
+import { useSocial } from "@/app/social/SocialContext";
+
 import { Conversation, Message } from "./types";
 
 interface ChatAreaProps {
@@ -18,10 +24,134 @@ interface ChatAreaProps {
   handleTextareaChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleKeyPress: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   handleSendMessage: () => void;
+  onInteraction: () => void;
+  partnerLastReadMessageId?: string | number;
+  partnerAvatar?: string | null;
 }
 
-export default function ChatArea({ activeConversation, messages, message, handleTextareaChange, handleKeyPress, handleSendMessage }: ChatAreaProps) {
+export default function ChatArea({
+  activeConversation,
+  messages,
+  message,
+  handleTextareaChange,
+  handleKeyPress,
+  handleSendMessage,
+  onInteraction,
+  partnerLastReadMessageId,
+  partnerAvatar,
+}: ChatAreaProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const {
+    contacts,
+    setIsAddFriendOpen,
+    currentUser,
+    blockedUserIds,
+    blockedByUserIds,
+    blockUser,
+    unblockUser,
+  } = useSocial();
+
+  // Derived state
+  // Partner ID
+  const partnerId = useMemo(() => {
+    if (!activeConversation || activeConversation.isGroup || !currentUser)
+      return null;
+    return activeConversation.memberIds?.find(
+      (id) => String(id) !== String(currentUser.id)
+    );
+  }, [activeConversation, currentUser]);
+
+  // Block Status
+  const isBlockedByMe = useMemo(() => {
+    if (!partnerId) return false;
+    return blockedUserIds.has(String(partnerId));
+  }, [partnerId, blockedUserIds]);
+
+  const isBlockedByPartner = useMemo(() => {
+    if (!partnerId) return false;
+    return blockedByUserIds.has(String(partnerId));
+  }, [partnerId, blockedByUserIds]);
+
+  const isBlocked = isBlockedByMe || isBlockedByPartner;
+
+  const handleBlockToggle = () => {
+    if (!partnerId) return;
+    if (isBlockedByMe) {
+      Swal.fire({
+        title: "Bỏ chặn người dùng?",
+        text: "Bạn sẽ có thể nhận tin nhắn từ người này.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3b82f6",
+        cancelButtonColor: "#64748b",
+        confirmButtonText: "Đồng ý",
+        cancelButtonText: "Hủy",
+        background: "#1e293b",
+        color: "#f1f5f9",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          unblockUser(String(partnerId));
+        }
+      });
+    } else {
+      Swal.fire({
+        title: "Chặn người dùng này?",
+        text: "Bạn sẽ không thể gửi hoặc nhận tin nhắn từ người này.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#ef4444",
+        cancelButtonColor: "#64748b",
+        confirmButtonText: "Chặn ngay",
+        cancelButtonText: "Hủy",
+        background: "#1e293b",
+        color: "#f1f5f9",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          blockUser(String(partnerId));
+        }
+      });
+    }
+  };
+
+  const isFriend = useMemo(() => {
+    if (!activeConversation || activeConversation.isGroup || !currentUser)
+      return false;
+
+    if (!partnerId) return false;
+
+    // Check if this partner is in my contacts list
+    return contacts.some((c) => String(c.id) === String(partnerId));
+  }, [activeConversation, contacts, currentUser, partnerId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // ... (seenMessageId logic same as before) ...
+  const seenMessageId = useMemo(() => {
+    if (!partnerLastReadMessageId || messages.length === 0) return null;
+
+    const readIdNum = Number(partnerLastReadMessageId);
+
+    // Iterate backwards from the end
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      const msgIdNum = Number(msg.id);
+
+      // If we found a message that is older or equal to what partner read
+      if (msgIdNum <= readIdNum) {
+        // If it's my message, this is the one!
+        if (msg.isOwn) {
+          return msg.id;
+        }
+        // If it's partner's message (e.g. they replied), continue searching backwards for MY last message
+      }
+    }
+    return null;
+  }, [messages, partnerLastReadMessageId]);
+
   if (!activeConversation) {
+    // ... same ...
     return (
       <div className="flex-1 flex items-center justify-center text-slate-400 bg-slate-900">
         <div className="text-center">
@@ -45,7 +175,7 @@ export default function ChatArea({ activeConversation, messages, message, handle
               <div className="bg-slate-700 flex items-center justify-center text-[8px] font-bold text-white">+2</div>
             </div>
           ) : (
-            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold text-lg">
+             <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold text-lg">
               {activeConversation.name.charAt(0)}
             </div>
           )}
@@ -60,115 +190,188 @@ export default function ChatArea({ activeConversation, messages, message, handle
           </div>
         </div>
         <div className="flex items-center gap-1 text-slate-400">
-          <Button
-            type="text"
-            size="small"
-            icon={<UserAddOutlined className="text-[16px]" style={{ color: "white" }} />}
-            className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
-          />
-          <Button
-            type="text"
-            size="small"
-            icon={<SearchOutlined className="text-[16px]" style={{ color: "white" }} />}
-            className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
-          />
-          <Button
-            type="text"
-            size="small"
-            icon={<VideoCameraOutlined className="text-[16px]" style={{ color: "white" }} />}
-            className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
-          />
-          <Button
-            type="text"
-            size="small"
-            icon={<MoreOutlined className="text-[16px]" style={{ color: "white" }} />}
-            className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
-          />
+          {!isBlocked && (
+            <Button
+              type="text"
+              size="small"
+              icon={
+                <StopOutlined
+                  className="text-[16px]"
+                  style={{ color: isBlockedByMe ? "#ff4d4f" : "white" }}
+                />
+              }
+              className={`p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-red-500 [&_.anticon]:text-white! ${
+                isBlockedByMe ? "bg-red-500/10" : ""
+              }`}
+              title={isBlockedByMe ? "Bỏ chặn" : "Chặn"}
+              onClick={handleBlockToggle}
+            />
+          )}
+
+          
+          {/* Conditional Buttons based on Friendship */}
+          {!activeConversation.isGroup && !isFriend && (
+               <Button
+                type="text"
+                size="small"
+                onClick={() => setIsAddFriendOpen(true)}
+                icon={<UserAddOutlined className="text-[16px]" style={{ color: "white" }} />}
+                className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
+                title="Thêm bạn bè"
+              />
+          )}
+
+          {/* Show Call/Video ONLY if Friend or Group AND NOT Blocked */}
+          {(isFriend || activeConversation.isGroup) && !isBlocked && (
+            <>
+                <Button
+                    type="text"
+                    size="small"
+                    icon={<PhoneOutlined className="text-[16px]" style={{ color: "white" }} />}
+                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
+                />
+                <Button
+                    type="text"
+                    size="small"
+                    icon={<VideoCameraOutlined className="text-[16px]" style={{ color: "white" }} />}
+                    className="p-0 flex items-center justify-center rounded-lg hover:bg-slate-800 hover:text-blue-400 [&_.anticon]:text-white!"
+                />
+            </>
+          )}
+
+
         </div>
       </header>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-6 flex flex-col gap-4 bg-[#0f172a]">
+      <div
+        className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-6 flex flex-col gap-4 bg-[#0f172a] min-h-0"
+        onScroll={onInteraction}
+        onClick={onInteraction}
+      >
         {/* Today separator */}
         <div className="flex justify-center">
           <span className="text-xs font-medium text-slate-400 bg-slate-800 px-3 py-1 rounded-full">Hôm nay</span>
         </div>
 
         {/* Messages */}
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex gap-3 max-w-[75%] ${msg.isOwn ? "flex-row-reverse self-end" : ""}`}>
-            {!msg.isOwn && (
-              <div className="shrink-0 flex flex-col justify-end">
-                <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold">
-                  {msg.sender.charAt(0)}
-                </div>
-              </div>
-            )}
-            {msg.isOwn && <div className="shrink-0 w-8"></div>}
-            <div className={`flex flex-col gap-1 ${msg.isOwn ? "items-end" : ""}`}>
+        {messages.map((msg, index) => {
+          const isSameSender = index > 0 && messages[index - 1].sender === msg.sender;
+          const showAvatar = !msg.isOwn && !isSameSender;
+          const showHeader = !msg.isOwn && !isSameSender;
+
+          return (
+            <div key={msg.id} className={`flex gap-3 max-w-[75%] ${msg.isOwn ? "flex-row-reverse self-end" : ""} ${isSameSender ? "mt-1" : "mt-4"}`}>
               {!msg.isOwn && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-slate-200">{msg.sender}</span>
-                  <span className="text-[10px] text-slate-400">{msg.time}</span>
+                <div className="shrink-0 flex flex-col justify-end w-8">
+                  {showAvatar ? (
+                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold">
+                      {msg.sender.charAt(0)}
+                    </div>
+                  ) : (
+                    <div className="w-8" />
+                  )}
                 </div>
               )}
-              {msg.isOwn && (
-                <div className="flex items-center gap-2 flex-row-reverse">
-                  <span className="text-[10px] text-slate-400">{msg.time}</span>
-                </div>
-              )}
-              {msg.fileAttachment ? (
-                <div className="p-3 rounded-lg bg-slate-800 border border-slate-700 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-red-900 rounded flex items-center justify-center">
-                      <FileTextOutlined className="text-lg" style={{ color: "white" }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-200 truncate">{msg.fileAttachment.name}</p>
-                      <p className="text-xs text-slate-400">{msg.fileAttachment.size}</p>
-                    </div>
-                    <Button
-                      type="text"
-                      icon={<DownloadOutlined style={{ color: "white" }} />}
-                      className="p-1 hover:bg-slate-700 [&_.anticon]:text-white!"
-                    />
+              {/* Own message spacer removed */}
+
+              <div className={`flex flex-col gap-1 ${msg.isOwn ? "items-end" : ""}`}>
+                {showHeader && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-slate-200">{msg.sender}</span>
+                    <span className="text-[10px] text-slate-400">{msg.time}</span>
                   </div>
-                </div>
-              ) : (
-                <div
-                  className={`p-3 rounded-lg shadow-sm text-sm leading-relaxed ${
-                    msg.isOwn ? "bg-blue-500 text-white rounded-br-sm" : "bg-slate-800 rounded-bl-sm border border-slate-700 text-slate-200"
-                  }`}
-                >
-                  <p>{msg.content}</p>
-                </div>
-              )}
+                )}
+                {/* For subsequent messages from same sender, show time on hover or simplified? Zalo specific: only show time for first? Or just show content. */}
+                {/* If grouped, we hide header. But we might want to show time for group? */}
+
+                {msg.fileAttachment ? (
+                  <div className="p-3 rounded-lg bg-slate-800 border border-slate-700 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-red-900 rounded flex items-center justify-center">
+                        <FileTextOutlined className="text-lg" style={{ color: "white" }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-200 truncate">{msg.fileAttachment.name}</p>
+                        <p className="text-xs text-slate-400">{msg.fileAttachment.size}</p>
+                      </div>
+                      <Button
+                        type="text"
+                        icon={<DownloadOutlined style={{ color: "white" }} />}
+                        className="p-1 hover:bg-slate-700 [&_.anticon]:text-white!"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className={`p-3 rounded-lg shadow-sm text-sm leading-relaxed ${
+                      msg.isOwn ? "bg-blue-500 text-white rounded-br-sm" : "bg-slate-800 rounded-bl-sm border border-slate-700 text-slate-200"
+                    }`}
+                  >
+                    <p>{msg.content}</p>
+                  </div>
+                )}
+
+                {/* Read Receipt (Seen Indicator) */}
+                {msg.isOwn && String(msg.id) === String(seenMessageId) && (
+                  <div className="flex justify-end mt-0.5 items-center gap-1">
+                    <span className="text-[10px] text-slate-400">Đã xem</span>
+                     <div className="w-3.5 h-3.5 rounded-full bg-slate-700 flex items-center justify-center text-[8px] text-slate-400">
+                        <UserOutlined />
+                     </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}
       <div className="px-5 py-4 bg-slate-900 border-t border-slate-800 shrink-0 relative z-20">
-        <div className="flex items-end gap-3 bg-slate-800 p-2 pr-2 rounded-2xl border border-slate-700/50 focus-within:border-blue-500/50 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-200">
-          <textarea
-            className="flex-1 bg-transparent border-none px-4 py-3 text-slate-200 placeholder-slate-500 focus:ring-0 focus:outline-none resize-none text-base leading-relaxed custom-scrollbar max-h-[120px]"
-            placeholder="Nhập tin nhắn..."
-            rows={1}
-            value={message}
-            onChange={handleTextareaChange}
-            onKeyDown={handleKeyPress}
-            style={{ minHeight: "24px" }}
-          />
-          <button
-            type="button"
-            onClick={handleSendMessage}
-            disabled={!message.trim()}
-            className="mb-1 w-10 h-10 shrink-0 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all flex items-center justify-center active:scale-95"
-          >
-            <SendOutlined className="text-lg" />
-          </button>
-        </div>
+        {isBlocked ? (
+          <div className="flex items-center justify-center p-4 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+            {isBlockedByMe ? (
+              <p className="text-red-400 font-medium">
+                Bạn đã chặn người dùng này.{" "}
+                <button
+                  onClick={handleBlockToggle}
+                  className="underline hover:text-red-300 font-bold ml-1"
+                >
+                  Bỏ chặn
+                </button>{" "}
+                để nhắn tin.
+              </p>
+            ) : (
+              <p className="text-slate-400 font-medium">
+                Bạn không thể nhắn tin cho người dùng này.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-end gap-3 bg-slate-800 p-2 pr-2 rounded-2xl border border-slate-700/50 focus-within:border-blue-500/50 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-200">
+            <textarea
+              className="flex-1 bg-transparent border-none px-4 py-3 text-slate-200 placeholder-slate-500 focus:ring-0 focus:outline-none resize-none text-base leading-relaxed custom-scrollbar max-h-[120px]"
+              placeholder="Nhập tin nhắn..."
+              rows={1}
+              value={message}
+              onChange={handleTextareaChange}
+              onKeyDown={handleKeyPress}
+              onFocus={onInteraction}
+              onClick={onInteraction}
+              style={{ minHeight: "24px" }}
+            />
+            <button
+              type="button"
+              onClick={handleSendMessage}
+              disabled={!message.trim()}
+              className="mb-1 w-10 h-10 shrink-0 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all flex items-center justify-center active:scale-95"
+            >
+              <SendOutlined className="text-lg" />
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

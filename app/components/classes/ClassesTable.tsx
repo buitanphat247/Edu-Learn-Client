@@ -8,6 +8,7 @@ import type { ClassItem } from "@/interface/classes";
 
 interface ClassesTableProps {
   data: ClassItem[];
+  loading?: boolean;
   pagination?: {
     current: number;
     pageSize: number;
@@ -18,7 +19,7 @@ interface ClassesTableProps {
   onDelete?: (classItem: ClassItem) => void;
 }
 
-export default function ClassesTable({ data, pagination, onEdit, onDelete }: ClassesTableProps) {
+export default function ClassesTable({ data, loading, pagination, onEdit, onDelete }: ClassesTableProps) {
   const router = useRouter();
   const { modal, message } = App.useApp();
 
@@ -140,6 +141,8 @@ export default function ClassesTable({ data, pagination, onEdit, onDelete }: Cla
     <Table
       columns={columns}
       dataSource={data}
+      loading={loading}
+      locale={{ emptyText: "Không có lớp học nào" }}
       pagination={
         pagination
           ? {

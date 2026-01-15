@@ -28,6 +28,8 @@ export interface Exam {
   format: string;
   subject: string;
   subjectColor: string;
+  isAi?: boolean;
+  isLocked?: boolean;
 }
 
 export interface Exercise {

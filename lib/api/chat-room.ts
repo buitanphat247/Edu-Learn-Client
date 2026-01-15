@@ -20,6 +20,7 @@ export interface GetChatRoomsParams {
   userId: number | string;
   page?: number;
   limit?: number;
+  joined_at?: string;
 }
 
 export interface GetChatRoomsResult {
@@ -77,5 +78,37 @@ export const getChatRooms = async (params: GetChatRoomsParams): Promise<GetChatR
   } catch (error: any) {
     console.error("Error fetching chat rooms:", error);
     throw new Error(error?.message || "Không thể lấy danh sách phòng chat");
+  }
+};
+
+export interface CreateChatRoomParams {
+  userId: number;
+  room_type: ChatRoomType;
+  name?: string;
+  members?: number[];
+}
+
+export const createChatRoom = async (params: CreateChatRoomParams): Promise<ChatRoomResponse> => {
+  try {
+    const response = await apiClient.post<ChatRoomResponse>("/chat-rooms", {
+      user_id: params.userId,
+      room_type: params.room_type,
+      name: params.name,
+      user_ids: params.members,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Error creating chat room:", error);
+    throw new Error(error?.message || "Không thể tạo phòng chat");
+  }
+};
+
+export const deleteConversation = async (userId: number | string, roomId: number | string): Promise<void> => {
+  try {
+    await apiClient.delete(`/chat-rooms/${roomId}/conversation`, {
+      params: { userId },
+    });
+  } catch (error: any) {
+    throw new Error(error?.message || "Không thể xóa đoạn chat");
   }
 };

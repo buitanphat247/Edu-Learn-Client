@@ -2,6 +2,7 @@ import React from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Avatar } from "antd";
 import { MessageOutlined, ContactsOutlined, SettingOutlined, HomeOutlined } from "@ant-design/icons";
+import { FaUser } from "react-icons/fa";
 
 interface NavigationRailProps {
   onSettingsClick: () => void;
@@ -27,16 +28,10 @@ export default function NavigationRail({ onSettingsClick, onProfileClick, user }
       <div>
         <div
           onClick={onProfileClick}
-          className="w-10 h-10 rounded-full cursor-pointer hover:opacity-80 transition-opacity border-2 border-transparent hover:border-blue-500 overflow-hidden"
+          className="w-10 h-10 rounded-full cursor-pointer hover:bg-slate-800 transition-all border border-slate-700 flex items-center justify-center group"
           title="Trang cá nhân"
         >
-          {user?.avatar ? (
-            <Avatar src={user.avatar} size={36} />
-          ) : (
-            <div className="w-full h-full bg-linear-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-sm font-bold">
-              {(user?.fullname?.[0] || user?.username?.[0] || "U").toUpperCase()}
-            </div>
-          )}
+          <FaUser className="text-lg text-slate-400 group-hover:text-blue-500 transition-colors" />
         </div>
       </div>
 

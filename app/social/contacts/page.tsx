@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Modal, message as antMessage } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import SocialSidebar from "@/app/components/social/SocialSidebar";
@@ -12,21 +13,37 @@ import { sendFriendRequest } from "@/lib/socket";
 import { acceptFriendRequest as acceptFriendRequestSocket, rejectFriendRequest as rejectFriendRequestSocket, removeFriend } from "@/lib/socket";
 
 export default function ContactsPage() {
-  const { contacts, receivedFriendRequests, friendRequests, setFriendRequests, setContacts } = useSocial();
-  const [contactSubTab, setContactSubTab] = useState<"friends" | "groups" | "requests" | "sent_requests">("friends");
-  const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [inputType, setInputType] = useState<"phone" | "email">("phone");
-  const [sendingRequest, setSendingRequest] = useState(false);
-  const [countryCode, setCountryCode] = useState("+84");
+  const router = useRouter();
+    const {
+    contacts,
+    receivedFriendRequests,
+    friendRequests,
+    setFriendRequests,
+    setContacts,
+    startChat,
+    setIsAddFriendOpen,
+    blockedUsers,
+    blockedUserIds,
+    blockedByUserIds,
+    unblockUser,
+    blockUser,
+  } = useSocial();
+  const [contactSubTab, setContactSubTab] = useState<"friends" | "groups" | "requests" | "sent_requests" | "blocked">("friends");
 
-  // Derived state for sent requests
+  // Derived state
   const currentUserId = getUserIdFromCookie();
   const currentUserIdNumber =
     typeof currentUserId === "string" ? parseInt(currentUserId, 10) : typeof currentUserId === "number" ? currentUserId : null;
 
   const sentFriendRequests = friendRequests.filter((request) => String(request.requester_id) === String(currentUserIdNumber));
+
+  // Handlers
+  const handleStartChat = async (friendId: string) => {
+    const roomId = await startChat(friendId);
+    if (roomId) {
+      router.push("/social");
+    }
+  };
 
   const handleAcceptFriendRequest = async (friendRequestId: number) => {
     const userId = getUserIdFromCookie();
@@ -56,9 +73,7 @@ export default function ContactsPage() {
       });
       antMessage.success("Đã chấp nhận lời mời kết bạn");
 
-      // Update state via context setters
       setFriendRequests((prev) => prev.filter((req) => req.id !== friendRequestId));
-      // Contacts will be updated by socket listener in Context
     } catch (error: any) {
       console.error("Error accepting friend request:", error);
       antMessage.error(error.message || "Không thể chấp nhận lời mời kết bạn");
@@ -123,46 +138,6 @@ export default function ContactsPage() {
     }
   };
 
-  const handleSendFriendRequest = async () => {
-    const userId = getUserIdFromCookie();
-    if (!userId) {
-      antMessage.error("Vui lòng đăng nhập để gửi lời mời kết bạn");
-      return;
-    }
-
-    if (inputType === "phone" && !phoneNumber.trim()) {
-      antMessage.warning("Vui lòng nhập số điện thoại");
-      return;
-    }
-    if (inputType === "email" && !email.trim()) {
-      antMessage.warning("Vui lòng nhập email");
-      return;
-    }
-
-    setSendingRequest(true);
-    try {
-      const userIdNumber = typeof userId === "string" ? parseInt(userId, 10) : userId;
-      if (isNaN(userIdNumber)) throw new Error("User ID không hợp lệ");
-
-      const requestData = {
-        requester_id: userIdNumber,
-        ...(inputType === "phone" ? { phone: phoneNumber.trim() } : { email: email.trim() }),
-      };
-
-      await sendFriendRequest(requestData);
-      antMessage.success("Đã gửi lời mời kết bạn thành công!");
-
-      setPhoneNumber("");
-      setEmail("");
-      setIsAddFriendModalOpen(false);
-    } catch (error: any) {
-      console.error("Error sending friend request:", error);
-      antMessage.error(error.message || "Không thể gửi lời mời kết bạn. Vui lòng thử lại.");
-    } finally {
-      setSendingRequest(false);
-    }
-  };
-
   return (
     <>
       <SocialSidebar
@@ -173,7 +148,8 @@ export default function ContactsPage() {
         selectedConversation={null}
         setSelectedConversation={() => {}}
         receivedFriendRequestsCount={receivedFriendRequests.length}
-        handleAddFriendClick={() => setIsAddFriendModalOpen(true)}
+        handleAddFriendClick={() => setIsAddFriendOpen(true)}
+        onDeleteConversation={async (id) => { console.log('Delete conversation in contacts not implemented', id); }}
       />
 
       <main className="flex-1 flex flex-col min-w-0 bg-slate-900 relative h-full overflow-hidden">
@@ -182,100 +158,20 @@ export default function ContactsPage() {
           receivedFriendRequests={receivedFriendRequests}
           sentFriendRequests={sentFriendRequests}
           contacts={contacts}
+          blockedUsers={blockedUsers}
+          blockedUserIds={blockedUserIds}
+          blockedByUserIds={blockedByUserIds}
           loadingFriendRequests={false} // Managed by context now or assumed loaded
           handleAcceptFriendRequest={handleAcceptFriendRequest}
           handleRejectFriendRequest={handleRejectFriendRequest}
           handleRemoveFriend={handleRemoveFriend}
+          handleStartChat={handleStartChat}
+          handleUnblockUser={unblockUser}
+          handleBlockUser={blockUser}
         />
       </main>
 
-      {/* Add Friend Modal */}
-      <Modal
-        open={isAddFriendModalOpen}
-        onCancel={() => setIsAddFriendModalOpen(false)}
-        footer={null}
-        closeIcon={null}
-        width={360}
-        centered
-        styles={{
-          mask: {
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
-            backdropFilter: "blur(2px)",
-          },
-        }}
-        className="add-friend-modal"
-      >
-        <div className="flex flex-col text-slate-200">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-bold text-white leading-none mb-0 tracking-tight text-base">Thêm Bạn</h2>
-            <button
-              onClick={() => setIsAddFriendModalOpen(false)}
-              className="flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-all border-none bg-transparent cursor-pointer w-7 h-7"
-            >
-              <CloseOutlined className="text-xs" />
-            </button>
-          </div>
 
-          {/* Input Type Toggle */}
-          <div className="flex gap-1.5 mb-3 bg-slate-800 rounded-lg">
-            <button
-              onClick={() => setInputType("phone")}
-              className={`flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all cursor-pointer border-none ${
-                inputType === "phone" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white hover:bg-slate-700 bg-transparent"
-              }`}
-            >
-              Số điện thoại
-            </button>
-            <button
-              onClick={() => setInputType("email")}
-              className={`flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all cursor-pointer border-none ${
-                inputType === "email" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white hover:bg-slate-700 bg-transparent"
-              }`}
-            >
-              Email
-            </button>
-          </div>
-
-          {/* Input Field */}
-          <div className="mb-4">
-            {inputType === "phone" ? (
-              <div className="flex bg-slate-800 rounded-xl border border-slate-700 focus-within:border-blue-500 transition-colors">
-                <div className="flex items-center px-3 border-r border-slate-700">
-                  <span className="text-slate-400 text-sm">VN</span>
-                  <span className="text-slate-300 ml-1 text-sm">{countryCode}</span>
-                </div>
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Nhập số điện thoại"
-                  className="flex-1 bg-transparent border-none py-2.5 px-3 text-white placeholder-slate-500 focus:outline-none text-sm"
-                />
-              </div>
-            ) : (
-              <div className="flex bg-slate-800 rounded-xl border border-slate-700 focus-within:border-blue-500 transition-colors">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Nhập địa chỉ email"
-                  className="flex-1 bg-transparent border-none py-2.5 px-3 text-white placeholder-slate-500 focus:outline-none text-sm"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Action Button */}
-          <button
-            onClick={handleSendFriendRequest}
-            disabled={sendingRequest || (inputType === "phone" ? !phoneNumber : !email)}
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20 border-none cursor-pointer text-sm"
-          >
-            {sendingRequest ? "Đang gửi..." : "Gửi lời mời"}
-          </button>
-        </div>
-      </Modal>
     </>
   );
 }

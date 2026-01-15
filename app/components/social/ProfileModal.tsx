@@ -12,6 +12,7 @@ interface ProfileModalProps {
     email?: string;
     phone?: string;
     avatar?: string;
+    role_name?: string;
   } | null;
   friendCount?: number;
   groupCount?: number;
@@ -88,7 +89,22 @@ export default function ProfileModal({ isOpen, onClose, user, friendCount = 0, g
 
           {/* Name & Info */}
           <h2 className="text-2xl font-bold text-white mb-1">{user.fullname || user.username}</h2>
-          <p className="text-slate-400 mb-6">@{user.username}</p>
+          <p className="text-slate-400 mb-2">@{user.username}</p>
+
+          {/* Role Tag */}
+          {user.role_name && (
+            <div className={`px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wide mb-6 ${
+              user.role_name.toLowerCase().includes('admin') || user.role_name.toLowerCase().includes('quản trị')
+                ? 'bg-red-500/10 text-red-500 border-red-500/20'
+                : user.role_name.toLowerCase().includes('teacher') || user.role_name.toLowerCase().includes('giáo viên') || user.role_name.toLowerCase().includes('gia sư')
+                ? 'bg-orange-500/10 text-orange-500 border-orange-500/20'
+                : user.role_name.toLowerCase().includes('student') || user.role_name.toLowerCase().includes('học sinh') || user.role_name.toLowerCase().includes('học viên')
+                ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                : 'bg-slate-700 text-slate-300 border-slate-600'
+            }`}>
+              {user.role_name}
+            </div>
+          )}
 
           {/* Stats / Quick Info */}
           <div className="grid grid-cols-3 gap-4 w-full mb-8 border-y border-slate-800 py-4">

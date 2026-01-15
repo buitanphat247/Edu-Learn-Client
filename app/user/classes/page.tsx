@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Table, Tag, Button, App, Spin } from "antd";
+import { Table, Tag, Button, App } from "antd";
 import { EyeOutlined, UserOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { getClassStudentsByUser, type ClassStudentRecord } from "@/lib/api/classes";
@@ -169,25 +169,25 @@ export default function UserClasses() {
       />
 
       {/* Table */}
-      <Spin spinning={loading}>
-        <Table
-          columns={columns}
-          dataSource={classes}
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            onChange: handleTableChange,
-            showSizeChanger: false,
-            showTotal: (total) => `Tổng ${total} lớp học`,
-            position: ["bottomRight"],
-          }}
-          scroll={{ x: "max-content" }}
-          className="news-table"
-          rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
-          size="small"
-        />
-      </Spin>
+      <Table
+        columns={columns}
+        dataSource={classes}
+        loading={loading}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+          onChange: handleTableChange,
+          showSizeChanger: false,
+          showTotal: (total) => `Tổng ${total} lớp học`,
+          position: ["bottomRight"],
+        }}
+        scroll={{ x: "max-content" }}
+        className="news-table"
+        rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+        size="small"
+        locale={{ emptyText: "Không có lớp học nào" }}
+      />
     </div>
   );
 }

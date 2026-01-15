@@ -6,6 +6,7 @@ import { App, Spin, Input, Button, Tag, Dropdown, Pagination, Empty, Modal } fro
 import type { MenuProps } from "antd";
 import { SearchOutlined, PlusOutlined, MoreOutlined, FileOutlined, CalendarOutlined } from "@ant-design/icons";
 import { IoBookOutline } from "react-icons/io5";
+import Swal from "sweetalert2";
 import { getAssignmentsByClass, getAssignmentById, deleteAssignment, type AssignmentResponse, type AssignmentDetailResponse } from "@/lib/api/assignments";
 import type { ClassExercisesTabProps, Exercise } from "./types";
 
@@ -21,7 +22,7 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
   const router = useRouter();
   const { message } = App.useApp();
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -33,10 +34,16 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
 
   // Debounce search query
   useEffect(() => {
+    // Nếu là lần đầu hoặc searchQuery rỗng, set luôn không cần đợi 500ms
+    if (!searchQuery) {
+      setDebouncedSearchQuery("");
+      return;
+    }
+
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
       onPageChange(1);
-    }, 500);
+    }, 250);
 
     return () => clearTimeout(timer);
   }, [searchQuery, onPageChange]);
@@ -275,7 +282,53 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
           break;
       }
     },
-    [message, handleDelete, handleViewDetail]
+    [router, classId, handleDelete, handleViewDetail]
+  );
+
+  const handleCardClick = useCallback(
+    (exercise: Exercise, e: React.MouseEvent) => {
+      // Chỉ xử lý khi click vào card, không xử lý khi click vào dropdown menu (chỉ có ở admin)
+      if (!readOnly && (e.target as HTMLElement).closest('.ant-dropdown-trigger')) {
+        return;
+      }
+
+      // Chỉ hiển thị modal xác nhận khi ở chế độ readOnly (trang user)
+      if (readOnly) {
+        Swal.fire({
+          title: "Xác nhận nộp bài",
+          html: `
+            <div class="text-left">
+              <p class="mb-2">Bạn có muốn nộp bài tập:</p>
+              <p class="font-semibold text-lg mb-3">${exercise.title}</p>
+              <div class="text-sm text-gray-600 space-y-1">
+                ${exercise.className ? `<p>📚 <strong>Lớp:</strong> ${exercise.className}</p>` : ''}
+                ${exercise.dueDate ? `<p>📅 <strong>Hạn nộp:</strong> ${exercise.dueDate}${exercise.dueTime ? ` - ${exercise.dueTime}` : ''}</p>` : ''}
+                ${exercise.creatorName ? `<p>👤 <strong>Người tạo:</strong> ${exercise.creatorName}</p>` : ''}
+              </div>
+            </div>
+          `,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Nộp bài",
+          cancelButtonText: "Hủy",
+          focusConfirm: true,
+          customClass: {
+            popup: "swal2-popup-custom",
+            htmlContainer: "text-left",
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push(`/user/classes/${classId}/exercises/${exercise.id}/submit`);
+          }
+        });
+      } else {
+        // Admin mode: mở modal chi tiết như cũ
+        handleViewDetail(exercise);
+      }
+    },
+    [router, classId, readOnly, handleViewDetail]
   );
 
   const handleDownloadFiles = useCallback(async () => {
@@ -345,94 +398,89 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
       </div>
 
       {/* Exercises List */}
-      <Spin spinning={loading}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {currentExercises.length > 0 ? (
-            currentExercises.map((exercise) => (
-              <div
-                key={exercise.id}
-                className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer relative ${
-                  deletingId === exercise.id ? "opacity-50 pointer-events-none" : ""
-                }`}
-                onClick={() => handleViewDetail(exercise)}
-              >
-                <div className="flex flex-col h-full">
-                  {/* Header with Icon, Tag and Menu */}
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`${exercise.iconColor} w-14 h-14 rounded-lg flex items-center justify-center shrink-0 shadow-md`}>
-                        <IoBookOutline className="text-white text-3xl" />
-                      </div>
-                      <div className={`${exercise.subjectColor} border-0 font-semibold capitalize text-md px-2.5 py-1 rounded-lg shadow-sm`}>
-                        {exercise.subject}
-                      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {currentExercises.length > 0 ? (
+          currentExercises.map((exercise) => (
+            <div
+              key={exercise.id}
+              className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer relative ${
+                deletingId === exercise.id ? "opacity-50 pointer-events-none" : ""
+              }`}
+              onClick={(e) => handleCardClick(exercise, e)}
+            >
+              <div className="flex flex-col h-full">
+                {/* Header with Icon, Tag and Menu */}
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`${exercise.iconColor} w-14 h-14 rounded-lg flex items-center justify-center shrink-0 shadow-md`}>
+                      <IoBookOutline className="text-white text-3xl" />
                     </div>
+                    <div className={`${exercise.subjectColor} border-0 font-semibold capitalize text-md px-2.5 py-1 rounded-lg shadow-sm`}>
+                      {exercise.subject}
+                    </div>
+                  </div>
+                  {!readOnly && (
                     <div onClick={(e) => e.stopPropagation()}>
-                      {readOnly ? (
-                        <Button
-                          type="text"
-                          icon={<MoreOutlined />}
-                          className="shrink-0 text-gray-500 hover:text-gray-700"
-                          onClick={() => handleViewDetail(exercise)}
-                        />
-                      ) : (
-                        <Dropdown
-                          menu={{
-                            items: getMenuItems(exercise),
-                            onClick: ({ key }) => {
-                              handleMenuClick(key, exercise);
-                            },
-                          }}
-                          trigger={["click"]}
-                        >
-                          <Button type="text" icon={<MoreOutlined />} className="shrink-0 text-gray-500 hover:text-gray-700" />
-                        </Dropdown>
+                      <Dropdown
+                        menu={{
+                          items: getMenuItems(exercise),
+                          onClick: ({ key }) => {
+                            handleMenuClick(key, exercise);
+                          },
+                        }}
+                        trigger={["click"]}
+                      >
+                        <Button type="text" icon={<MoreOutlined />} className="shrink-0 text-gray-500 hover:text-gray-700" />
+                      </Dropdown>
+                    </div>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 space-y-3">
+                  <h3 className="font-semibold text-gray-800 text-lg line-clamp-2 leading-tight">{exercise.title}</h3>
+                  
+                  {/* Class Info */}
+                  {(exercise.className || exercise.classCode) && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      {exercise.className && <span className="font-medium text-gray-600">{exercise.className}</span>}
+                      {exercise.classCode && (
+                        <>
+                          {exercise.className && <span>•</span>}
+                          <span className="text-gray-500">Mã: {exercise.classCode}</span>
+                        </>
                       )}
                     </div>
-                  </div>
+                  )}
 
-                  {/* Content */}
-                  <div className="flex-1 space-y-3">
-                    <h3 className="font-semibold text-gray-800 text-lg line-clamp-2 leading-tight">{exercise.title}</h3>
-                    
-                    {/* Class Info */}
-                    {(exercise.className || exercise.classCode) && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        {exercise.className && <span className="font-medium text-gray-600">{exercise.className}</span>}
-                        {exercise.classCode && (
-                          <>
-                            {exercise.className && <span>•</span>}
-                            <span className="text-gray-500">Mã: {exercise.classCode}</span>
-                          </>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Creator */}
-                    {exercise.creatorName && (
-                      <div className="text-xs text-gray-500">
-                        Người tạo: <span className="text-gray-700 font-medium">{exercise.creatorName}</span>
-                      </div>
-                    )}
-
-                    {/* Due Date */}
-                    <div className="text-sm text-gray-600">
-                      Hạn nộp: <span className="text-gray-800 font-semibold">{exercise.dueDate}</span>
-                      {exercise.dueTime && <span className="text-gray-800 font-semibold"> - {exercise.dueTime}</span>}
+                  {/* Creator */}
+                  {exercise.creatorName && (
+                    <div className="text-xs text-gray-500">
+                      Người tạo: <span className="text-gray-700 font-medium">{exercise.creatorName}</span>
                     </div>
+                  )}
 
-                 
+                  {/* Due Date */}
+                  <div className="text-sm text-gray-600">
+                    Hạn nộp: <span className="text-gray-800 font-semibold">{exercise.dueDate}</span>
+                    {exercise.dueTime && <span className="text-gray-800 font-semibold"> - {exercise.dueTime}</span>}
                   </div>
+
+               
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="col-span-full">
-              <Empty description={searchQuery ? "Không tìm thấy bài tập nào" : "Chưa có bài tập nào"} image={Empty.PRESENTED_IMAGE_SIMPLE} />
             </div>
-          )}
-        </div>
-      </Spin>
+          ))
+        ) : !loading ? (
+          <div className="col-span-full">
+            <Empty description={searchQuery ? "Không tìm thấy bài tập nào" : "Chưa có bài tập nào"} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          </div>
+        ) : (
+          <div className="col-span-full py-12 flex justify-center items-center">
+            {/* Mất hiệu ứng Spin cục bộ, phụ thuộc vào Spin cha */}
+          </div>
+        )}
+      </div>
 
       {/* Pagination */}
       {total > pageSize && (

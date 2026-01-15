@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { App, Button, Upload } from "antd";
+import { App, Button, Upload, Divider, Tabs } from "antd";
 import CustomCard from "@/app/components/common/CustomCard";
 import FileUploadSection from "@/app/components/exams/FileUploadSection";
 import InfoBox from "@/app/components/exams/InfoBox";
 import TemplatesSection from "@/app/components/exams/TemplatesSection";
 import ExamFormatGuide from "@/app/components/exams/ExamFormatGuide";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import AIGenerationSection from "@/app/components/exams/AIGenerationSection";
+import { ArrowLeftOutlined, ThunderboltFilled, FileAddOutlined } from "@ant-design/icons";
 import type { UploadFile, UploadProps } from "antd";
 
 export default function ExaminatePage() {
@@ -87,33 +88,65 @@ export default function ExaminatePage() {
         <div className="lg:col-span-1 space-y-6">
           <CustomCard padding="lg">
             <div className="space-y-6">
-              {/* Upload Section */}
-              <FileUploadSection fileList={fileList} onUpload={handleUpload} onRemove={handleRemoveFile} beforeUpload={beforeUpload} />
+              <Tabs
+                defaultActiveKey="ai"
+                type="card"
+                className="custom-exam-tabs mb-4"
+                items={[
+                  {
+                    key: "ai",
+                    label: (
+                      <span className="flex items-center gap-2 px-2">
+                        <ThunderboltFilled /> AI Smart Gen
+                      </span>
+                    ),
+                    children: (
+                      <div className="pt-4">
+                        <AIGenerationSection uploadedFile={fileList.length > 0 ? fileList[0] : null} />
+                      </div>
+                    ),
+                  },
+                  {
+                    key: "manual",
+                    label: (
+                      <span className="flex items-center gap-2 px-2">
+                        <FileAddOutlined /> Tải file thủ công
+                      </span>
+                    ),
+                    children: (
+                      <div className="pt-4 space-y-6">
+                        <FileUploadSection fileList={fileList} onUpload={handleUpload} onRemove={handleRemoveFile} beforeUpload={beforeUpload} />
+                        
+                        <InfoBox type="info">
+                          <p className="mb-2">
+                            Có thể Upload File <strong>Bài tập</strong>, <strong>Đề thi</strong> Hoặc <strong>Bảng đáp án</strong> để chấm offline.
+                          </p>
+                          <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+                            Tìm hiểu thêm →
+                          </a>
+                        </InfoBox>
+                      </div>
+                    ),
+                  },
+                ]}
+              />
 
-              {/* Info Section */}
-              <InfoBox type="info">
-                <p className="mb-2">
-                  Có thể Upload File <strong>Bài tập</strong>, <strong>Đề thi</strong> Hoặc <strong>Bảng đáp án</strong> để chấm offline.
-                </p>
-                <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                  Tìm hiểu thêm →
-                </a>
-              </InfoBox>
+              <div className="space-y-3 pt-2">
+                {/* Image Note */}
+                <InfoBox type="warning">
+                  <p>
+                    <span className="font-medium">Lưu ý:</span> File ảnh chỉ hỗ trợ số hóa
+                  </p>
+                </InfoBox>
 
-              {/* Image Note */}
-              <InfoBox type="warning">
-                <p>
-                  <span className="font-medium">Lưu ý:</span> File ảnh chỉ hỗ trợ số hóa
-                </p>
-              </InfoBox>
+                {/* Templates Section */}
+                <TemplatesSection templates={templates} />
 
-              {/* Templates Section */}
-              <TemplatesSection templates={templates} />
-
-              {/* OCR Feature */}
-              <InfoBox type="success" title="Tính năng mới">
-                <p>Azota đã hỗ trợ nhận dạng đề từ file ảnh (ảnh chụp đề hoặc viết tay)</p>
-              </InfoBox>
+                {/* OCR Feature */}
+                <InfoBox type="success" title="Tính năng mới">
+                  <p>Azota đã hỗ trợ nhận dạng đề từ file ảnh (ảnh chụp đề hoặc viết tay)</p>
+                </InfoBox>
+              </div>
             </div>
           </CustomCard>
         </div>

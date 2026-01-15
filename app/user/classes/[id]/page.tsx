@@ -465,7 +465,7 @@ export default function UserClassDetail() {
       {classInfo && <ClassInfoCard classInfo={classInfo} onCopyCode={handleCopyCode} />}
 
       {/* Tabs */}
-      <Tabs activeKey={activeTab} onChange={handleTabChange} destroyInactiveTabPane items={tabItems} />
+      <Tabs activeKey={activeTab} onChange={handleTabChange} destroyOnHidden items={tabItems} />
     </div>
   );
 }

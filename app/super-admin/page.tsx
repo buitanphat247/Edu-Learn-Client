@@ -8,6 +8,7 @@ import {
   CalendarOutlined,
   ArrowRightOutlined,
   CloudDownloadOutlined,
+  SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import { Card } from "antd";
 import { useRouter } from "next/navigation";
@@ -71,6 +72,15 @@ const dashboardItems = [
     iconColor: "text-indigo-600",
     path: "/super-admin/all",
   },
+  {
+    icon: SafetyCertificateOutlined,
+    title: "Phân quyền hệ thống",
+    description: "Quản lý vai trò và quyền hạn truy cập của các thành viên",
+    gradient: "from-rose-500 to-rose-600",
+    iconBg: "bg-rose-100",
+    iconColor: "text-rose-600",
+    path: "/super-admin/permissions",
+  },
 ];
 
 // Stats sẽ được fetch từ API
@@ -86,27 +96,31 @@ function WelcomeBanner() {
   return (
     <div className="bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white border border-gray-200 hover:shadow-lg transition-shadow duration-300">
       <h1 className="text-3xl font-bold mb-2">{getGreeting()}, Super Admin!</h1>
-      <p className="text-blue-100 text-lg">
-        Chào mừng bạn quay trở lại. Dưới đây là tổng quan về hệ thống của bạn.
-      </p>
+      <p className="text-blue-100 text-lg">Chào mừng bạn quay trở lại. Dưới đây là tổng quan về hệ thống của bạn.</p>
     </div>
   );
 }
 
-function StatCard({ label, value, icon: IconComponent, color, bgColor }: { label: string; value: number; icon: any; color: string; bgColor: string }) {
+function StatCard({
+  label,
+  value,
+  icon: IconComponent,
+  color,
+  bgColor,
+}: {
+  label: string;
+  value: number;
+  icon: any;
+  color: string;
+  bgColor: string;
+}) {
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-600 text-sm mb-1">{label}</p>
           <p className="text-3xl font-bold text-gray-800">
-            <CountUp
-              start={0}
-              end={value}
-              duration={2}
-              separator=","
-              decimals={0}
-            />
+            <CountUp start={0} end={value} duration={2} separator="," decimals={0} />
           </p>
         </div>
         <div className={`${bgColor} p-4 rounded-lg`}>
@@ -206,9 +220,7 @@ export default function SuperAdminDashboard() {
                   body: { padding: 0 },
                 }}
               >
-                <div
-                  className={`bg-linear-to-br ${item.gradient} p-6 text-white relative overflow-hidden`}
-                >
+                <div className={`bg-linear-to-br ${item.gradient} p-6 text-white relative overflow-hidden`}>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
                   <div className="relative z-10">
@@ -237,4 +249,3 @@ export default function SuperAdminDashboard() {
     </div>
   );
 }
-

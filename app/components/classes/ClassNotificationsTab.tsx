@@ -34,21 +34,27 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
   const [selectedNotification, setSelectedNotification] = useState<NotificationResponse | null>(null);
   const [editNotification, setEditNotification] = useState<NotificationResponse | null>(null);
   const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [loadingEdit, setLoadingEdit] = useState(false);
 
   // Debounce search query
   useEffect(() => {
+    // Nếu là lần đầu hoặc searchQuery rỗng, set luôn không cần đợi 500ms
+    if (!searchQuery) {
+      setDebouncedSearchQuery("");
+      return;
+    }
+
     const timer = setTimeout(() => {
       const prevSearch = debouncedSearchQuery;
       setDebouncedSearchQuery(searchQuery);
-      // Reset to page 1 when search actually changes
+      // Reset to page 1 when search thực sự thay đổi
       if (searchQuery !== prevSearch && currentPage !== 1) {
         onPageChange(1);
       }
-    }, 500);
+    }, 250);
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -289,73 +295,81 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
       </div>
 
       <div className="relative min-h-[200px]">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {displayNotifications.map((notification) => (
-            <div
-              key={notification.id}
-              className="bg-white rounded-lg border-l-4 border-blue-500 border-t border-r border-b p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
-              onClick={() => {
-                const fullNotification = notifications.find((n) => String(n.notification_id) === notification.id);
-                if (fullNotification) {
-                  setSelectedNotification(fullNotification);
-                  setIsDetailModalOpen(true);
-                }
-              }}
-            >
-              <div className="flex flex-col h-full">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm text-gray-500">
-                      {notification.time ? `${notification.time} - ${notification.date}` : notification.date}
-                    </span>
-                    <Tag color="orange" className="text-xs">
-                      {notification.scope}
-                    </Tag>
-                  </div>
-                  {(() => {
-                    const menuItems = getMenuItems(notification) || [];
-                    return menuItems.length > 1 ? (
-                      <Dropdown
-                        menu={{
-                          items: menuItems,
-                          onClick: ({ key }) => handleMenuClick(key, notification),
-                        }}
-                        trigger={["click"]}
-                      >
-                        <Button
-                          type="text"
-                          icon={<MoreOutlined />}
-                          className="shrink-0"
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent card click when clicking dropdown
-                          }}
-                        />
-                      </Dropdown>
-                    ) : (
-                      <Button
-                        type="text"
-                        icon={<MoreOutlined />}
-                        className="shrink-0"
+        {notifications.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {displayNotifications.map((notification) => (
+              <div
+                key={notification.id}
+                className="bg-white rounded-lg border-l-4 border-blue-500 border-t border-r border-b p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                onClick={() => {
+                  const fullNotification = notifications.find((n) => String(n.notification_id) === notification.id);
+                  if (fullNotification) {
+                    setSelectedNotification(fullNotification);
+                    setIsDetailModalOpen(true);
+                  }
+                }}
+              >
+                <div className="flex flex-col h-full">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm text-gray-500">
+                        {notification.time ? `${notification.time} - ${notification.date}` : notification.date}
+                      </span>
+                      <Tag color="orange" className="text-xs">
+                        {notification.scope}
+                      </Tag>
+                    </div>
+                    {!readOnly && (
+                      <div
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent card click when clicking button
-                          const fullNotification = notifications.find((n) => String(n.notification_id) === notification.id);
-                          if (fullNotification) {
-                            setSelectedNotification(fullNotification);
-                            setIsDetailModalOpen(true);
-                          }
+                          e.stopPropagation(); // Global stop for anything in this area
                         }}
-                      />
-                    );
-                  })()}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800 text-lg line-clamp-2">{notification.title}</h3>
-                  <span className="text-xs text-gray-500">{notification.author}</span>
+                        onMouseDown={(e) => e.stopPropagation()} // Some components might use onMouseDown
+                      >
+                        {(() => {
+                          const menuItems = getMenuItems(notification) || [];
+                          return menuItems.length > 1 ? (
+                            <Dropdown
+                              menu={{
+                                items: menuItems,
+                                onClick: ({ key }) => handleMenuClick(key, notification),
+                              }}
+                              trigger={["click"]}
+                              getPopupContainer={(trigger) => trigger.parentElement || document.body}
+                            >
+                              <Button type="text" icon={<MoreOutlined />} className="shrink-0" />
+                            </Dropdown>
+                          ) : (
+                            <Button
+                              type="text"
+                              icon={<MoreOutlined />}
+                              className="shrink-0"
+                              onClick={() => {
+                                const fullNotification = notifications.find((n) => String(n.notification_id) === notification.id);
+                                if (fullNotification) {
+                                  setSelectedNotification(fullNotification);
+                                  setIsDetailModalOpen(true);
+                                }
+                              }}
+                            />
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800 text-lg line-clamp-2">{notification.title}</h3>
+                    <span className="text-xs text-gray-500">{notification.author}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : !loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Empty description={searchQuery ? "Không tìm thấy thông báo nào" : "Chưa có thông báo nào"} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          </div>
+        ) : null}
       </div>
 
       {total > pageSize && (

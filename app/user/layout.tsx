@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import UserSidebar from "../components/layout/UserSidebar";
 import UserHeader from "@/app/components/user/UserHeader";
 import DashboardFooter from "../components/layout/DashboardFooter";
@@ -9,8 +10,20 @@ export default function UserLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Authentication and authorization are handled by middleware.ts
-  // No need for client-side ProtectedRoute wrapper
+  const pathname = usePathname();
+  
+  // Check if we are in an exam session: /user/classes/[id]/exams/[examId]
+  // We want to hide all sidebar/header for actual exam doing page
+  const isExamSession = pathname.includes("/exams/") && pathname.split("/").length >= 6;
+
+  if (isExamSession) {
+      return (
+        <div className="h-screen w-screen bg-gray-50 overflow-hidden overflow-y-auto">
+            {children}
+        </div>
+      );
+  }
+
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       <UserSidebar />

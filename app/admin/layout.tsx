@@ -2,11 +2,7 @@
 
 import AdminSidebar from "../components/layout/AdminSidebar";
 import DashboardFooter from "../components/layout/DashboardFooter";
-import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { BellOutlined, RobotOutlined } from "@ant-design/icons";
-import NotificationPanel from "../components/layout/NotificationPanel";
-import AIChatPanel from "../components/layout/AIChatPanel";
 
 const pageTitles: Record<string, string> = {
   "/admin": "Dashboard",
@@ -18,8 +14,6 @@ const pageTitles: Record<string, string> = {
 function AdminHeader() {
   const router = useRouter();
   const pathname = usePathname();
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   // Find matching page title, checking for exact match first, then prefix match
   const getCurrentPageTitle = () => {
@@ -56,20 +50,6 @@ function AdminHeader() {
         </div>
 
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => setIsAIChatOpen(true)}
-            className="text-gray-600 hover:text-gray-800 transition-colors relative"
-            title="Trợ lý AI"
-          >
-            <RobotOutlined className="text-2xl" />
-          </button>
-          <button
-            onClick={() => setIsNotificationOpen(true)}
-            className="text-gray-600 hover:text-gray-800 transition-colors relative"
-          >
-            <BellOutlined className="text-2xl" />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
           <div
             onClick={() => router.push("/profile")}
             className="flex items-center gap-3 pl-4 border-l border-gray-300 cursor-pointer hover:opacity-80 transition-opacity"
@@ -84,8 +64,6 @@ function AdminHeader() {
           </div>
         </div>
       </header>
-      <NotificationPanel open={isNotificationOpen} onClose={() => setIsNotificationOpen(false)} />
-      <AIChatPanel open={isAIChatOpen} onClose={() => setIsAIChatOpen(false)} />
     </>
   );
 }

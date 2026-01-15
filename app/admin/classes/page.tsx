@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { App, Spin } from "antd";
+import { App } from "antd";
 import ClassesHeader from "@/app/components/classes/ClassesHeader";
 import ClassesTable from "@/app/components/classes/ClassesTable";
 import CreateClassModal from "@/app/components/classes/CreateClassModal";
@@ -176,19 +176,18 @@ export default function AdminClasses() {
         />
       )}
 
-      <Spin spinning={loading}>
-        <ClassesTable 
-          data={classes} 
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            onChange: handleTableChange,
-          }}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      </Spin>
+      <ClassesTable 
+        data={classes}
+        loading={loading}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+          onChange: handleTableChange,
+        }}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }

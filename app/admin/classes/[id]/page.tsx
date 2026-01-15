@@ -68,7 +68,7 @@ export default function ClassDetail() {
   const notificationPageSize = 4;
   const [examSearchQuery, setExamSearchQuery] = useState("");
   const [examPage, setExamPage] = useState(1);
-  const examPageSize = 4;
+  const examPageSize = 12;
 
   // Map ClassStudentRecord to StudentItem
   const mapStudentRecordToItem = useCallback((record: ClassStudentRecord, className: string): StudentItem => {

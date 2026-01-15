@@ -65,6 +65,26 @@ export interface GetFriendRequestsResult {
 // API returns array directly, not wrapped in object
 export type GetFriendRequestsApiResponse = FriendRequestResponse[];
 
+export interface CreateFriendRequestParams {
+  requester_id: number;
+  addressee_id: number;
+}
+
+export const sendFriendRequest = async (params: CreateFriendRequestParams): Promise<FriendRequestResponse> => {
+  try {
+    const response = await apiClient.post<any>("/friends/request", params);
+    
+    if (response.data?.status && response.data.data) {
+      return response.data.data;
+    }
+    
+    // Fallback if structure is different
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message || "Không thể gửi lời mời kết bạn");
+  }
+};
+
 /**
  * Get pending friend requests for current user
  */

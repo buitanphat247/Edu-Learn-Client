@@ -11,6 +11,8 @@ export interface Conversation {
   members?: number;
   lastAccess?: string;
   isOwn?: boolean;
+  memberIds?: number[];
+  isEmpty?: boolean;
 }
 
 export interface Message {

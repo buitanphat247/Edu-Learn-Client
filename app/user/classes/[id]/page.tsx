@@ -194,7 +194,7 @@ export default function UserClassDetail() {
     setShowSplash(true); // Show splash when starting to load
 
     const startTime = Date.now();
-    const minSplashDuration = 1000; // Minimum 1 second
+    const minSplashDuration = 250; // Minimum 1 second
 
     try {
       // Fetch class info first and get className (data loading in background)
@@ -206,9 +206,9 @@ export default function UserClassDetail() {
     } finally {
       setLoading(false);
 
-      // Calculate remaining time to show splash (minimum 2 seconds)
+      // Calculate remaining time to show splash (minimum 250ms)
       const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, 2000 - elapsed);
+      const remaining = Math.max(0, 250 - elapsed);
 
       // Hide splash after minimum display time
       setTimeout(() => {

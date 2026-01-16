@@ -203,7 +203,7 @@ export default function ClassDetail() {
       setLoading(false);
 
       const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, 2000 - elapsed);
+      const remaining = Math.max(0, 250 - elapsed);
 
       setTimeout(() => {
         setShowSplash(false);
@@ -348,7 +348,6 @@ export default function ClassDetail() {
     },
     [modal, message]
   );
-
 
   const handleViewBannedList = useCallback(() => {
     setIsBannedListModalOpen(true);

@@ -183,24 +183,25 @@ export default function UserClasses() {
       <ClassesHeader searchValue={searchQuery} onSearchChange={setSearchQuery} onJoinClick={() => setIsJoinModalOpen(true)} />
 
       {/* Table */}
-      <Table
-        columns={columns}
-        dataSource={classes}
-        loading={loading}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          onChange: handleTableChange,
-          showSizeChanger: false,
-          showTotal: (total) => `Tổng ${total} lớp học`,
-          position: ["bottomRight"],
-        }}
-        scroll={{ x: "max-content" }}
-        className="news-table"
-        rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
-        size="small"
-      />
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <Table
+          columns={columns}
+          dataSource={classes}
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            onChange: handleTableChange,
+            showSizeChanger: false,
+            showTotal: (total) => `Tổng ${total} lớp học`,
+          }}
+          scroll={{ x: "max-content" }}
+          className="news-table"
+          rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+          size="small"
+        />
+      </div>
 
       {/* Modal Tham gia lớp học */}
       <Modal

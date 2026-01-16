@@ -1,66 +1,99 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { HomeOutlined, AppstoreOutlined, SettingOutlined } from "@ant-design/icons";
-import { RiContactsBookLine } from "react-icons/ri";
+import { usePathname, useRouter } from "next/navigation";
+import { HomeOutlined, AppstoreOutlined, SettingOutlined, LogoutOutlined, FileTextOutlined, BarChartOutlined } from "@ant-design/icons";
+import { IoBookOutline } from "react-icons/io5";
+import { Button, App } from "antd";
 
 const menuItems = [
   { path: "/user", icon: HomeOutlined, label: "Trang chủ" },
   { path: "/user/classes", icon: AppstoreOutlined, label: "Lớp học" },
+  { path: "/user/courses", icon: IoBookOutline, label: "Khóa học của tôi", isComingSoon: true },
+  { path: "/user/courses/overview", icon: BarChartOutlined, label: "Tổng quan khóa học", isComingSoon: true },
+  { path: "/user/documents", icon: FileTextOutlined, label: "Tài liệu" },
+  { path: "/user/settings", icon: SettingOutlined, label: "Cài đặt" },
 ];
 
 export default function UserSidebar() {
   const pathname = usePathname();
-  const sidebarColor = "#2f3542";
+  const router = useRouter();
+  const { message } = App.useApp();
+
+  const handleLogout = () => {
+    router.push("/");
+  };
+
+  const handleMenuItemClick = (item: typeof menuItems[0], e: React.MouseEvent) => {
+    if (item.isComingSoon) {
+      e.preventDefault();
+      message.info("Tính năng đang phát triển");
+      return;
+    }
+  };
 
   return (
-    <aside
-      className="w-20 flex flex-col items-center py-4"
-      style={{ backgroundColor: sidebarColor, "--sidebar-bg": sidebarColor } as React.CSSProperties & { "--sidebar-bg": string }}
-    >
-      {/* Logo */}
-      <div className="mb-6">
-        <div className="w-12 h-12 bg-white border border-gray-300 rounded-lg flex items-center justify-center shadow-sm overflow-hidden">
-          <img src="/images/logo/1.png" alt="Logo" className="w-full h-full object-contain" />
+    <aside className="w-64 h-screen flex flex-col z-50 transition-all duration-300 border-r border-gray-200 bg-white">
+      {/* Logo Section */}
+      <div className="p-4 pb-6 flex items-center gap-3">
+        <div className="w-10 h-10 bg-linear-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+          <span className="text-white text-lg font-bold tracking-tighter">AIO</span>
         </div>
+        <span className="text-xl font-black text-gray-900 tracking-tighter capitalize">Edu Learning</span>
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 flex flex-col gap-1 w-full ">
+      <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isExactMatch = item.path === "/user";
           const isActive = isExactMatch ? pathname === "/user" : pathname?.startsWith(item.path);
 
           return (
-            <Link
+            <div
               key={item.path}
-              href={item.path}
-              className="flex items-center justify-center group relative"
-              style={{ backgroundColor: "transparent" }}
-              title={item.label}
+              className={`group flex items-center gap-4 px-5 py-3 rounded-xl transition-all duration-200 ${
+                isActive ? "bg-blue-200" : "hover:bg-gray-50"
+              }`}
             >
-              <div className={`flex items-center justify-center w-12 h-12 ${isActive ? "bg-blue-500 rounded-xl" : ""}`}>
-                <Icon
-                  className="text-xl"
-                  style={{
-                    color: "#ffffff",
-                    position: "relative",
-                    zIndex: 2,
-                  }}
-                />
-              </div>
-            </Link>
+              {item.isComingSoon ? (
+                <div onClick={(e) => handleMenuItemClick(item, e)} className="flex items-center gap-4 w-full cursor-pointer">
+                  <Icon
+                    className={`text-xl transition-colors duration-200 ${!isActive ? "group-hover:text-blue-600" : ""}`}
+                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                  />
+                  <span
+                    className={`text-[14px] transition-colors duration-200 ${isActive ? "font-bold" : "font-medium group-hover:text-blue-600"}`}
+                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+              ) : (
+                <Link href={item.path} className="flex items-center gap-4 w-full">
+                  <Icon
+                    className={`text-xl transition-colors duration-200 ${!isActive ? "group-hover:text-blue-600" : ""}`}
+                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                  />
+                  <span
+                    className={`text-[14px] transition-colors duration-200 ${isActive ? "font-bold" : "font-medium group-hover:text-blue-600"}`}
+                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              )}
+            </div>
           );
         })}
       </nav>
 
-      {/* Utility Icons */}
-      <div className="flex flex-col gap-1 w-full mt-auto px-2">
-        <button className="flex items-center justify-center py-2 px-2 rounded-xl" style={{ backgroundColor: "transparent" }} title="Cài đặt">
-          <SettingOutlined className="text-lg" style={{ color: "#ffffff" }} />
-        </button>
+      {/* Logout Button */}
+      <div className="p-4">
+        <Button size="large" type="primary" danger onClick={handleLogout} className="w-full">
+          <LogoutOutlined className="text-xl transition-colors duration-200" />
+          <span>Thoát hệ thống</span>
+        </Button>
       </div>
     </aside>
   );

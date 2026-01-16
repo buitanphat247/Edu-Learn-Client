@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { AppstoreOutlined, UserOutlined, ArrowRightOutlined, CloudDownloadOutlined, FileTextOutlined } from "@ant-design/icons";
-import { Card } from "antd";
+import { Card, Skeleton, App } from "antd";
 import { useRouter } from "next/navigation";
+import { getStats, type StatsResponse } from "@/lib/api/stats";
 
 const dashboardItems = [
   {
@@ -34,31 +36,6 @@ const dashboardItems = [
   },
 ];
 
-// Mock statistics data - có thể thay thế bằng dữ liệu thực từ API
-const stats = [
-  {
-    label: "Lớp học",
-    value: "12",
-    icon: AppstoreOutlined,
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-  },
-  {
-    label: "Học sinh",
-    value: "156",
-    icon: UserOutlined,
-    color: "text-cyan-600",
-    bgColor: "bg-cyan-50",
-  },
-  {
-    label: "Tài liệu",
-    value: "89",
-    icon: FileTextOutlined,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-  },
-];
-
 function WelcomeBanner() {
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -77,7 +54,7 @@ function WelcomeBanner() {
 
 function StatisticsCards({ stats }: { stats: any[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
@@ -150,13 +127,82 @@ function QuickActionsGrid({ items }: { items: any[] }) {
 }
 
 export default function AdminDashboard() {
+  const { message } = App.useApp();
+  const [stats, setStats] = useState<StatsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const data = await getStats();
+        setStats(data);
+      } catch (error: any) {
+        message.error(error?.message || "Không thể tải thống kê");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [message]);
+
+  const statsCards = stats
+    ? [
+        {
+          label: "Tài liệu",
+          value: stats.documents.toString(),
+          icon: FileTextOutlined,
+          color: "text-purple-600",
+          bgColor: "bg-purple-50",
+        },
+        {
+          label: "Người dùng",
+          value: stats.users.toString(),
+          icon: UserOutlined,
+          color: "text-cyan-600",
+          bgColor: "bg-cyan-50",
+        },
+        {
+          label: "Tin tức",
+          value: stats.news.toString(),
+          icon: AppstoreOutlined,
+          color: "text-green-600",
+          bgColor: "bg-green-50",
+        },
+        {
+          label: "Sự kiện",
+          value: stats.events.toString(),
+          icon: CloudDownloadOutlined,
+          color: "text-indigo-600",
+          bgColor: "bg-indigo-50",
+        },
+      ]
+    : [];
+
   return (
     <div className="space-y-5">
       {/* Welcome Section */}
       <WelcomeBanner />
 
       {/* Statistics Cards */}
-      <StatisticsCards stats={stats} />
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[1, 2, 3, 4].map((index) => (
+            <Card key={index} className="border border-gray-200" styles={{ body: { padding: "24px" } }}>
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <Skeleton active paragraph={{ rows: 0 }} title={{ width: "60%", style: { marginBottom: 8 } }} />
+                  <Skeleton active paragraph={{ rows: 0 }} title={{ width: "40%", style: { marginTop: 8, height: 32 } }} />
+                </div>
+                <Skeleton.Avatar active size={64} shape="square" className="rounded-xl" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <StatisticsCards stats={statsCards} />
+      )}
 
       {/* Quick Actions Section */}
       <div>

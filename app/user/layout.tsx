@@ -1,40 +1,32 @@
-"use client";
+import { cookies } from "next/headers";
+import UserLayoutClient from "./UserLayoutClient";
 
-import { usePathname } from "next/navigation";
-import UserSidebar from "../components/layout/UserSidebar";
-import UserHeader from "@/app/components/user/UserHeader";
-import DashboardFooter from "../components/layout/DashboardFooter";
+async function getInitialUserData() {
+  try {
+    const cookieStore = await cookies();
+    const userCookie = cookieStore.get("user");
 
-export default function UserLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const pathname = usePathname();
-  
-  // Check if we are in an exam session: /user/classes/[id]/exams/[examId]
-  // We want to hide all sidebar/header for actual exam doing page
-  const isExamSession = pathname.includes("/exams/") && pathname.split("/").length >= 6;
-
-  if (isExamSession) {
-      return (
-        <div className="h-screen w-screen bg-gray-50 overflow-hidden overflow-y-auto">
-            {children}
-        </div>
-      );
+    if (userCookie?.value) {
+      try {
+        const userData = JSON.parse(userCookie.value);
+        return {
+          username: userData.username || null,
+          role_name: userData.role_name || userData.role?.role_name || null,
+          avatar: userData.avatar || null,
+        };
+      } catch (error) {
+        console.error("Error parsing user cookie:", error);
+      }
+    }
+  } catch (error) {
+    console.error("Error reading server cookie:", error);
   }
 
-  return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
-      <UserSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <UserHeader />
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-          {children}
-        </main>
-        <DashboardFooter />
-      </div>
-    </div>
-  );
+  return null;
 }
 
+export default async function UserLayout({ children }: { children: React.ReactNode }) {
+  const initialUserData = await getInitialUserData();
+
+  return <UserLayoutClient initialUserData={initialUserData}>{children}</UserLayoutClient>;
+}

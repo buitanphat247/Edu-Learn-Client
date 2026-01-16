@@ -1,17 +1,22 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import AdminSidebar from "../components/layout/AdminSidebar";
+import SuperAdminSidebar from "../components/layout/SuperAdminSidebar";
 import { usePathname } from "next/navigation";
-import { Modal, Spin, message } from "antd";
+import { Modal, Spin, message, Breadcrumb } from "antd";
 import { getUserInfo, type UserInfoResponse } from "@/lib/api/users";
 import { getUserIdFromCookie } from "@/lib/utils/cookies";
+import Link from "next/link";
 
 const pageTitles: Record<string, string> = {
-  "/admin": "Dashboard",
-  "/admin/classes": "Quản lý Lớp học",
-  "/admin/students": "Quản lý Học sinh",
-  "/admin/document-crawl": "Quản lý Tài liệu Crawl",
+  "/super-admin": "Dashboard",
+  "/super-admin/documents-crawl": "Quản lý tài liệu",
+  "/super-admin/accounts": "Quản lý tài khoản",
+  "/super-admin/notification": "Quản lý thông báo",
+  "/super-admin/posts": "Quản lý tin tức",
+  "/super-admin/events": "Quản lý sự kiện",
+  "/super-admin/permissions": "Quản lý phân quyền",
+  "/super-admin/all": "Quản lý toàn bộ",
 };
 
 interface InitialUserData {
@@ -20,23 +25,31 @@ interface InitialUserData {
   avatar: string | null;
 }
 
-function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | null }) {
+function SuperAdminHeader({ initialUserData }: { initialUserData: InitialUserData | null }) {
   const pathname = usePathname();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
 
-  // Memoize page title calculation
-  const currentPageTitle = useMemo(() => {
-    if (!pathname) return undefined;
-    if (pageTitles[pathname]) return pageTitles[pathname];
-    for (const [route, title] of Object.entries(pageTitles)) {
-      if (route !== "/admin" && pathname.startsWith(route)) return title;
+  const getBreadcrumbItems = useMemo(() => {
+    const items = [
+      {
+        title: <Link href="/super-admin">Hệ thống quản lý Super Admin</Link>,
+      },
+    ];
+
+    if (pathname && pathname !== "/super-admin") {
+      const title = pageTitles[pathname];
+      if (title) {
+        items.push({
+          title: <span className="font-semibold text-gray-800">{title}</span>,
+        });
+      }
     }
-    return undefined;
+
+    return items;
   }, [pathname]);
 
-  // Memoize fetch function
   const fetchUserInfo = useCallback(async (showError = false) => {
     const userId = getUserIdFromCookie();
     if (!userId) {
@@ -58,45 +71,34 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
     }
   }, []);
 
-  // Fetch user info on mount (silent)
   useEffect(() => {
     fetchUserInfo(false);
   }, [fetchUserInfo]);
 
-  // Fetch user info when modal opens (with loading state)
   useEffect(() => {
     if (!isProfileModalOpen || userInfo) return;
     fetchUserInfo(true);
   }, [isProfileModalOpen, userInfo, fetchUserInfo]);
 
-  // Memoize getInitials function
   const getInitials = useCallback((name: string) => {
-    if (!name) return "A";
+    if (!name) return "SA";
     const parts = name.trim().split(" ");
     return parts.length >= 2 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
   }, []);
 
-  // Memoize display values
-  const displayName = useMemo(() => userInfo?.username || initialUserData?.username || "Admin", [userInfo?.username, initialUserData?.username]);
+  const displayName = useMemo(() => userInfo?.username || initialUserData?.username || "Super Admin", [userInfo?.username, initialUserData?.username]);
   const displayRole = useMemo(
-    () => userInfo?.role?.role_name || initialUserData?.role_name || "Giáo viên",
+    () => userInfo?.role?.role_name || initialUserData?.role_name || "Quản trị viên",
     [userInfo?.role?.role_name, initialUserData?.role_name]
   );
 
-  // Memoize initials for avatar
   const displayInitials = useMemo(() => getInitials(displayName), [displayName, getInitials]);
 
   return (
     <>
       <header className="bg-white h-16 flex items-center justify-between px-6 shadow-sm border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold text-gray-800">Hệ thống quản lý Admin</h1>
-          {currentPageTitle && (
-            <>
-              <span className="text-gray-500">-</span>
-              <span className="text-lg font-semibold text-gray-800">{currentPageTitle}</span>
-            </>
-          )}
+          <Breadcrumb items={getBreadcrumbItems} />
         </div>
 
         <div className="flex items-center gap-4">
@@ -113,17 +115,17 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
         </div>
       </header>
 
-      <Modal title="Hồ sơ giáo viên" open={isProfileModalOpen} onCancel={() => setIsProfileModalOpen(false)} footer={null} width={600}>
+      <Modal title="Hồ sơ quản trị viên" open={isProfileModalOpen} onCancel={() => setIsProfileModalOpen(false)} footer={null} width={600}>
         <Spin spinning={loadingProfile}>
           {userInfo ? (
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-2xl">
-                  {getInitials(userInfo.fullname || userInfo.username || "A")}
+                  {getInitials(userInfo.fullname || userInfo.username || "SA")}
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-800">{userInfo.fullname || userInfo.username}</h3>
-                  <p className="text-gray-600">{userInfo.role?.role_name || "Giáo viên"}</p>
+                  <p className="text-gray-600">{userInfo.role?.role_name || "Quản trị viên"}</p>
                 </div>
               </div>
               <div className="border-t border-gray-200 pt-4 space-y-3">
@@ -156,15 +158,15 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
   );
 }
 
-export default function AdminLayoutClient({ children, initialUserData }: { children: React.ReactNode; initialUserData: InitialUserData | null }) {
+export default function SuperAdminLayoutClient({ children, initialUserData }: { children: React.ReactNode; initialUserData: InitialUserData | null }) {
   const pathname = usePathname();
-  const isDocumentCrawlPage = pathname?.startsWith("/admin/document-crawl");
+  const isDocumentCrawlPage = pathname === "/super-admin/documents-crawl";
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
-      <AdminSidebar />
+    <div className="super-admin flex h-screen bg-gray-100 overflow-hidden">
+      <SuperAdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <AdminHeader initialUserData={initialUserData} />
+        <SuperAdminHeader initialUserData={initialUserData} />
         <main className={`flex-1 overflow-y-auto bg-gray-50 p-6 ${isDocumentCrawlPage ? "pb-0" : ""}`}>{children}</main>
       </div>
     </div>

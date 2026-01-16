@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import AdminSidebar from "../components/layout/AdminSidebar";
+import UserSidebar from "../components/layout/UserSidebar";
 import { usePathname } from "next/navigation";
 import { Modal, Spin, message } from "antd";
 import { getUserInfo, type UserInfoResponse } from "@/lib/api/users";
 import { getUserIdFromCookie } from "@/lib/utils/cookies";
 
 const pageTitles: Record<string, string> = {
-  "/admin": "Dashboard",
-  "/admin/classes": "Quản lý Lớp học",
-  "/admin/students": "Quản lý Học sinh",
-  "/admin/document-crawl": "Quản lý Tài liệu Crawl",
+  "/user": "Trang chủ",
+  "/user/classes": "Lớp học",
+  "/user/documents": "Tài liệu",
+  "/user/settings": "Cài đặt",
 };
 
 interface InitialUserData {
@@ -20,7 +20,7 @@ interface InitialUserData {
   avatar: string | null;
 }
 
-function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | null }) {
+function UserHeader({ initialUserData }: { initialUserData: InitialUserData | null }) {
   const pathname = usePathname();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
@@ -31,7 +31,7 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
     if (!pathname) return undefined;
     if (pageTitles[pathname]) return pageTitles[pathname];
     for (const [route, title] of Object.entries(pageTitles)) {
-      if (route !== "/admin" && pathname.startsWith(route)) return title;
+      if (route !== "/user" && pathname.startsWith(route)) return title;
     }
     return undefined;
   }, [pathname]);
@@ -77,9 +77,9 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
   }, []);
 
   // Memoize display values
-  const displayName = useMemo(() => userInfo?.username || initialUserData?.username || "Admin", [userInfo?.username, initialUserData?.username]);
+  const displayName = useMemo(() => userInfo?.username || initialUserData?.username || "Học sinh", [userInfo?.username, initialUserData?.username]);
   const displayRole = useMemo(
-    () => userInfo?.role?.role_name || initialUserData?.role_name || "Giáo viên",
+    () => userInfo?.role?.role_name || initialUserData?.role_name || "Học sinh",
     [userInfo?.role?.role_name, initialUserData?.role_name]
   );
 
@@ -90,7 +90,7 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
     <>
       <header className="bg-white h-16 flex items-center justify-between px-6 shadow-sm border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold text-gray-800">Hệ thống quản lý Admin</h1>
+          <h1 className="text-xl font-semibold text-gray-800">Hệ thống học tập</h1>
           {currentPageTitle && (
             <>
               <span className="text-gray-500">-</span>
@@ -113,7 +113,7 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
         </div>
       </header>
 
-      <Modal title="Hồ sơ giáo viên" open={isProfileModalOpen} onCancel={() => setIsProfileModalOpen(false)} footer={null} width={600}>
+      <Modal title="Hồ sơ học sinh" open={isProfileModalOpen} onCancel={() => setIsProfileModalOpen(false)} footer={null} width={600}>
         <Spin spinning={loadingProfile}>
           {userInfo ? (
             <div className="space-y-4">
@@ -123,7 +123,7 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-800">{userInfo.fullname || userInfo.username}</h3>
-                  <p className="text-gray-600">{userInfo.role?.role_name || "Giáo viên"}</p>
+                  <p className="text-gray-600">{userInfo.role?.role_name || "Học sinh"}</p>
                 </div>
               </div>
               <div className="border-t border-gray-200 pt-4 space-y-3">
@@ -156,16 +156,29 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
   );
 }
 
-export default function AdminLayoutClient({ children, initialUserData }: { children: React.ReactNode; initialUserData: InitialUserData | null }) {
+export default function UserLayoutClient({ children, initialUserData }: { children: React.ReactNode; initialUserData: InitialUserData | null }) {
   const pathname = usePathname();
-  const isDocumentCrawlPage = pathname?.startsWith("/admin/document-crawl");
+  
+  // Check if we are in an exam session: /user/classes/[id]/exams/[examId]
+  // We want to hide all sidebar/header for actual exam doing page
+  const isExamSession = pathname.includes("/exams/") && pathname.split("/").length >= 6;
+
+  if (isExamSession) {
+    return (
+      <div className="h-screen w-screen bg-gray-50 overflow-hidden overflow-y-auto">
+        {children}
+      </div>
+    );
+  }
+
+  const isDocumentsPage = pathname?.startsWith("/user/documents");
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
-      <AdminSidebar />
+      <UserSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <AdminHeader initialUserData={initialUserData} />
-        <main className={`flex-1 overflow-y-auto bg-gray-50 p-6 ${isDocumentCrawlPage ? "pb-0" : ""}`}>{children}</main>
+        <UserHeader initialUserData={initialUserData} />
+        <main className={`flex-1 overflow-y-auto bg-gray-50 p-6`}>{children}</main>
       </div>
     </div>
   );

@@ -151,6 +151,54 @@ body {
   box-shadow: -4px 0 0 0 rgba(59, 130, 246, 0.3);
 }
 
+/* Super Admin Tables - No Shadow */
+.super-admin .news-table .ant-table,
+.super-admin .news-table .ant-table-container,
+.super-admin .news-table .ant-table-content {
+  box-shadow: none !important;
+}
+
+.super-admin .news-table .ant-table-tbody > tr.group:hover {
+  box-shadow: none !important;
+}
+
+/* Pagination Spacing - Global */
+.news-table .ant-pagination {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 16px 24px !important;
+  margin: 0 !important;
+}
+
+.news-table .ant-pagination .ant-pagination-total-text {
+  margin-right: 16px !important;
+  margin-left: 0 !important;
+}
+
+.news-table .ant-pagination-item {
+  margin: 0 !important;
+  margin-inline-end: 0 !important;
+}
+
+.news-table .ant-pagination-prev,
+.news-table .ant-pagination-next {
+  margin: 0 !important;
+  margin-inline-end: 0 !important;
+}
+
+.news-table .ant-pagination-jump-prev,
+.news-table .ant-pagination-jump-next {
+  margin: 0 !important;
+  margin-inline-end: 0 !important;
+}
+
+.news-table .ant-pagination-options {
+  margin: 0 !important;
+  margin-left: 16px !important;
+}
+
 .news-table .ant-table-measure-row {
   display: none !important;
   visibility: hidden !important;

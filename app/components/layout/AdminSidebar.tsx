@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { AppstoreOutlined, ReadOutlined, UserOutlined, FileTextOutlined, SettingOutlined, BookFilled, LogoutOutlined } from "@ant-design/icons";
-import { RiMoonLine } from "react-icons/ri";
-import { Button } from "antd";
+import { AppstoreOutlined, ReadOutlined, UserOutlined, FileTextOutlined, SettingOutlined, LogoutOutlined } from "@ant-design/icons";
+import { IoBookOutline } from "react-icons/io5";
+import { Button, App } from "antd";
 
 const menuItems = [
   { path: "/admin", icon: AppstoreOutlined, label: "Dashboard" },
   { path: "/admin/classes", icon: ReadOutlined, label: "Quản lí lớp học" },
   { path: "/admin/students", icon: UserOutlined, label: "Quản lí học sinh" },
+  { path: "/admin/courses", icon: IoBookOutline, label: "Quản lí khóa học", isComingSoon: true },
   { path: "/admin/document-crawl", icon: FileTextOutlined, label: "Tài liệu hệ thống" },
   { path: "/admin/settings", icon: SettingOutlined, label: "Cài đặt" },
 ];
@@ -17,9 +18,18 @@ const menuItems = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { message } = App.useApp();
 
   const handleLogout = () => {
     router.push("/");
+  };
+
+  const handleMenuItemClick = (item: typeof menuItems[0], e: React.MouseEvent) => {
+    if (item.isComingSoon) {
+      e.preventDefault();
+      message.info("Tính năng đang phát triển");
+      return;
+    }
   };
 
   return (
@@ -46,18 +56,33 @@ export default function AdminSidebar() {
                 isActive ? "bg-blue-200" : "hover:bg-gray-50"
               }`}
             >
-              <Link href={item.path} className="flex items-center gap-4 w-full">
-                <Icon
-                  className={`text-xl transition-colors duration-200 ${!isActive ? "group-hover:text-blue-600" : ""}`}
-                  style={{ color: isActive ? "#2563eb" : "#4b5563" }}
-                />
-                <span
-                  className={`text-[14px] transition-colors duration-200 ${isActive ? "font-bold" : "font-medium group-hover:text-blue-600"}`}
-                  style={{ color: isActive ? "#2563eb" : "#4b5563" }}
-                >
-                  {item.label}
-                </span>
-              </Link>
+              {item.isComingSoon ? (
+                <div onClick={(e) => handleMenuItemClick(item, e)} className="flex items-center gap-4 w-full cursor-pointer">
+                  <Icon
+                    className={`text-xl transition-colors duration-200 ${!isActive ? "group-hover:text-blue-600" : ""}`}
+                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                  />
+                  <span
+                    className={`text-[14px] transition-colors duration-200 ${isActive ? "font-bold" : "font-medium group-hover:text-blue-600"}`}
+                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+              ) : (
+                <Link href={item.path} className="flex items-center gap-4 w-full">
+                  <Icon
+                    className={`text-xl transition-colors duration-200 ${!isActive ? "group-hover:text-blue-600" : ""}`}
+                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                  />
+                  <span
+                    className={`text-[14px] transition-colors duration-200 ${isActive ? "font-bold" : "font-medium group-hover:text-blue-600"}`}
+                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              )}
             </div>
           );
         })}

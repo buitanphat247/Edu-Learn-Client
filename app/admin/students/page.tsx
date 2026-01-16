@@ -220,31 +220,32 @@ export default function AdminStudents() {
         />
       </div>
 
-      <Spin spinning={loading}>
-        <Table
-          columns={columns}
-          dataSource={students}
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            position: ["bottomRight"],
-            showSizeChanger: true,
-            showTotal: (total) => `Tổng ${total} học sinh`,
-            pageSizeOptions: ["10", "20", "50"],
-            size: "small",
-            onChange: handleTableChange,
-          }}
-          className="news-table"
-          rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
-          size="small"
-          onRow={(record) => ({
-            onClick: () => {
-              handleViewStudent(record);
-            },
-          })}
-        />
-      </Spin>
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <Spin spinning={loading}>
+          <Table
+            columns={columns}
+            dataSource={students}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: pagination.total,
+              showSizeChanger: true,
+              showTotal: (total) => `Tổng ${total} học sinh`,
+              pageSizeOptions: ["10", "20", "50"],
+              size: "small",
+              onChange: handleTableChange,
+            }}
+            className="news-table"
+            rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+            size="small"
+            onRow={(record) => ({
+              onClick: () => {
+                handleViewStudent(record);
+              },
+            })}
+          />
+        </Spin>
+      </div>
 
       <StudentDetailModal
         open={isViewModalOpen}

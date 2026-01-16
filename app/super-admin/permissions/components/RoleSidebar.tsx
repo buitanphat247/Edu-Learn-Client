@@ -18,7 +18,7 @@ interface RoleSidebarProps {
 export default function RoleSidebar({ roles, selectedRole, onSelectRole, searchRole, onSearchChange, onAddRole }: RoleSidebarProps) {
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="p-4 bg-gray-50/30 border-b border-gray-100 flex items-center justify-between">
           <Space>
             <TeamOutlined className="text-blue-500" />
@@ -98,7 +98,7 @@ export default function RoleSidebar({ roles, selectedRole, onSelectRole, searchR
       `}</style>
 
       <div
-        className="rounded-md overflow-hidden relative border-0 p-4 shadow-md"
+        className="rounded-md overflow-hidden relative border-0 p-4"
         style={{ background: "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)" }}
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>

@@ -415,28 +415,25 @@ export default function SuperAdminEvents() {
         </Space>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={filteredData}
-        loading={loading}
-        pagination={{
-          position: ["bottomRight"],
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: false,
-          showTotal: (total) => `Tổng ${total} sự kiện`,
-          className: "px-4 py-3",
-          size: "small",
-          onChange: handleTableChange,
-        }}
-        className="news-table"
-        rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
-        size="small"
-        style={{
-          padding: "0",
-        }}
-      />
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <Table
+          columns={columns}
+          dataSource={filteredData}
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: false,
+            showTotal: (total) => `Tổng ${total} sự kiện`,
+            size: "small",
+            onChange: handleTableChange,
+          }}
+          className="news-table"
+          rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+          size="small"
+        />
+      </div>
 
       {/* Add Event Modal */}
       <Modal

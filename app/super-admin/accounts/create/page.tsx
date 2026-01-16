@@ -368,7 +368,7 @@ function FileUploadForm({
 
       {/* File Status Card */}
       {uploadFileList.length > 0 && (
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden">
+        <div className="bg-white rounded-xl p-6 border border-gray-200 relative overflow-hidden">
           <div className="flex items-center justify-between mb-2 z-10 relative">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
@@ -396,7 +396,7 @@ function FileUploadForm({
 
       {/* Preview Section */}
       {csvPreviewData.length > 0 && (
-        <section className="w-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <section className="w-full bg-white rounded-xl border border-gray-200 overflow-hidden">
           {/* Preview Header */}
           <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -441,7 +441,7 @@ function FileUploadForm({
 
       {/* Progress Bar */}
       {submitting && (
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-200">
           <Progress percent={uploadProgress} status="active" className="mb-2" />
           <p className="text-sm text-gray-600 text-center">Đang tạo tài khoản... {uploadProgress}%</p>
         </div>

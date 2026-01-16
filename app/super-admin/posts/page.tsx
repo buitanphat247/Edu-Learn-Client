@@ -241,24 +241,21 @@ export default function SuperAdminNews() {
         </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={filteredData}
-        pagination={{
-          position: ["bottomRight"],
-          showSizeChanger: true,
-          showTotal: (total) => `Tổng ${total} tin tức`,
-          pageSizeOptions: ["10", "20", "50"],
-          className: "px-4 py-3",
-          size: "small",
-        }}
-        className="news-table"
-        rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
-        size="small"
-        style={{
-          padding: "0",
-        }}
-      />
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <Table
+          columns={columns}
+          dataSource={filteredData}
+          pagination={{
+            showSizeChanger: true,
+            showTotal: (total) => `Tổng ${total} tin tức`,
+            pageSizeOptions: ["10", "20", "50"],
+            size: "small",
+          }}
+          className="news-table"
+          rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+          size="small"
+        />
+      </div>
     </div>
   );
 }

@@ -1,15 +1,14 @@
 "use client";
 
-import { Table, Tag, Button, Select, App, Space, Input } from "antd";
-import { SearchOutlined, EyeOutlined, DownloadOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import type { ColumnsType } from "antd/es/table";
-import { getDocumentAttachmentsCrawl, type DocumentAttachmentCrawl } from "@/lib/api/documents";
-import DocumentPreviewModal from "@/app/components/documents/DocumentPreviewModal";
-import { useDocumentPreview } from "@/app/components/documents/useDocumentPreview";
+import { Table, Tag, Button, Input, Space, App, message, Select } from "antd";
+import { SearchOutlined, EyeOutlined, DownloadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
+import type { ColumnsType } from "antd/es/table";
+import DocumentPreviewModal from "@/app/components/documents/DocumentPreviewModal";
+import { getDocumentAttachmentsCrawl, type DocumentAttachmentCrawl } from "@/lib/api/documents";
+import { useDocumentPreview } from "@/app/components/documents/useDocumentPreview";
 
 interface DocumentTableType {
   key: string;
@@ -26,14 +25,11 @@ interface DocumentTableType {
   documentLink: string;
 }
 
-export default function SuperAdminDocumentsCrawl() {
-  const router = useRouter();
-  const { message } = App.useApp();
+export default function UserDocuments() {
+  const { message: messageApi } = App.useApp();
   const { previewDoc, openPreview, closePreview, handleAfterClose, isOpen } = useDocumentPreview();
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [selectedMonHoc, setSelectedMonHoc] = useState<string | undefined>();
-  const [selectedFileType, setSelectedFileType] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFileType, setSelectedFileType] = useState<string | undefined>();
   const [documents, setDocuments] = useState<DocumentTableType[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -48,21 +44,6 @@ export default function SuperAdminDocumentsCrawl() {
   const prevSearchQueryRef = useRef("");
   const prevFileTypeRef = useRef<string | undefined>(undefined);
   const initialFetchDone = useRef(false);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        setIsSearchModalOpen(true);
-      }
-      if (e.key === "Escape" && isSearchModalOpen) {
-        setIsSearchModalOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isSearchModalOpen]);
 
   const fetchDocuments = useCallback(async (page: number = 1, limit: number = 10, fileName?: string, fileType?: string) => {
     // Prevent multiple simultaneous fetches
@@ -112,8 +93,8 @@ export default function SuperAdminDocumentsCrawl() {
       const minLoadingTime = 250;
       const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
-      
-      message.error(error?.message || "Không thể tải danh sách tài liệu crawl");
+
+      messageApi.error(error?.message || "Không thể tải danh sách tài liệu");
       setDocuments([]);
     } finally {
       setLoading(false);
@@ -127,7 +108,7 @@ export default function SuperAdminDocumentsCrawl() {
     if (initialFetchDone.current || hasFetched.current) {
       return;
     }
-    
+
     initialFetchDone.current = true;
     hasFetched.current = true;
     fetchDocuments(1, pageSizeRef.current, undefined, undefined);
@@ -177,24 +158,20 @@ export default function SuperAdminDocumentsCrawl() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, selectedFileType]);
 
-  const handleTableChange = useCallback((page: number, pageSize: number) => {
-    if (!isFetching.current) {
-      pageSizeRef.current = pageSize;
-      fetchDocuments(page, pageSize, searchQuery.trim() || undefined, selectedFileType);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, selectedFileType]);
-
-  // Filter data based on selectedMonHoc (client-side filter for môn học)
-  const filteredData = useMemo(() => {
-    return documents.filter((item) => {
-      const matchesMonHoc = !selectedMonHoc || item.documentMonHoc.includes(selectedMonHoc);
-      return matchesMonHoc;
-    });
-  }, [documents, selectedMonHoc]);
+  const handleTableChange = useCallback(
+    (page: number, pageSize: number) => {
+      if (!isFetching.current) {
+        pageSizeRef.current = pageSize;
+        fetchDocuments(page, pageSize, searchQuery.trim() || undefined, selectedFileType);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [searchQuery, selectedFileType]
+  );
 
   const formatFileSize = (bytes: string) => {
     const size = parseInt(bytes, 10);
+    if (isNaN(size)) return "0 B";
     if (size < 1024) return `${size} B`;
     if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
     return `${(size / (1024 * 1024)).toFixed(2)} MB`;
@@ -206,124 +183,148 @@ export default function SuperAdminDocumentsCrawl() {
     return date.toLocaleDateString("vi-VN");
   };
 
-  const uniqueMonHoc = Array.from(new Set(documents.map((doc) => doc.documentMonHoc).filter(Boolean)));
+  const handleDownload = useCallback(
+    async (record: DocumentTableType) => {
+      if (!record.link) {
+        messageApi.warning("Không có link để tải về");
+        return;
+      }
 
-  const columns: ColumnsType<DocumentTableType> = useMemo(() => [
-    {
-      title: "STT",
-      dataIndex: "id",
-      key: "id",
-      render: (_: any, __: DocumentTableType, index: number) => {
-        const currentPage = pagination.current;
-        const pageSize = pagination.pageSize;
-        const stt = (currentPage - 1) * pageSize + index + 1;
-        return <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">{stt}</span>;
+      try {
+        const response = await fetch(record.link);
+        if (!response.ok) {
+          throw new Error("Không thể tải file");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = record.fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        messageApi.success("Đã tải file thành công!");
+      } catch (error: any) {
+        messageApi.error(error?.message || "Không thể tải file");
+      }
+    },
+    [messageApi]
+  );
+
+  const handleView = useCallback(
+    (record: DocumentTableType) => {
+      if (!record.link) {
+        messageApi.warning("Không có link để xem");
+        return;
+      }
+      openPreview({
+        title: record.fileName,
+        fileUrl: record.link,
+      });
+    },
+    [messageApi, openPreview]
+  );
+
+  const columns: ColumnsType<DocumentTableType> = useMemo(
+    () => [
+      {
+        title: "STT",
+        key: "stt",
+        width: 80,
+        render: (_: any, __: DocumentTableType, index: number) => {
+          const currentPage = pagination.current;
+          const pageSize = pagination.pageSize;
+          const stt = (currentPage - 1) * pageSize + index + 1;
+          return <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">{stt}</span>;
+        },
       },
-    },
-    {
-      title: "Tên file",
-      dataIndex: "fileName",
-      key: "fileName",
-      width: "50%",
-      render: (fileName: string) => (
-        <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">{fileName}</span>
-      ),
-    },
- 
-    {
-      title: "Loại file",
-      dataIndex: "fileType",
-      key: "fileType",
-      render: (fileType: string) => (
-        <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color="default">
-          {fileType.toUpperCase()}
-        </Tag>
-      ),
-    },
-    {
-      title: "Size",
-      dataIndex: "fileSize",
-      key: "fileSize",
-      render: (fileSize: string) => <span className="text-gray-600">{formatFileSize(fileSize)}</span>,
-    },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => <span className="text-gray-600">{formatDate(date)}</span>,
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      render: (_: any, record: DocumentTableType) => {
-
-        const handleDownload = async (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (!record.link) {
-            message.warning("Không có link để tải về");
-            return;
-          }
-
-          try {
-            const response = await fetch(record.link);
-            if (!response.ok) {
-              throw new Error("Không thể tải file");
-            }
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = record.fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            message.success("Đã tải file thành công!");
-          } catch (error: any) {
-            message.error(error?.message || "Không thể tải file");
-          }
-        };
-
-        const handleView = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (!record.link) {
-            message.warning("Không có link để xem");
-            return;
-          }
-          openPreview({
-            title: record.fileName,
-            fileUrl: record.link,
-          });
-        };
-
-        return (
-          <Space size="small">
-            <Button
-              icon={<EyeOutlined />}
-              size="small"
-              className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
-              onClick={handleView}
-            >
-              Xem
-            </Button>
-            <Button
-              icon={<DownloadOutlined />}
-              size="small"
-              className="hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200"
-              onClick={handleDownload}
-            >
-              Tải xuống
-            </Button>
-          </Space>
-        );
+      {
+        title: "TÊN FILE",
+        dataIndex: "fileName",
+        key: "fileName",
+        width: "40%",
+        render: (fileName: string) => (
+          <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">{fileName}</span>
+        ),
       },
-    },
-  ], [pagination.current, pagination.pageSize, message, openPreview]);
+      {
+        title: "LOẠI FILE",
+        dataIndex: "fileType",
+        key: "fileType",
+        width: 120,
+        render: (fileType: string) => (
+          <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color="default">
+            {fileType.toUpperCase()}
+          </Tag>
+        ),
+      },
+      {
+        title: "SIZE",
+        dataIndex: "fileSize",
+        key: "fileSize",
+        width: 120,
+        render: (fileSize: string) => <span className="text-gray-600">{formatFileSize(fileSize)}</span>,
+      },
+      {
+        title: "NGÀY TẠO",
+        dataIndex: "createdAt",
+        key: "createdAt",
+        width: 150,
+        render: (date: string) => <span className="text-gray-600">{formatDate(date)}</span>,
+      },
+      {
+        title: "HÀNH ĐỘNG",
+        key: "action",
+        width: 200,
+        render: (_: any, record: DocumentTableType) => {
+          return (
+            <Space size="small">
+              <Button
+                icon={<EyeOutlined />}
+                size="small"
+                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
+                onClick={() => handleView(record)}
+              >
+                Xem
+              </Button>
+              <Button
+                icon={<DownloadOutlined />}
+                size="small"
+                className="hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200"
+                onClick={() => handleDownload(record)}
+              >
+                Tải xuống
+              </Button>
+            </Space>
+          );
+        },
+      },
+    ],
+    [pagination.current, pagination.pageSize, handleView, handleDownload]
+  );
 
   return (
     <div className="space-y-3">
-      {/* Search Bar and Filters */}
+      <style jsx global>{`
+        .ant-pagination {
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+        }
+        .ant-pagination-item {
+          margin: 0 !important;
+        }
+        .ant-pagination-prev,
+        .ant-pagination-next {
+          margin: 0 !important;
+        }
+        .ant-pagination-total-text {
+          margin-right: 16px !important;
+        }
+      `}</style>
+      {/* Search Bar and File Type Filter */}
       <div className="flex gap-3">
         <Input
           placeholder="Tìm kiếm tài liệu theo tên file, loại file, tác giả..."
@@ -352,10 +353,11 @@ export default function SuperAdminDocumentsCrawl() {
         </Select>
       </div>
 
+      {/* Table */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
         <Table
           columns={columns}
-          dataSource={filteredData}
+          dataSource={documents}
           loading={loading}
           pagination={{
             current: pagination.current,

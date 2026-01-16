@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   HomeOutlined,
-  SettingOutlined,
   BellOutlined,
   UserOutlined,
   FileTextOutlined,
@@ -12,15 +11,17 @@ import {
   CalendarOutlined,
   CloudDownloadOutlined,
   SafetyCertificateOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
+import { Button, App } from "antd";
 
 const menuItems = [
   { path: "/super-admin", icon: HomeOutlined, label: "Trang chủ" },
-  { path: "/super-admin/documents-crawl", icon: CloudDownloadOutlined, label: "Tài liệu Crawl" },
+  { path: "/super-admin/documents-crawl", icon: CloudDownloadOutlined, label: "Quản lý tài liệu" },
   { path: "/super-admin/accounts", icon: UserOutlined, label: "Quản lý tài khoản" },
   { path: "/super-admin/notification", icon: BellOutlined, label: "Quản lý thông báo" },
   { path: "/super-admin/posts", icon: FileTextOutlined, label: "Quản lý tin tức" },
-  { path: "/super-admin/events", icon: CalendarOutlined, label: "Quản lý toàn bộ sự kiện" },
+  { path: "/super-admin/events", icon: CalendarOutlined, label: "Quản lý sự kiện" },
   { path: "/super-admin/permissions", icon: SafetyCertificateOutlined, label: "Phân quyền" },
   { path: "/super-admin/all", icon: DatabaseOutlined, label: "Quản lý toàn bộ" },
 ];
@@ -28,79 +29,59 @@ const menuItems = [
 export default function SuperAdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const sidebarColor = "#2f3542";
+  const { message } = App.useApp();
 
-  const handleNavigation = (path: string) => {
-    // Scroll to top khi navigate
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+  const handleLogout = () => {
+    router.push("/");
   };
 
   return (
-    <aside
-      className="w-20 flex flex-col items-center py-4"
-      style={{ backgroundColor: sidebarColor, "--sidebar-bg": sidebarColor } as React.CSSProperties & { "--sidebar-bg": string }}
-    >
-      {/* Logo */}
-      <div className="mb-6">
-        <div className="w-12 h-12 bg-white border border-gray-300 rounded-lg flex items-center justify-center shadow-sm overflow-hidden">
-          <img src="/images/logo/1.png" alt="Logo" className="w-full h-full object-contain" />
+    <aside className="w-64 h-screen flex flex-col z-50 transition-all duration-300 border-r border-gray-200 bg-white">
+      {/* Logo Section */}
+      <div className="p-4 pb-6 flex items-center gap-3">
+        <div className="w-10 h-10 bg-linear-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+          <span className="text-white text-lg font-bold tracking-tighter">AIO</span>
         </div>
+        <span className="text-xl font-black text-gray-900 tracking-tighter capitalize">Edu Learning</span>
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 flex flex-col gap-1 w-full">
+      <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isExactMatch = item.path === "/super-admin";
           const isActive = isExactMatch ? pathname === "/super-admin" : pathname?.startsWith(item.path);
 
           return (
-            <Link
+            <div
               key={item.path}
-              href={item.path}
-              onClick={() => handleNavigation(item.path)}
-              className="flex items-center justify-center group relative"
-              style={{ backgroundColor: "transparent" }}
-              title={item.label}
-              prefetch={true}
+              className={`group flex items-center gap-4 px-5 py-3 rounded-xl transition-all duration-200 ${
+                isActive ? "bg-blue-200" : "hover:bg-gray-50"
+              }`}
             >
-              <div className={`flex items-center justify-center w-12 h-12 ${isActive ? "bg-blue-500 rounded-xl" : ""}`}>
+              <Link href={item.path} className="flex items-center gap-4 w-full">
                 <Icon
-                  className="text-xl"
-                  style={{
-                    color: "#ffffff",
-                    position: "relative",
-                    zIndex: 2,
-                    width: "20px",
-                    height: "20px",
-                    fontSize: "20px",
-                  }}
+                  className={`text-xl transition-colors duration-200 ${!isActive ? "group-hover:text-blue-600" : ""}`}
+                  style={{ color: isActive ? "#2563eb" : "#4b5563" }}
                 />
-              </div>
-            </Link>
+                <span
+                  className={`text-[14px] transition-colors duration-200 ${isActive ? "font-bold" : "font-medium group-hover:text-blue-600"}`}
+                  style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            </div>
           );
         })}
       </nav>
 
-      {/* Utility Icons */}
-      <div className="flex flex-col gap-1 w-full mt-auto px-2">
-        <button
-          className="flex items-center justify-center py-2 px-2 rounded-xl transition-colors"
-          style={{ backgroundColor: "transparent" }}
-          title="Cài đặt"
-        >
-          <SettingOutlined
-            className="text-lg"
-            style={{
-              color: "#ffffff",
-              width: "18px",
-              height: "18px",
-              fontSize: "18px",
-            }}
-          />
-        </button>
+      {/* Logout Button */}
+      <div className="p-4">
+        <Button size="large" type="primary" danger onClick={handleLogout} className="w-full">
+          <LogoutOutlined className="text-xl transition-colors duration-200" />
+          <span>Thoát hệ thống</span>
+        </Button>
       </div>
     </aside>
   );

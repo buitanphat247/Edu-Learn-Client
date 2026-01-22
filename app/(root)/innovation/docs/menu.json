@@ -1,0 +1,29 @@
+[
+  {
+    "title": "Công nghệ cốt lõi",
+    "items": [
+      { "title": "Tổng quan hệ sinh thái", "slug": "overview" },
+      { "title": "Trợ giảng AI thông minh", "slug": "ai-tutor" },
+      { "title": "Tạo sinh đề thi AI", "slug": "ai-exam-generation" },
+      { "title": "Công nghệ Chống gian lận", "slug": "anti-cheating" },
+      { "title": "Cá nhân hóa học tập", "slug": "personalized-learning" },
+      { "title": "Tương tác thời gian thực", "slug": "real-time-interaction" }
+    ]
+  },
+  {
+    "title": "Module Quản lý Đào tạo",
+    "items": [
+      { "title": "Quản lý Lớp học & Học viên", "slug": "class-management" },
+      { "title": "Ngân hàng đề & Tổ chức thi", "slug": "exam-management" },
+      { "title": "Báo cáo & Phân tích số liệu", "slug": "analytics-reporting" }
+    ]
+  },
+  {
+    "title": "Bảo mật & An toàn",
+    "items": [
+      { "title": "Bảo vệ dữ liệu người dùng", "slug": "data-security" },
+      { "title": "Hệ thống phân quyền (RBAC)", "slug": "access-control" },
+      { "title": "Kiểm duyệt nội dung", "slug": "content-moderation" }
+    ]
+  }
+]

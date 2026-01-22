@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Giới thiệu chung",
+    "items": [
+      { "title": "Tổng quan về Thư Viện Số", "slug": "overview" },
+      { "title": "Bắt đầu nhanh", "slug": "getting-started" }
+    ]
+  },
+  {
+    "title": "Tài khoản & Bảo mật",
+    "items": [
+      { "title": "Đăng ký tài khoản", "slug": "account-registration" },
+      { "title": "Đăng nhập & Đăng xuất", "slug": "login-logout" },
+      { "title": "Khôi phục mật khẩu", "slug": "password-recovery" },
+      { "title": "Đổi mật khẩu & Bảo mật 2 lớp", "slug": "security-settings" }
+    ]
+  },
+  {
+    "title": "Dành cho Học sinh",
+    "items": [
+      { "title": "Tìm kiếm & Tham gia khóa học", "slug": "find-courses" },
+      { "title": "Làm bài thi Online", "slug": "taking-exams" },
+      { "title": "Theo dõi tiến độ học tập", "slug": "track-progress" },
+      { "title": "Thư viện & Tài liệu", "slug": "library-resources" }
+    ]
+  },
+  {
+    "title": "Dành cho Giáo viên",
+    "items": [
+      { "title": "Tạo lớp học mới", "slug": "create-class" },
+      { "title": "Quản lý học sinh", "slug": "manage-students" },
+      { "title": "Tạo ngân hàng câu hỏi", "slug": "question-bank" }
+    ]
+  },
+  {
+    "title": "Câu hỏi thường gặp",
+    "items": [
+      { "title": "Vấn đề kỹ thuật", "slug": "technical-issues" },
+      { "title": "Thanh toán & Hoàn tiền", "slug": "payment-policy" }
+    ]
+  }
+]

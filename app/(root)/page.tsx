@@ -13,30 +13,30 @@ import ScrollAnimation from "@/app/components/common/ScrollAnimation";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#0f172a]">
+    <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0f172a] transition-all duration-500 ease-in-out">
       <Hero />
       <ScrollAnimation direction="up" delay={0}>
-        <div className="border-b border-slate-800">
+        <div className="border-b border-slate-200/60 dark:border-slate-800 transition-colors duration-500">
           <Stats />
         </div>
       </ScrollAnimation>
       <ScrollAnimation direction="up" delay={100}>
-        <div className="border-b border-slate-800">
+        <div className="border-b border-slate-200/60 dark:border-slate-800 transition-colors duration-500">
           <Features />
         </div>
       </ScrollAnimation>
       {/* <ScrollAnimation direction="up" delay={200}>
-        <div className="border-b border-slate-800">
+        <div className="border-b border-slate-200/60 dark:border-slate-800 transition-colors duration-500">
           <Events />
         </div>
       </ScrollAnimation> */}
       <ScrollAnimation direction="up" delay={200}>
-        <div className="border-b border-slate-800">
+        <div className="border-b border-slate-200/60 dark:border-slate-800 transition-colors duration-500">
           <Testimonials />
         </div>
       </ScrollAnimation>
       {/* <ScrollAnimation direction="up" delay={300}>
-        <div className="border-b border-slate-800">
+        <div className="border-b border-slate-200/60 dark:border-slate-800 transition-colors duration-500">
           <News />
         </div>
       </ScrollAnimation> */}

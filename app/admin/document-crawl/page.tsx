@@ -93,7 +93,7 @@ export default function AdminContent() {
       const minLoadingTime = 250;
       const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
-
+      
       messageApi.error(error?.message || "Không thể tải danh sách tài liệu");
       setDocuments([]);
     } finally {
@@ -108,7 +108,7 @@ export default function AdminContent() {
     if (initialFetchDone.current || hasFetched.current) {
       return;
     }
-
+    
     initialFetchDone.current = true;
     hasFetched.current = true;
     fetchDocuments(1, pageSizeRef.current, undefined, undefined);
@@ -160,11 +160,11 @@ export default function AdminContent() {
 
   const handleTableChange = useCallback(
     (page: number, pageSize: number) => {
-      if (!isFetching.current) {
-        pageSizeRef.current = pageSize;
-        fetchDocuments(page, pageSize, searchQuery.trim() || undefined, selectedFileType);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!isFetching.current) {
+      pageSizeRef.current = pageSize;
+      fetchDocuments(page, pageSize, searchQuery.trim() || undefined, selectedFileType);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [searchQuery, selectedFileType]
   );
@@ -185,122 +185,122 @@ export default function AdminContent() {
 
   const handleDownload = useCallback(
     async (record: DocumentTableType) => {
-      if (!record.link) {
-        messageApi.warning("Không có link để tải về");
-        return;
+    if (!record.link) {
+      messageApi.warning("Không có link để tải về");
+      return;
+    }
+
+    try {
+      const response = await fetch(record.link);
+      if (!response.ok) {
+        throw new Error("Không thể tải file");
       }
 
-      try {
-        const response = await fetch(record.link);
-        if (!response.ok) {
-          throw new Error("Không thể tải file");
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = record.fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        messageApi.success("Đã tải file thành công!");
-      } catch (error: any) {
-        messageApi.error(error?.message || "Không thể tải file");
-      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = record.fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      messageApi.success("Đã tải file thành công!");
+    } catch (error: any) {
+      messageApi.error(error?.message || "Không thể tải file");
+    }
     },
     [messageApi]
   );
 
   const handleView = useCallback(
     (record: DocumentTableType) => {
-      if (!record.link) {
-        messageApi.warning("Không có link để xem");
-        return;
-      }
-      openPreview({
-        title: record.fileName,
-        fileUrl: record.link,
-      });
+    if (!record.link) {
+      messageApi.warning("Không có link để xem");
+      return;
+    }
+    openPreview({
+      title: record.fileName,
+      fileUrl: record.link,
+    });
     },
     [messageApi, openPreview]
   );
 
   const columns: ColumnsType<DocumentTableType> = useMemo(
     () => [
-      {
-        title: "STT",
-        key: "stt",
-        width: 80,
-        render: (_: any, __: DocumentTableType, index: number) => {
-          const currentPage = pagination.current;
-          const pageSize = pagination.pageSize;
-          const stt = (currentPage - 1) * pageSize + index + 1;
-          return <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">{stt}</span>;
-        },
+    {
+      title: "STT",
+      key: "stt",
+      width: 80,
+      render: (_: any, __: DocumentTableType, index: number) => {
+        const currentPage = pagination.current;
+        const pageSize = pagination.pageSize;
+        const stt = (currentPage - 1) * pageSize + index + 1;
+        return <span className="text-gray-600 dark:text-gray-400 font-mono text-sm bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">{stt}</span>;
       },
-      {
-        title: "TÊN FILE",
-        dataIndex: "fileName",
-        key: "fileName",
-        width: "40%",
-        render: (fileName: string) => (
-          <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">{fileName}</span>
-        ),
+    },
+    {
+      title: "TÊN FILE",
+      dataIndex: "fileName",
+      key: "fileName",
+      width: "40%",
+      render: (fileName: string) => (
+          <span className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-1">{fileName}</span>
+      ),
+    },
+    {
+      title: "LOẠI FILE",
+      dataIndex: "fileType",
+      key: "fileType",
+      width: 120,
+      render: (fileType: string) => (
+        <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs bg-gray-100 dark:bg-gray-800 border-none text-gray-600 dark:text-gray-300" color="default">
+          {fileType.toUpperCase()}
+        </Tag>
+      ),
+    },
+    {
+      title: "SIZE",
+      dataIndex: "fileSize",
+      key: "fileSize",
+      width: 120,
+      render: (fileSize: string) => <span className="text-gray-600 dark:text-gray-400">{formatFileSize(fileSize)}</span>,
+    },
+    {
+      title: "NGÀY TẠO",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: 150,
+      render: (date: string) => <span className="text-gray-600 dark:text-gray-400">{formatDate(date)}</span>,
+    },
+    {
+      title: "HÀNH ĐỘNG",
+      key: "action",
+      width: 200,
+      render: (_: any, record: DocumentTableType) => {
+        return (
+          <Space size="small">
+            <Button
+              icon={<EyeOutlined />}
+              size="small"
+              className="hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200"
+              onClick={() => handleView(record)}
+            >
+              Xem
+            </Button>
+            <Button
+              icon={<DownloadOutlined />}
+              size="small"
+              className="hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-700 transition-all duration-200"
+              onClick={() => handleDownload(record)}
+            >
+              Tải xuống
+            </Button>
+          </Space>
+        );
       },
-      {
-        title: "LOẠI FILE",
-        dataIndex: "fileType",
-        key: "fileType",
-        width: 120,
-        render: (fileType: string) => (
-          <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color="default">
-            {fileType.toUpperCase()}
-          </Tag>
-        ),
-      },
-      {
-        title: "SIZE",
-        dataIndex: "fileSize",
-        key: "fileSize",
-        width: 120,
-        render: (fileSize: string) => <span className="text-gray-600">{formatFileSize(fileSize)}</span>,
-      },
-      {
-        title: "NGÀY TẠO",
-        dataIndex: "createdAt",
-        key: "createdAt",
-        width: 150,
-        render: (date: string) => <span className="text-gray-600">{formatDate(date)}</span>,
-      },
-      {
-        title: "HÀNH ĐỘNG",
-        key: "action",
-        width: 200,
-        render: (_: any, record: DocumentTableType) => {
-          return (
-            <Space size="small">
-              <Button
-                icon={<EyeOutlined />}
-                size="small"
-                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
-                onClick={() => handleView(record)}
-              >
-                Xem
-              </Button>
-              <Button
-                icon={<DownloadOutlined />}
-                size="small"
-                className="hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200"
-                onClick={() => handleDownload(record)}
-              >
-                Tải xuống
-              </Button>
-            </Space>
-          );
-        },
-      },
+    },
     ],
     [pagination.current, pagination.pageSize, handleView, handleDownload]
   );
@@ -323,6 +323,22 @@ export default function AdminContent() {
         .ant-pagination-total-text {
           margin-right: 16px !important;
         }
+        .dark .ant-select-selector {
+          background-color: #1f2937 !important; /* gray-800 */
+          border-color: #475569 !important; /* slate-600 */
+          color: #e5e7eb !important; /* gray-200 */
+        }
+        .dark .ant-select-arrow {
+          color: #9ca3af !important; /* gray-400 */
+        }
+        .dark .ant-input {
+          background-color: #1f2937 !important;
+          border-color: #475569 !important; /* slate-600 */
+          color: #e5e7eb !important;
+        }
+        .dark .ant-input::placeholder {
+          color: #6b7280 !important; /* gray-500 */
+        }
       `}</style>
       {/* Search Bar and File Type Filter */}
       <div className="flex gap-3">
@@ -333,7 +349,7 @@ export default function AdminContent() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           allowClear
-          className="flex-1"
+          className="flex-1 dark:bg-gray-800 dark:border-slate-600 dark:text-white dark:placeholder-gray-500"
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -346,6 +362,7 @@ export default function AdminContent() {
           onChange={setSelectedFileType}
           allowClear
           style={{ width: 200 }}
+          popupClassName="dark:bg-gray-800 dark:text-gray-200"
         >
           <Option value="pdf">PDF</Option>
           <Option value="docx">Word</Option>
@@ -354,24 +371,24 @@ export default function AdminContent() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <Table
-          columns={columns}
-          dataSource={documents}
-          loading={loading}
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            showSizeChanger: false,
-            showTotal: (total) => `Tổng ${total} tài liệu`,
-            size: "small",
-            onChange: handleTableChange,
-          }}
-          className="news-table"
-          rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
-          size="small"
-        />
+      <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-none dark:shadow-sm">
+      <Table
+        columns={columns}
+        dataSource={documents}
+        loading={loading}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+          showSizeChanger: false,
+          showTotal: (total) => <span className="text-gray-500 dark:text-gray-400 font-medium">Tổng {total} tài liệu</span>,
+          size: "small",
+          onChange: handleTableChange,
+        }}
+        className="[&_.ant-pagination]:px-6 [&_.ant-pagination]:pb-4"
+        rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20 transition-all duration-200 cursor-pointer border-b border-gray-100 dark:border-gray-800"
+        size="small"
+      />
       </div>
 
       <DocumentPreviewModal

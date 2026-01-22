@@ -11,7 +11,7 @@ const menuItems = [
   { path: "/user/classes", icon: AppstoreOutlined, label: "Lớp học" },
   { path: "/user/courses", icon: IoBookOutline, label: "Khóa học của tôi", isComingSoon: true },
   { path: "/user/courses/overview", icon: BarChartOutlined, label: "Tổng quan khóa học", isComingSoon: true },
-  { path: "/user/documents", icon: FileTextOutlined, label: "Tài liệu" },
+  { path: "/user/documents", icon: FileTextOutlined, label: "Tài liệu hệ thống" },
   { path: "/user/settings", icon: SettingOutlined, label: "Cài đặt" },
 ];
 
@@ -33,13 +33,13 @@ export default function UserSidebar() {
   };
 
   return (
-    <aside className="w-64 h-screen flex flex-col z-50 transition-all duration-300 border-r border-gray-200 bg-white">
+    <aside className="w-64 h-screen flex flex-col z-50 transition-all duration-300 border-r border-gray-200 dark:!border-slate-600 bg-white dark:bg-gray-900">
       {/* Logo Section */}
       <div className="p-4 pb-6 flex items-center gap-3">
         <div className="w-10 h-10 bg-linear-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
           <span className="text-white text-lg font-bold tracking-tighter">AIO</span>
         </div>
-        <span className="text-xl font-black text-gray-900 tracking-tighter capitalize">Edu Learning</span>
+        <span className="text-xl font-black text-gray-900 dark:text-gray-100 tracking-tighter capitalize">Edu Learning</span>
       </div>
 
       {/* Navigation Menu */}
@@ -53,18 +53,27 @@ export default function UserSidebar() {
             <div
               key={item.path}
               className={`group flex items-center gap-4 px-5 py-3 rounded-xl transition-all duration-200 ${
-                isActive ? "bg-blue-200" : "hover:bg-gray-50"
+                isActive 
+                  ? "bg-blue-100 dark:bg-blue-900/40" 
+                  : "hover:bg-gray-50 dark:hover:bg-gray-800"
               }`}
             >
               {item.isComingSoon ? (
                 <div onClick={(e) => handleMenuItemClick(item, e)} className="flex items-center gap-4 w-full cursor-pointer">
                   <Icon
-                    className={`text-xl transition-colors duration-200 ${!isActive ? "group-hover:text-blue-600" : ""}`}
-                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                    style={{ color: "#3b82f6" }}
+                    className={`text-xl transition-colors duration-200 ${
+                      isActive 
+                        ? "" 
+                        : "group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                    }`}
                   />
                   <span
-                    className={`text-[14px] transition-colors duration-200 ${isActive ? "font-bold" : "font-medium group-hover:text-blue-600"}`}
-                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                    className={`text-[14px] transition-colors duration-200 ${
+                      isActive 
+                        ? "font-bold text-blue-600 dark:text-blue-400" 
+                        : "font-medium text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                    }`}
                   >
                     {item.label}
                   </span>
@@ -72,12 +81,19 @@ export default function UserSidebar() {
               ) : (
                 <Link href={item.path} className="flex items-center gap-4 w-full">
                   <Icon
-                    className={`text-xl transition-colors duration-200 ${!isActive ? "group-hover:text-blue-600" : ""}`}
-                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                    style={{ color: "#3b82f6" }}
+                    className={`text-xl transition-colors duration-200 ${
+                      isActive 
+                        ? "" 
+                        : "group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                    }`}
                   />
                   <span
-                    className={`text-[14px] transition-colors duration-200 ${isActive ? "font-bold" : "font-medium group-hover:text-blue-600"}`}
-                    style={{ color: isActive ? "#2563eb" : "#4b5563" }}
+                    className={`text-[14px] transition-colors duration-200 ${
+                      isActive 
+                        ? "font-bold text-blue-600 dark:text-blue-400" 
+                        : "font-medium text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                    }`}
                   >
                     {item.label}
                   </span>

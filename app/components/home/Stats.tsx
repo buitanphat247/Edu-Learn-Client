@@ -47,18 +47,18 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section className="py-10 border-b border-slate-800 bg-[#0f172a] relative z-20">
+    <section className="py-10 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] relative z-20 transition-colors duration-300">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-800">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 dark:divide-slate-800">
           {stats.map((stat) => (
-            <div key={stat.id} className="p-8 text-center group hover:bg-slate-800/30 transition-colors duration-300 cursor-default">
-              <div className="flex items-center justify-center mb-4 text-slate-500 group-hover:text-blue-400 transition-colors duration-300">
+            <div key={stat.id} className="p-8 text-center group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors duration-300 cursor-default">
+              <div className="flex items-center justify-center mb-4 text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                 {React.cloneElement(stat.icon as any, { className: "w-10 h-10 opacity-70 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300" })}
               </div>
-              <div className="text-3xl md:text-5xl font-extrabold text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-indigo-400 transition-all duration-300">
+              <div className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-indigo-600 dark:group-hover:from-blue-400 dark:group-hover:to-indigo-400 transition-all duration-300">
                 {stat.value}
               </div>
-              <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest group-hover:text-slate-400 transition-colors">{stat.label}</div>
+              <div className="text-sm font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-widest group-hover:text-slate-600 dark:group-hover:text-slate-400 transition-colors">{stat.label}</div>
             </div>
           ))}
         </div>

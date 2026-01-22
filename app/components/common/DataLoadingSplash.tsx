@@ -11,7 +11,7 @@ interface DataLoadingSplashProps {
 
 const DataLoadingSplash = memo(({ tip = "ĐANG TẢI DỮ LIỆU..." }: DataLoadingSplashProps) => {
   return (
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-white">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="flex flex-col items-center justify-center space-y-3">
         {/* Logo and Spin Section */}
         <div className="relative w-32 h-32 flex items-center justify-center">
@@ -45,7 +45,7 @@ const DataLoadingSplash = memo(({ tip = "ĐANG TẢI DỮ LIỆU..." }: DataLoad
           ></div>
 
           {/* Logo Circle */}
-          <div className="relative z-10 w-20 h-20 rounded-full bg-linear-to-br from-indigo-600 via-purple-600 to-blue-600 shadow-2xl flex items-center justify-center transform hover:scale-110 transition-transform duration-500 ring-4 ring-white">
+          <div className="relative z-10 w-20 h-20 rounded-full bg-linear-to-br from-indigo-600 via-purple-600 to-blue-600 shadow-2xl flex items-center justify-center transform hover:scale-110 transition-transform duration-500 ring-4 ring-white dark:ring-gray-900">
             <span className="text-white text-3xl font-black tracking-tighter">AIO</span>
           </div>
         </div>
@@ -53,16 +53,16 @@ const DataLoadingSplash = memo(({ tip = "ĐANG TẢI DỮ LIỆU..." }: DataLoad
         {/* Branding & Status Text */}
         <div className="flex flex-col items-center space-y-3">
           <div className="text-center group">
-            <h1 className="text-xl font-black text-gray-900 uppercase tracking-[0.25em]">HỆ THỐNG AIO</h1>
+            <h1 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-[0.25em]">HỆ THỐNG AIO</h1>
             <div className="h-0.5 w-10 bg-linear-to-r from-indigo-600 to-blue-600 mx-auto rounded-full mt-1.5 opacity-60"></div>
           </div>
 
-          <div className="flex items-center gap-2.5 bg-gray-50/50 px-5 py-2 rounded-full border border-gray-100/80">
+          <div className="flex items-center gap-2.5 bg-gray-50/50 dark:bg-gray-900/50 px-5 py-2 rounded-full border border-gray-100/80 dark:border-gray-800">
             <div className="flex items-center gap-1.5">
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="w-1 h-1 rounded-full bg-indigo-500"
+                  className="w-1 h-1 rounded-full bg-indigo-500 dark:bg-indigo-400"
                   style={{
                     animation: "loading-dot 1.4s infinite ease-in-out both",
                     animationDelay: `${i * 0.15}s`,
@@ -70,13 +70,13 @@ const DataLoadingSplash = memo(({ tip = "ĐANG TẢI DỮ LIỆU..." }: DataLoad
                 ></div>
               ))}
             </div>
-            <span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">{tip}</span>
+            <span className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-widest">{tip}</span>
           </div>
         </div>
 
         {/* Footer */}
         <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 text-center">
-          <Text className="text-gray-400 text-[9px] font-bold uppercase tracking-[0.4em] opacity-30">PREMIUM LEARNING EXPERIENCE</Text>
+          <Text className="text-gray-400 dark:text-gray-600 text-[9px] font-bold uppercase tracking-[0.4em] opacity-30">PREMIUM LEARNING EXPERIENCE</Text>
         </div>
       </div>
 

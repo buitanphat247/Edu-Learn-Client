@@ -2,62 +2,22 @@
 
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { App, Button, Upload, Divider, Tabs } from "antd";
+import { Button, Modal, Spin } from "antd";
 import CustomCard from "@/app/components/common/CustomCard";
-import FileUploadSection from "@/app/components/exams/FileUploadSection";
 import InfoBox from "@/app/components/exams/InfoBox";
 import TemplatesSection from "@/app/components/exams/TemplatesSection";
 import ExamFormatGuide from "@/app/components/exams/ExamFormatGuide";
 import AIGenerationSection from "@/app/components/exams/AIGenerationSection";
-import { ArrowLeftOutlined, ThunderboltFilled, FileAddOutlined } from "@ant-design/icons";
-import type { UploadFile, UploadProps } from "antd";
+import { ArrowLeftOutlined, LoadingOutlined } from "@ant-design/icons";
+import type { UploadFile } from "antd";
 
 export default function ExaminatePage() {
   const router = useRouter();
   const params = useParams();
-  const { message } = App.useApp();
   const classId = params?.id as string;
 
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-
-  const handleUpload: UploadProps["onChange"] = (info) => {
-    let newFileList = [...info.fileList];
-
-    newFileList = newFileList.map((file) => {
-      if (file.response) {
-        file.url = file.response.url;
-      }
-      return file;
-    });
-
-    setFileList(newFileList);
-  };
-
-  const handleRemoveFile = (file: UploadFile) => {
-    const newFileList = fileList.filter((item) => item.uid !== file.uid);
-    setFileList(newFileList);
-  };
-
-  const beforeUpload = (file: File) => {
-    const validExtensions = [".pdf", ".docx", ".xlsx", ".azt", ".tex", ".zip"];
-    const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
-    const fileName = file.name.toLowerCase();
-
-    const isValidExtension = validExtensions.some((ext) => fileName.endsWith(ext));
-    const isValidImage = validImageTypes.includes(file.type);
-
-    if (!isValidExtension && !isValidImage) {
-      message.error("Chỉ chấp nhận file .pdf, .docx, .xlsx, .azt, .tex, .zip hoặc ảnh!");
-      return Upload.LIST_IGNORE;
-    }
-
-    const isLt50M = file.size / 1024 / 1024 < 50;
-    if (!isLt50M) {
-      message.error("File phải nhỏ hơn 50MB!");
-      return Upload.LIST_IGNORE;
-    }
-    return true;
-  };
+  const [fileList] = useState<UploadFile[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
 
   const handleCancel = () => {
     router.push(`/admin/classes/${classId}`);
@@ -77,6 +37,7 @@ export default function ExaminatePage() {
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={handleCancel}
+          disabled={isCreating}
           className="border-gray-300 text-gray-600 hover:text-blue-600 hover:border-blue-600 transition-colors"
         >
           Quay lại
@@ -88,48 +49,12 @@ export default function ExaminatePage() {
         <div className="lg:col-span-1 space-y-6">
           <CustomCard padding="lg">
             <div className="space-y-6">
-              <Tabs
-                defaultActiveKey="ai"
-                type="card"
-                className="custom-exam-tabs mb-4"
-                items={[
-                  {
-                    key: "ai",
-                    label: (
-                      <span className="flex items-center gap-2 px-2">
-                        <ThunderboltFilled /> AI Smart Gen
-                      </span>
-                    ),
-                    children: (
-                      <div className="pt-4">
-                        <AIGenerationSection uploadedFile={fileList.length > 0 ? fileList[0] : null} />
-                      </div>
-                    ),
-                  },
-                  {
-                    key: "manual",
-                    label: (
-                      <span className="flex items-center gap-2 px-2">
-                        <FileAddOutlined /> Tải file thủ công
-                      </span>
-                    ),
-                    children: (
-                      <div className="pt-4 space-y-6">
-                        <FileUploadSection fileList={fileList} onUpload={handleUpload} onRemove={handleRemoveFile} beforeUpload={beforeUpload} />
-                        
-                        <InfoBox type="info">
-                          <p className="mb-2">
-                            Có thể Upload File <strong>Bài tập</strong>, <strong>Đề thi</strong> Hoặc <strong>Bảng đáp án</strong> để chấm offline.
-                          </p>
-                          <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                            Tìm hiểu thêm →
-                          </a>
-                        </InfoBox>
-                      </div>
-                    ),
-                  },
-                ]}
-              />
+              <div className="pt-4">
+                <AIGenerationSection 
+                  uploadedFile={fileList.length > 0 ? fileList[0] : null} 
+                  onLoadingChange={setIsCreating}
+                />
+              </div>
 
               <div className="space-y-3 pt-2">
                 {/* Image Note */}
@@ -140,7 +65,7 @@ export default function ExaminatePage() {
                 </InfoBox>
 
                 {/* Templates Section */}
-                <TemplatesSection templates={templates} />
+                <TemplatesSection templates={templates} disabled={isCreating} />
 
                 {/* OCR Feature */}
                 <InfoBox type="success" title="Tính năng mới">
@@ -158,6 +83,32 @@ export default function ExaminatePage() {
           </CustomCard>
         </div>
       </div>
+
+      {/* Modal hiển thị khi đang tạo bài */}
+      <Modal
+        open={isCreating}
+        closable={false}
+        footer={null}
+        centered
+        maskClosable={false}
+        className="text-center"
+      >
+        <div className="py-6">
+          <Spin 
+            indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} 
+            className="mb-4"
+          />
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            Đang tạo bài thi...
+          </h3>
+          <p className="text-gray-600 mb-1">
+            AI Agent đang xử lý và tạo câu hỏi cho bạn
+          </p>
+          <p className="text-sm text-gray-500">
+            Quá trình này có thể mất 30-60 giây tùy độ dài tài liệu
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 }

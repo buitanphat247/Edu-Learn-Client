@@ -47,7 +47,7 @@ const ClassExamsTab = memo(function ClassExamsTab({
       }
 
       console.log("Fetching exams for Student ID:", studentId);
-      const tests = await getRagTestsByClass(classId, studentId);
+      const tests = await getRagTestsByClass(classId, studentId, !readOnly);
 
       console.log(
         "RAG Tests Debug Data:",
@@ -76,7 +76,14 @@ const ClassExamsTab = memo(function ClassExamsTab({
           room: readOnly ? (isLocked ? `Hết lượt (${count}/${max})` : `Lượt: ${count}/${max}`) : "Trực tuyến",
           format: "Trắc nghiệm AI",
           subject: "RAG AI Test",
-          subjectColor: isLocked ? "bg-gray-100 text-gray-500" : "bg-blue-100 text-blue-700",
+          subjectColor: isLocked ? "bg-gray-100 text-gray-500" : "",
+          subjectStyle: isLocked ? undefined : {
+            backgroundColor: "#fff7e6",
+            color: "#d46b08",
+            borderColor: "#ffd591",
+            borderWidth: "1px",
+            borderStyle: "solid"
+          },
           isAi: true,
           isLocked: isLocked, // Attach lock status
           isPublished: t.is_published ?? false, // Add publish status
@@ -342,8 +349,7 @@ const ClassExamsTab = memo(function ClassExamsTab({
             onSearchChange(e.target.value);
             onPageChange(1);
           }}
-          className="flex-1"
-          allowClear
+          className="flex-1 dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
         />
         {!readOnly && (
           <Button size="middle" icon={<PlusOutlined />} onClick={handleCreateExam} className="bg-blue-600 hover:bg-blue-700">
@@ -358,18 +364,33 @@ const ClassExamsTab = memo(function ClassExamsTab({
             <div
               key={exam.id}
               onClick={(e) => handleCardClick(exam, e)}
-              className={`bg-white rounded-lg border-l-4 ${
+              className={`bg-white dark:bg-gray-800 rounded-lg border-l-4 ${
                 exam.isAi ? "border-cyan-500" : "border-orange-500"
-              } border-t border-r border-b p-6 hover:shadow-md transition-shadow ${readOnly ? "cursor-pointer" : ""} ${
+              } border-t border-r border-b border-gray-200 dark:!border-slate-600 p-6 hover:shadow-md transition-shadow ${readOnly ? "cursor-pointer" : ""} ${
                 exam.isLocked ? "opacity-60 grayscale cursor-not-allowed" : ""
               }`}
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex flex-wrap gap-2">
-                    <Tag className={`${exam.subjectColor} border-0 font-semibold`}>{exam.subject}</Tag>
+                    <Tag 
+                      className={`${exam.subjectColor} border-0 font-semibold`}
+                      style={exam.subjectStyle}
+                    >
+                      {exam.subject}
+                    </Tag>
                     {exam.isAi && (
-                      <Tag color="cyan" icon={<RobotOutlined />} className="font-bold border-cyan-200">
+                      <Tag 
+                        icon={<RobotOutlined />} 
+                        className="font-bold"
+                        style={{
+                          backgroundColor: "#e6f4ff",
+                          color: "#0958d9",
+                          borderColor: "#91caff",
+                          borderWidth: "1px",
+                          borderStyle: "solid"
+                        }}
+                      >
                         THI THỬ AI
                       </Tag>
                     )}
@@ -400,8 +421,8 @@ const ClassExamsTab = memo(function ClassExamsTab({
                   )}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800 text-lg mb-3 line-clamp-2">{exam.title}</h3>
-                  <div className="text-sm text-gray-600 space-y-2">
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-lg mb-3 line-clamp-2">{exam.title}</h3>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
                     <div className="flex items-center gap-2">
                       <CalendarOutlined className={exam.isAi ? "text-cyan-500" : "text-orange-500"} />
                       <span className="line-clamp-1">
@@ -426,7 +447,7 @@ const ClassExamsTab = memo(function ClassExamsTab({
 
       {totalExams > pageSize && (
         <div className="flex items-center justify-between pt-4">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             Hiển thị {startIndex + 1} đến {Math.min(endIndex, totalExams)} của {totalExams} kết quả
           </div>
           <Pagination current={currentPage} total={totalExams} pageSize={pageSize} onChange={onPageChange} showSizeChanger={false} />

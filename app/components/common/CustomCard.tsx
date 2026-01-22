@@ -35,16 +35,16 @@ export default function CustomCard({
   if (title) {
     return (
       <div
-        className={`bg-white border border-gray-200 rounded-xl ${className}`}
+        className={`bg-white dark:bg-gray-800 rounded-xl transition-colors duration-300 ${className}`}
         style={style}
         onClick={onClick}
       >
         <div
-          className={`px-6 py-4 border-b border-gray-200 flex items-center justify-between ${headerClassName}`}
+          className={`px-6 py-4 border-b border-gray-200 dark:!border-slate-600 flex items-center justify-between ${headerClassName}`}
         >
           <div>
             {typeof title === "string" ? (
-              <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{title}</h3>
             ) : (
               title
             )}
@@ -58,7 +58,7 @@ export default function CustomCard({
 
   return (
     <div
-      className={`bg-white border border-gray-200 rounded-xl transition-all duration-300 ${
+      className={`bg-white dark:bg-gray-800 rounded-xl transition-all duration-300 ${
         paddingClasses[padding]
       } ${className} ${onClick ? "cursor-pointer" : ""}`}
       style={style}

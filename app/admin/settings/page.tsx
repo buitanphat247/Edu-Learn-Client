@@ -115,8 +115,8 @@ export default function AdminSettings() {
 
   // Custom Card Component
   const CustomCard = ({ title, children }: { title?: React.ReactNode; children: React.ReactNode }) => (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      {title && <div className="mb-6">{title}</div>}
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-none dark:shadow-sm mb-6 transition-colors duration-200 border border-slate-200 dark:border-slate-700">
+      {title && <div className="mb-6 text-gray-800 dark:text-gray-100">{title}</div>}
       {children}
     </div>
   );
@@ -135,8 +135,8 @@ export default function AdminSettings() {
       <CustomCard
         title={
           <div className="flex items-center gap-3">
-            <UserOutlined className="text-blue-600" />
-            <span className="text-lg font-semibold">Thông tin tài khoản</span>
+            <UserOutlined className="text-blue-600 dark:text-blue-500" />
+            <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">Thông tin tài khoản</span>
           </div>
         }
       >
@@ -150,45 +150,66 @@ export default function AdminSettings() {
             {userInfo?.fullname ? getInitials(userInfo.fullname) : "A"}
           </Avatar>
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-800 mb-1">{userInfo?.fullname || "Admin"}</h3>
-            <p className="text-gray-600 mb-1">@{userInfo?.username || "admin"}</p>
-            <p className="text-sm text-gray-500">{userInfo?.role?.role_name || "Giáo viên"}</p>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-1">{userInfo?.fullname || "Admin"}</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-1">@{userInfo?.username || "admin"}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500">{userInfo?.role?.role_name || "Giáo viên"}</p>
           </div>
         </div>
 
-        <Divider />
+        <Divider className="dark:!border-slate-600" />
 
         <Form form={form} layout="vertical" onFinish={handleSaveProfile}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Form.Item
-              label="Họ và tên"
+              label={<span className="text-gray-700 dark:text-gray-300">Họ và tên</span>}
               name="fullname"
               rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]}
             >
-              <Input prefix={<UserOutlined />} placeholder="Nhập họ và tên" size="large" />
+              <Input
+                prefix={<UserOutlined className="text-gray-400 dark:text-gray-500" />}
+                placeholder="Nhập họ và tên"
+                size="large"
+                className="dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
+              />
             </Form.Item>
 
             <Form.Item
-              label="Tên đăng nhập"
+              label={<span className="text-gray-700 dark:text-gray-300">Tên đăng nhập</span>}
               name="username"
               rules={[{ required: true, message: "Vui lòng nhập tên đăng nhập" }]}
             >
-              <Input prefix={<UserOutlined />} placeholder="Nhập tên đăng nhập" size="large" disabled />
+              <Input
+                prefix={<UserOutlined className="text-gray-400 dark:text-gray-600" />}
+                placeholder="Nhập tên đăng nhập"
+                size="large"
+                disabled
+                className="dark:bg-gray-900/50 dark:!border-slate-700 dark:text-gray-400"
+              />
             </Form.Item>
 
             <Form.Item
-              label="Email"
+              label={<span className="text-gray-700 dark:text-gray-300">Email</span>}
               name="email"
               rules={[
                 { required: true, message: "Vui lòng nhập email" },
                 { type: "email", message: "Email không hợp lệ" },
               ]}
             >
-              <Input prefix={<MailOutlined />} placeholder="Nhập email" size="large" />
+              <Input
+                prefix={<MailOutlined className="text-gray-400 dark:text-gray-500" />}
+                placeholder="Nhập email"
+                size="large"
+                className="dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
+              />
             </Form.Item>
 
-            <Form.Item label="Số điện thoại" name="phone">
-              <Input prefix={<PhoneOutlined />} placeholder="Nhập số điện thoại" size="large" />
+            <Form.Item label={<span className="text-gray-700 dark:text-gray-300">Số điện thoại</span>} name="phone">
+              <Input
+                prefix={<PhoneOutlined className="text-gray-400 dark:text-gray-500" />}
+                placeholder="Nhập số điện thoại"
+                size="large"
+                className="dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
+              />
             </Form.Item>
           </div>
 
@@ -199,7 +220,7 @@ export default function AdminSettings() {
               icon={<SaveOutlined />}
               size="large"
               loading={saving}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 border-none"
             >
               Lưu thay đổi
             </Button>
@@ -211,32 +232,32 @@ export default function AdminSettings() {
       <CustomCard
         title={
           <div className="flex items-center gap-3">
-            <BellOutlined className="text-blue-600" />
-            <span className="text-lg font-semibold">Cài đặt thông báo</span>
+            <BellOutlined className="text-blue-600 dark:text-blue-500" />
+            <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">Cài đặt thông báo</span>
           </div>
         }
       >
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:!border-slate-600">
             <div>
-              <p className="font-semibold text-gray-800">Thông báo qua email</p>
-              <p className="text-sm text-gray-500">Nhận thông báo quan trọng qua email</p>
+              <p className="font-semibold text-gray-800 dark:text-gray-200">Thông báo qua email</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Nhận thông báo quan trọng qua email</p>
             </div>
             <Switch checked={emailNotifications} onChange={setEmailNotifications} />
           </div>
 
-          <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:!border-slate-600">
             <div>
-              <p className="font-semibold text-gray-800">Thông báo đẩy</p>
-              <p className="text-sm text-gray-500">Nhận thông báo ngay trên trình duyệt</p>
+              <p className="font-semibold text-gray-800 dark:text-gray-200">Thông báo đẩy</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Nhận thông báo ngay trên trình duyệt</p>
             </div>
             <Switch checked={pushNotifications} onChange={setPushNotifications} />
           </div>
 
           <div className="flex items-center justify-between py-3">
             <div>
-              <p className="font-semibold text-gray-800">Cập nhật hệ thống</p>
-              <p className="text-sm text-gray-500">Nhận thông báo về các cập nhật hệ thống</p>
+              <p className="font-semibold text-gray-800 dark:text-gray-200">Cập nhật hệ thống</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Nhận thông báo về các cập nhật hệ thống</p>
             </div>
             <Switch checked={systemUpdates} onChange={setSystemUpdates} />
           </div>
@@ -249,7 +270,7 @@ export default function AdminSettings() {
             size="large"
             loading={saving}
             onClick={handleSaveNotifications}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 border-none"
           >
             Lưu cài đặt
           </Button>
@@ -260,16 +281,16 @@ export default function AdminSettings() {
       <CustomCard
         title={
           <div className="flex items-center gap-3">
-            <SecurityScanOutlined className="text-blue-600" />
-            <span className="text-lg font-semibold">Bảo mật</span>
+            <SecurityScanOutlined className="text-blue-600 dark:text-blue-500" />
+            <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">Bảo mật</span>
           </div>
         }
       >
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:!border-slate-600">
             <div>
-              <p className="font-semibold text-gray-800">Xác thực hai yếu tố (2FA)</p>
-              <p className="text-sm text-gray-500">Bảo vệ tài khoản của bạn bằng xác thực hai yếu tố</p>
+              <p className="font-semibold text-gray-800 dark:text-gray-200">Xác thực hai yếu tố (2FA)</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Bảo vệ tài khoản của bạn bằng xác thực hai yếu tố</p>
             </div>
             <Switch checked={twoFactorAuth} onChange={setTwoFactorAuth} />
           </div>
@@ -281,7 +302,7 @@ export default function AdminSettings() {
               size="large"
               loading={saving}
               onClick={handleSaveSecurity}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 border-none"
             >
               Lưu cài đặt
             </Button>
@@ -293,8 +314,8 @@ export default function AdminSettings() {
       <CustomCard
         title={
           <div className="flex items-center gap-3">
-            <LockOutlined className="text-blue-600" />
-            <span className="text-lg font-semibold">Đổi mật khẩu</span>
+            <LockOutlined className="text-blue-600 dark:text-blue-500" />
+            <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">Đổi mật khẩu</span>
           </div>
         }
       >
@@ -303,26 +324,36 @@ export default function AdminSettings() {
           messageApi.success("Đã đổi mật khẩu thành công");
         }}>
           <Form.Item
-            label="Mật khẩu hiện tại"
+            label={<span className="text-gray-700 dark:text-gray-300">Mật khẩu hiện tại</span>}
             name="currentPassword"
             rules={[{ required: true, message: "Vui lòng nhập mật khẩu hiện tại" }]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu hiện tại" size="large" />
+            <Input.Password
+              prefix={<LockOutlined className="text-gray-400 dark:text-gray-500" />}
+              placeholder="Nhập mật khẩu hiện tại"
+              size="large"
+              className="dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
+            />
           </Form.Item>
 
           <Form.Item
-            label="Mật khẩu mới"
+            label={<span className="text-gray-700 dark:text-gray-300">Mật khẩu mới</span>}
             name="newPassword"
             rules={[
               { required: true, message: "Vui lòng nhập mật khẩu mới" },
               { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự" },
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu mới" size="large" />
+            <Input.Password
+              prefix={<LockOutlined className="text-gray-400 dark:text-gray-500" />}
+              placeholder="Nhập mật khẩu mới"
+              size="large"
+              className="dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
+            />
           </Form.Item>
 
           <Form.Item
-            label="Xác nhận mật khẩu mới"
+            label={<span className="text-gray-700 dark:text-gray-300">Xác nhận mật khẩu mới</span>}
             name="confirmPassword"
             dependencies={["newPassword"]}
             rules={[
@@ -337,7 +368,12 @@ export default function AdminSettings() {
               }),
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Xác nhận mật khẩu mới" size="large" />
+            <Input.Password
+              prefix={<LockOutlined className="text-gray-400 dark:text-gray-500" />}
+              placeholder="Xác nhận mật khẩu mới"
+              size="large"
+              className="dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
+            />
           </Form.Item>
 
           <div className="mt-6">
@@ -346,7 +382,7 @@ export default function AdminSettings() {
               htmlType="submit"
               icon={<SaveOutlined />}
               size="large"
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 border-none"
             >
               Đổi mật khẩu
             </Button>

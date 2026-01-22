@@ -8,6 +8,8 @@ import { deleteNotification, getNotificationsByScopeId, getNotificationById, typ
 import CreateClassNotificationModal from "./CreateClassNotificationModal";
 import EditClassNotificationModal from "./EditClassNotificationModal";
 import type { ClassNotificationsTabProps, Notification } from "./types";
+import { notificationSocketClient } from "@/lib/socket/notification-client";
+import { getUserIdFromCookie } from "@/lib/utils/cookies";
 
 const ClassNotificationsTab = memo(function ClassNotificationsTab({
   classId,
@@ -73,7 +75,16 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
         return;
       }
 
+      const userId = getUserIdFromCookie();
+      if (!userId) {
+        setNotifications([]);
+        setTotal(0);
+        setLoading(false);
+        return;
+      }
+
       const result = await getNotificationsByScopeId(numericClassId, {
+        userId,
         page: currentPage,
         limit: pageSize,
         search: debouncedSearchQuery.trim() || undefined,
@@ -101,6 +112,76 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
+
+  // Socket setup
+  useEffect(() => {
+    const numericClassId = typeof classId === "string" ? Number(classId) : classId;
+    if (isNaN(numericClassId)) return;
+
+    // Connect and join room
+    notificationSocketClient.connect();
+    notificationSocketClient.joinClassNotifications(numericClassId);
+
+    // Listen for events
+    const handleNotificationCreated = (newNotification: NotificationResponse) => {
+      // Logic: Only add if searching doesn't exclude it, or just refresh to be safe but optimized
+      // For simplicity and correctness with pagination, if search is active, refresh
+      if (debouncedSearchQuery.trim()) {
+        fetchNotifications();
+      } else {
+        // If on page 1, we can prepend
+        if (currentPage === 1) {
+          setNotifications((prev) => {
+            // Check if already exists to avoid duplicates (race condition with API)
+            if (prev.some((n) => n.notification_id === newNotification.notification_id)) return prev;
+            const updatedList = [newNotification, ...prev];
+            if (updatedList.length > pageSize) {
+              updatedList.pop(); // Keep page size
+            }
+            return updatedList;
+          });
+          setTotal((prev) => prev + 1);
+        } else {
+          // If not on page 1, just update total, user would need to go to page 1 to see it
+          setTotal((prev) => prev + 1);
+        }
+      }
+    };
+
+    const handleNotificationUpdated = (updatedNotification: NotificationResponse) => {
+      setNotifications((prev) =>
+        prev.map((n) => (n.notification_id === updatedNotification.notification_id ? updatedNotification : n))
+      );
+    };
+
+    const handleNotificationDeleted = (data: { notification_id: number }) => {
+      setNotifications((prev) => {
+        const filtered = prev.filter((n) => n.notification_id !== data.notification_id);
+        // If we were on this page and it became empty, and we aren't on page 1, go back
+        if (filtered.length === 0 && currentPage > 1 && prev.length > 0) {
+          onPageChange(currentPage - 1);
+        } else if (filtered.length < prev.length) {
+          // If we deleted something but there might be more on next pages, refresh to pull next item
+          if (total > pageSize * currentPage) {
+            fetchNotifications();
+          }
+        }
+        return filtered;
+      });
+      setTotal((prev) => Math.max(0, prev - 1));
+    };
+
+    notificationSocketClient.on("notification_created", handleNotificationCreated);
+    notificationSocketClient.on("notification_updated", handleNotificationUpdated);
+    notificationSocketClient.on("notification_deleted", handleNotificationDeleted);
+
+    return () => {
+      notificationSocketClient.off("notification_created", handleNotificationCreated);
+      notificationSocketClient.off("notification_updated", handleNotificationUpdated);
+      notificationSocketClient.off("notification_deleted", handleNotificationDeleted);
+      notificationSocketClient.leaveClassNotifications(numericClassId);
+    };
+  }, [classId, fetchNotifications, debouncedSearchQuery, currentPage, pageSize, total, onPageChange]);
 
   // Map API response to display format - memoized
   const mapNotificationToDisplay = useCallback((notification: NotificationResponse): Notification => {
@@ -140,7 +221,7 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
 
   const handleCreateSuccess = () => {
     setIsCreateModalOpen(false);
-    fetchNotifications(); // Refresh list after creating
+    // fetchNotifications() removed to rely on socket
     if (onNotificationCreated) {
       onNotificationCreated();
     }
@@ -149,7 +230,7 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
   const handleEditSuccess = () => {
     setIsEditModalOpen(false);
     setEditNotification(null);
-    fetchNotifications(); // Refresh list after editing
+    // fetchNotifications() removed to rely on socket
   };
 
   const handleEditNotification = useCallback(async (notification: Notification) => {
@@ -239,9 +320,15 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
                   return;
                 }
 
-                await deleteNotification(notificationId);
+                const userId = getUserIdFromCookie();
+                if (!userId) {
+                  messageRef.current.error("Không tìm thấy thông tin người dùng");
+                  return;
+                }
+
+                await deleteNotification(notificationId, userId);
                 messageRef.current.success("Đã xóa thông báo thành công");
-                fetchNotifications(); // Refresh list after deleting
+                // fetchNotifications() removed to rely on socket
               } catch (error: any) {
                 messageRef.current.error(error?.message || "Không thể xóa thông báo");
               }
@@ -284,11 +371,11 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
           onChange={(e) => {
             onSearchChange(e.target.value);
           }}
-          className="flex-1"
+          className="flex-1 dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
           allowClear
         />
         {!readOnly && (
-          <Button size="middle" icon={<PlusOutlined />} onClick={handleCreateNotification} className="bg-blue-600 hover:bg-blue-700">
+          <Button size="middle" icon={<PlusOutlined />} onClick={handleCreateNotification} className="bg-blue-600 hover:bg-blue-700 border-none">
             Tạo thông báo mới
           </Button>
         )}
@@ -300,7 +387,7 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
             {displayNotifications.map((notification) => (
               <div
                 key={notification.id}
-                className="bg-white rounded-lg border-l-4 border-blue-500 border-t border-r border-b p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                className="bg-white dark:bg-gray-800 rounded-lg border-l-4 border-blue-500 border-t border-r border-b border-gray-200 dark:!border-slate-600 p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
                 onClick={() => {
                   const fullNotification = notifications.find((n) => String(n.notification_id) === notification.id);
                   if (fullNotification) {
@@ -312,7 +399,7 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
                 <div className="flex flex-col h-full">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {notification.time ? `${notification.time} - ${notification.date}` : notification.date}
                       </span>
                       <Tag color="orange" className="text-xs">
@@ -358,8 +445,8 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
                     )}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800 text-lg line-clamp-2">{notification.title}</h3>
-                    <span className="text-xs text-gray-500">{notification.author}</span>
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-lg line-clamp-2">{notification.title}</h3>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{notification.author}</span>
                   </div>
                 </div>
               </div>
@@ -374,7 +461,7 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
 
       {total > pageSize && (
         <div className="flex items-center justify-between pt-4">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             Hiển thị {(currentPage - 1) * pageSize + 1} đến {Math.min(currentPage * pageSize, total)} của {total} kết quả
           </div>
           <Pagination current={currentPage} total={total} pageSize={pageSize} onChange={onPageChange} showSizeChanger={false} />
@@ -416,22 +503,22 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
         {selectedNotification && (
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-semibold text-gray-600">Tiêu đề</label>
-              <div className="mt-1 text-base font-semibold text-gray-800">{selectedNotification.title}</div>
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Tiêu đề</label>
+              <div className="mt-1 text-base font-semibold text-gray-800 dark:text-gray-100">{selectedNotification.title}</div>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-gray-600">Nội dung</label>
-              <div className="mt-1 p-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-700 whitespace-pre-wrap">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Nội dung</label>
+              <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:!border-slate-600 text-gray-700 dark:text-gray-200 whitespace-pre-wrap">
                 {selectedNotification.message}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-gray-600">Phạm vi</label>
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Phạm vi</label>
                 <div className="mt-1">
-                  <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color={getScopeInfo(selectedNotification.scope).color}>
+                  <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs border-none" color={getScopeInfo(selectedNotification.scope).color}>
                     {getScopeInfo(selectedNotification.scope).text}
                   </Tag>
                 </div>
@@ -439,35 +526,35 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
 
               {selectedNotification.scope_id && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600">{selectedNotification.scope === "user" ? "Mã người dùng" : "Mã lớp"}</label>
-                  <div className="mt-1 text-gray-700">{selectedNotification.scope_id}</div>
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">{selectedNotification.scope === "user" ? "Mã người dùng" : "Mã lớp"}</label>
+                  <div className="mt-1 text-gray-700 dark:text-gray-200">{selectedNotification.scope_id}</div>
                 </div>
               )}
             </div>
 
             {selectedNotification.creator && (
               <div>
-                <label className="text-sm font-semibold text-gray-600">Người tạo</label>
-                <div className="mt-1 text-gray-700">{selectedNotification.creator.fullname}</div>
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Người tạo</label>
+                <div className="mt-1 text-gray-700 dark:text-gray-200">{selectedNotification.creator.fullname}</div>
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-200 dark:!border-slate-600">
               <div>
-                <label className="text-sm font-semibold text-gray-600 flex items-center gap-1">
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-1">
                   <CalendarOutlined />
                   Ngày tạo
                 </label>
-                <div className="mt-1 text-gray-700">{formatDate(selectedNotification.created_at)}</div>
+                <div className="mt-1 text-gray-700 dark:text-gray-200">{formatDate(selectedNotification.created_at)}</div>
               </div>
 
               {selectedNotification.updated_at && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 flex items-center gap-1">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-1">
                     <CalendarOutlined />
                     Ngày cập nhật
                   </label>
-                  <div className="mt-1 text-gray-700">{formatDate(selectedNotification.updated_at)}</div>
+                  <div className="mt-1 text-gray-700 dark:text-gray-200">{formatDate(selectedNotification.updated_at)}</div>
                 </div>
               )}
             </div>

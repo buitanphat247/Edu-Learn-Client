@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
 :root {
   --background: #ffffff;
@@ -43,6 +44,63 @@ body {
   background: #fafbfc;
   color: var(--foreground);
   font-family: var(--font-roboto), sans-serif;
+  /* Removed transition here to let View Transition handle the big effect */
+}
+
+html {
+  /* Removed transition here */
+}
+
+div, section, article, aside, nav, main, header, footer, 
+p, h1, h2, h3, h4, h5, h6, span, a, label, button,
+input, textarea, select {
+  /* Keep generic transitions for hover states, but maybe reduce for theme switch if View Transition is used */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Exclude elements with explicit transition classes or animations */
+[class*="animate-"],
+[class*="transition-"],
+[class*="duration-"],
+svg,
+img,
+canvas,
+video {
+  transition: none !important;
+}
+
+/* VIEW TRANSITION API ANIMATION */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  z-index: 2147483646;
+  animation: theme-wipe 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+/* Theme wipe animation - Top Right Corner */
+@keyframes theme-wipe {
+  0% {
+    clip-path: circle(0% at 100% 0%);
+  }
+  100% {
+    clip-path: circle(150% at 100% 0%);
+  }
+}
+
+/* Disable view transition if user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
 }
 
 /* Style cho admin sidebar active state */
@@ -57,8 +115,6 @@ body {
   position: relative;
   z-index: 2;
 }
-
-/* Style cho user sidebar active state - background xanh cho icon */
 
 /* Style cho dropdown menu đổi màu sidebar */
 .sidebar-color-dropdown .ant-dropdown-menu {
@@ -95,6 +151,9 @@ body {
 .border-b.border-gray-200,
 .border-l.border-gray-200,
 .border-r.border-gray-200,
+.border-t.border-gray-200,
+.border-t.border-gray-200,
+.border-b.border-gray-200,
 [class*="border-gray"] {
   border-color: #d1d5dc !important;
 }
@@ -149,6 +208,26 @@ body {
 .news-table .ant-table-tbody > tr.group:hover {
   transform: translateX(4px);
   box-shadow: -4px 0 0 0 rgba(59, 130, 246, 0.3);
+}
+
+/* Dark Mode for News Table */
+html.dark .news-table .ant-table-thead > tr > th {
+  background: #1f2937 !important; /* gray-800 */
+  color: #e5e7eb !important; /* gray-200 */
+  border-bottom: 1px solid #475569 !important; /* slate-600 */
+}
+
+html.dark .news-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #334155 !important; /* slate-700 */
+  color: #e5e7eb !important; /* gray-200 */
+}
+
+html.dark .news-table .ant-table-tbody > tr:hover > td {
+  background: transparent !important;
+}
+
+html.dark .news-table .ant-table {
+  background: transparent !important;
 }
 
 /* Super Admin Tables - No Shadow */
@@ -327,53 +406,99 @@ body {
 }
 
 /* User Dropdown Menu Styles */
-.user-dropdown-overlay .ant-dropdown-menu {
-  background: #1e293b !important;
-  border: 1px solid #334155 !important;
+/* User Dropdown Menu Styles */
+/* User Dropdown Menu Styles */
+.user-dropdown-overlay .ant-dropdown-menu,
+.user-dropdown-menu {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
   border-radius: 12px !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
   padding: 8px 0 !important;
   min-width: 220px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.user-dropdown-overlay .ant-dropdown-menu-item {
+html.dark .user-dropdown-overlay .ant-dropdown-menu,
+html.dark .user-dropdown-menu {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+.user-dropdown-overlay .ant-dropdown-menu-item,
+.user-dropdown-menu .ant-dropdown-menu-item {
   padding: 10px 16px !important;
-  color: #e2e8f0 !important;
+  color: #334155 !important;
   font-size: 14px !important;
   transition: all 0.2s !important;
 }
 
-.user-dropdown-overlay .ant-dropdown-menu-item:hover {
+html.dark .user-dropdown-overlay .ant-dropdown-menu-item,
+html.dark .user-dropdown-menu .ant-dropdown-menu-item {
+  color: #e2e8f0 !important;
+}
+
+.user-dropdown-overlay .ant-dropdown-menu-item:hover,
+.user-dropdown-menu .ant-dropdown-menu-item:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html.dark .user-dropdown-overlay .ant-dropdown-menu-item:hover,
+html.dark .user-dropdown-menu .ant-dropdown-menu-item:hover {
   background: #334155 !important;
   color: #ffffff !important;
 }
 
-.user-dropdown-overlay .ant-dropdown-menu-item-danger {
+.user-dropdown-overlay .ant-dropdown-menu-item-danger,
+.user-dropdown-menu .ant-dropdown-menu-item-danger {
+  color: #ef4444 !important;
+}
+
+.user-dropdown-overlay .ant-dropdown-menu-item-danger:hover,
+.user-dropdown-menu .ant-dropdown-menu-item-danger:hover {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+
+html.dark .user-dropdown-overlay .ant-dropdown-menu-item-danger,
+html.dark .user-dropdown-menu .ant-dropdown-menu-item-danger {
   color: #f87171 !important;
 }
 
-.user-dropdown-overlay .ant-dropdown-menu-item-danger:hover {
+html.dark .user-dropdown-overlay .ant-dropdown-menu-item-danger:hover,
+html.dark .user-dropdown-menu .ant-dropdown-menu-item-danger:hover {
   background: #7f1d1d !important;
   color: #fca5a5 !important;
 }
 
-.user-dropdown-overlay .ant-dropdown-menu-item-icon {
+.user-dropdown-overlay .ant-dropdown-menu-item-icon,
+.user-dropdown-menu .ant-dropdown-menu-item-icon {
   color: inherit !important;
   margin-right: 12px !important;
 }
 
-.user-dropdown-overlay .ant-dropdown-menu-item-disabled {
+.user-dropdown-overlay .ant-dropdown-menu-item-disabled,
+.user-dropdown-menu .ant-dropdown-menu-item-disabled {
   opacity: 1 !important;
   cursor: default !important;
 }
 
-.user-dropdown-overlay .ant-dropdown-menu-item-disabled:hover {
+.user-dropdown-overlay .ant-dropdown-menu-item-disabled:hover,
+.user-dropdown-menu .ant-dropdown-menu-item-disabled:hover {
   background: transparent !important;
 }
 
-.user-dropdown-overlay .ant-dropdown-menu-item-divider {
-  background: #334155 !important;
+.user-dropdown-overlay .ant-dropdown-menu-item-divider,
+.user-dropdown-menu .ant-dropdown-menu-item-divider {
+  background: #e2e8f0 !important;
   margin: 8px 0 !important;
+}
+
+html.dark .user-dropdown-overlay .ant-dropdown-menu-item-divider,
+html.dark .user-dropdown-menu .ant-dropdown-menu-item-divider {
+  background: #334155 !important;
 }
 
 /* Auth Page Premium Styles */

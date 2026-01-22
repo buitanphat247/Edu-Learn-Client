@@ -31,12 +31,20 @@ export interface RagTestDetail extends RagTestOverview {
   questions: RagQuestion[];
 }
 
-export const getRagTestsByClass = async (classId: string | number, studentId?: number): Promise<RagTestOverview[]> => {
+export const getRagTestsByClass = async (
+  classId: string | number, 
+  studentId?: number,
+  isTeacher: boolean = false
+): Promise<RagTestOverview[]> => {
   try {
-    const params = studentId ? `?student_id=${studentId}` : "";
     const ts = new Date().getTime();
-    const separator = params ? "&" : "?";
-    const response = await axios.get(`${AI_API_URL}/tests/class/${classId}${params}${separator}_ts=${ts}`);
+    const params = studentId ? `student_id=${studentId}` : "";
+    const endpoint = isTeacher ? "teacher" : "published";
+    
+    // Explicitly call specialized endpoints to ensure correct data (especially drafts for teachers)
+    const response = await axios.get(
+      `${AI_API_URL}/tests/class/${classId}/${endpoint}?${params}${params ? '&' : ''}_ts=${ts}`
+    );
     return response.data.data;
   } catch (error) {
     console.error("Error fetching RAG tests:", error);

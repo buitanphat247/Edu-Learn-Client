@@ -23,10 +23,10 @@ export default function UserStatisticsCards({ stats }: UserStatisticsCardsProps)
         const Icon = stat.icon;
         const numericValue = parseInt(stat.value.replace(/,/g, "")) || 0;
         return (
-          <CustomCard key={index} padding="md" className="hover:scale-105 transition-transform duration-200">
+          <CustomCard key={index} padding="md" className="hover:scale-105 transition-transform duration-200 border border-gray-100 dark:!border-slate-600">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm mb-2">{stat.label}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{stat.label}</p>
                 <p className={`text-3xl font-bold ${stat.color}`}>
                   <CountUp start={0} end={numericValue} duration={2} separator="," decimals={0} />
                 </p>

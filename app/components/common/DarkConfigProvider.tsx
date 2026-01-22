@@ -34,6 +34,15 @@ export default function DarkConfigProvider({ children }: DarkConfigProviderProps
             colorPrimaryHover: '#2563eb',
             colorPrimaryActive: '#1d4ed8',
           },
+          Table: {
+            colorBgContainer: '#111827',
+            headerBg: '#1f2937',
+            borderColor: 'transparent',
+          },
+          Pagination: {
+            itemBg: '#111827',
+            itemActiveBg: '#1f2937',
+          },
         }
       }}
     >

@@ -56,7 +56,7 @@ export interface GetClassesByUserParams {
   userId: number | string;
   page?: number;
   limit?: number;
-  name?: string;
+  search?: string;
 }
 
 export interface GetClassesByUserApiResponse {
@@ -80,8 +80,8 @@ export const getClassesByUser = async (params: GetClassesByUserParams): Promise<
       limit: params?.limit || 10,
     };
 
-    if (params?.name && params.name.trim()) {
-      requestParams.name = params.name.trim();
+    if (params?.search && params.search.trim()) {
+      requestParams.search = params.search.trim();
     }
 
     const response = await apiClient.get<GetClassesByUserApiResponse>(`/classes/by-user/${userId}`, {
@@ -501,7 +501,7 @@ export const updateClassStudentStatus = async (params: UpdateClassStudentStatusP
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     if (response.data.status && response.data.data) {

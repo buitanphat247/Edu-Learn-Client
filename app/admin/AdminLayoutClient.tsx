@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { Modal, Spin, message } from "antd";
 import { getUserInfo, type UserInfoResponse } from "@/lib/api/users";
 import { getUserIdFromCookie } from "@/lib/utils/cookies";
+import { useTheme } from "@/app/context/ThemeContext";
+import { MoonOutlined, SunOutlined } from "@ant-design/icons";
 
 const pageTitles: Record<string, string> = {
   "/admin": "Dashboard",
@@ -25,6 +27,7 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   // Memoize page title calculation
   const currentPageTitle = useMemo(() => {
@@ -88,26 +91,36 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
 
   return (
     <>
-      <header className="bg-white h-16 flex items-center justify-between px-6 shadow-sm border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-900 h-16 flex items-center justify-between px-6 shadow-sm transition-colors duration-300 border-b border-gray-200 dark:!border-slate-600">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold text-gray-800">Hệ thống quản lý Admin</h1>
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Hệ thống quản lý Admin</h1>
           {currentPageTitle && (
             <>
               <span className="text-gray-500">-</span>
-              <span className="text-lg font-semibold text-gray-800">{currentPageTitle}</span>
+              <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">{currentPageTitle}</span>
             </>
           )}
         </div>
 
         <div className="flex items-center gap-4">
+          <button
+            onClick={toggleTheme}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-yellow-500 dark:hover:text-white transition-all duration-300"
+          >
+            {theme === "dark" ? (
+              <SunOutlined className="text-xl text-yellow-400" />
+            ) : (
+              <MoonOutlined className="text-xl" />
+            )}
+          </button>
           <div
             onClick={() => setIsProfileModalOpen(true)}
-            className="flex items-center gap-3 pl-4 border-l border-gray-300 cursor-pointer hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 pl-4 cursor-pointer hover:opacity-80 transition-opacity"
           >
             <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">{displayInitials}</div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-800">{displayName}</span>
-              <span className="text-xs text-gray-600">{displayRole}</span>
+              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{displayName}</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">{displayRole}</span>
             </div>
           </div>
         </div>
@@ -122,33 +135,33 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
                   {getInitials(userInfo.fullname || userInfo.username || "A")}
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">{userInfo.fullname || userInfo.username}</h3>
-                  <p className="text-gray-600">{userInfo.role?.role_name || "Giáo viên"}</p>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">{userInfo.fullname || userInfo.username}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">{userInfo.role?.role_name || "Giáo viên"}</p>
                 </div>
               </div>
-              <div className="border-t border-gray-200 pt-4 space-y-3">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
                 <div>
-                  <span className="text-sm text-gray-500">Tên đăng nhập:</span>
-                  <p className="text-gray-800 font-medium">{userInfo.username || "Chưa cập nhật"}</p>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Tên đăng nhập:</span>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">{userInfo.username || "Chưa cập nhật"}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Email:</span>
-                  <p className="text-gray-800 font-medium">{userInfo.email || "Chưa cập nhật"}</p>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Email:</span>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">{userInfo.email || "Chưa cập nhật"}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Số điện thoại:</span>
-                  <p className="text-gray-800 font-medium">{userInfo.phone || "Chưa cập nhật"}</p>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Số điện thoại:</span>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">{userInfo.phone || "Chưa cập nhật"}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Ngày tạo:</span>
-                  <p className="text-gray-800 font-medium">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Ngày tạo:</span>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">
                     {userInfo.created_at ? new Date(userInfo.created_at).toLocaleDateString("vi-VN") : "Chưa có thông tin"}
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">Không có thông tin</div>
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">Không có thông tin</div>
           )}
         </Spin>
       </Modal>
@@ -161,11 +174,11 @@ export default function AdminLayoutClient({ children, initialUserData }: { child
   const isDocumentCrawlPage = pathname?.startsWith("/admin/document-crawl");
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-950 overflow-hidden transition-colors duration-300">
       <AdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <AdminHeader initialUserData={initialUserData} />
-        <main className={`flex-1 overflow-y-auto bg-gray-50 p-6 ${isDocumentCrawlPage ? "pb-0" : ""}`}>{children}</main>
+        <main className={`flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6 transition-colors duration-300`}>{children}</main>
       </div>
     </div>
   );

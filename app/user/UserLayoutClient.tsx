@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { Modal, Spin, message } from "antd";
 import { getUserInfo, type UserInfoResponse } from "@/lib/api/users";
 import { getUserIdFromCookie } from "@/lib/utils/cookies";
+import { useTheme } from "@/app/context/ThemeContext";
+import { MoonOutlined, SunOutlined } from "@ant-design/icons";
 
 const pageTitles: Record<string, string> = {
   "/user": "Trang chủ",
@@ -25,6 +27,7 @@ function UserHeader({ initialUserData }: { initialUserData: InitialUserData | nu
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   // Memoize page title calculation
   const currentPageTitle = useMemo(() => {
@@ -88,26 +91,36 @@ function UserHeader({ initialUserData }: { initialUserData: InitialUserData | nu
 
   return (
     <>
-      <header className="bg-white h-16 flex items-center justify-between px-6 shadow-sm border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-900 h-16 flex items-center justify-between px-6 shadow-sm border-b border-gray-200 dark:!border-slate-600 transition-colors duration-300">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold text-gray-800">Hệ thống học tập</h1>
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Hệ thống học tập</h1>
           {currentPageTitle && (
             <>
               <span className="text-gray-500">-</span>
-              <span className="text-lg font-semibold text-gray-800">{currentPageTitle}</span>
+              <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">{currentPageTitle}</span>
             </>
           )}
         </div>
 
         <div className="flex items-center gap-4">
+          <button
+            onClick={toggleTheme}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-yellow-500 dark:hover:text-white transition-all duration-300"
+          >
+            {theme === "dark" ? (
+              <SunOutlined className="text-xl text-yellow-400" />
+            ) : (
+              <MoonOutlined className="text-xl" />
+            )}
+          </button>
           <div
             onClick={() => setIsProfileModalOpen(true)}
-            className="flex items-center gap-3 pl-4 border-l border-gray-300 cursor-pointer hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 pl-4 border-l border-gray-300 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity"
           >
             <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">{displayInitials}</div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-800">{displayName}</span>
-              <span className="text-xs text-gray-600">{displayRole}</span>
+              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{displayName}</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">{displayRole}</span>
             </div>
           </div>
         </div>
@@ -165,7 +178,7 @@ export default function UserLayoutClient({ children, initialUserData }: { childr
 
   if (isExamSession) {
     return (
-      <div className="h-screen w-screen bg-gray-50 overflow-hidden overflow-y-auto">
+      <div className="h-screen w-screen bg-gray-50 dark:bg-gray-950 overflow-hidden overflow-y-auto">
         {children}
       </div>
     );
@@ -174,11 +187,11 @@ export default function UserLayoutClient({ children, initialUserData }: { childr
   const isDocumentsPage = pathname?.startsWith("/user/documents");
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-950 overflow-hidden transition-colors duration-300">
       <UserSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <UserHeader initialUserData={initialUserData} />
-        <main className={`flex-1 overflow-y-auto bg-gray-50 p-6`}>{children}</main>
+        <main className={`flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6 transition-colors duration-300`}>{children}</main>
       </div>
     </div>
   );

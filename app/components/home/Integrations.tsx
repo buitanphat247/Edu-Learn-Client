@@ -31,24 +31,24 @@ export default function Integrations() {
   ];
 
   return (
-    <section className="py-16 bg-[#0f172a] border-y border-slate-800">
+    <section className="py-16 bg-slate-50 dark:bg-[#0f172a] border-y border-slate-200 dark:border-slate-800 transition-colors duration-300">
       <div className="container mx-auto px-4 max-w-[1280px]">
         <div className="text-center mb-10">
-          <span className="text-sm font-semibold uppercase tracking-wider text-blue-400">
+          <span className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
             Seamless Connectivity
           </span>
-          <h3 className="text-2xl md:text-3xl font-bold text-white mt-2">
+          <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mt-2">
             Tích hợp với các công cụ bạn đang sử dụng
           </h3>
         </div>
         
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-500">
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-80 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-500">
           {integrations.map((integration, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 text-xl font-bold text-slate-300 hover:text-white transition-colors duration-300 cursor-pointer group"
+              className="flex items-center gap-3 text-xl font-bold text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors duration-300 cursor-pointer group"
             >
-              <div className="group-hover:scale-110 transition-transform duration-300 text-blue-400">
+              <div className="group-hover:scale-110 transition-transform duration-300 text-blue-600 dark:text-blue-400">
                 {integration.icon}
               </div>
               <span>{integration.name}</span>

@@ -28,6 +28,7 @@ export interface Exam {
   format: string;
   subject: string;
   subjectColor: string;
+  subjectStyle?: React.CSSProperties;
   isAi?: boolean;
   isLocked?: boolean;
   isPublished?: boolean;

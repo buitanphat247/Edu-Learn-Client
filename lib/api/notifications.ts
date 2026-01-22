@@ -222,6 +222,7 @@ export const updateNotification = async (
     }
 
     const response = await apiClient.patch(`/notifications/${id}`, params, {
+      params: { userId: params.created_by }, // Use created_by as the acting user
       headers: {
         "Content-Type": "application/json",
       },
@@ -236,14 +237,19 @@ export const updateNotification = async (
   }
 };
 
-export const deleteNotification = async (notificationId: number | string): Promise<void> => {
+export const deleteNotification = async (
+  notificationId: number | string, 
+  userId: number | string
+): Promise<void> => {
   try {
     const id = typeof notificationId === "string" ? parseInt(notificationId, 10) : notificationId;
     if (Number.isNaN(id)) {
       throw new Error("ID thông báo không hợp lệ");
     }
 
-    await apiClient.delete(`/notifications/${id}`);
+    await apiClient.delete(`/notifications/${id}`, {
+      params: { userId },
+    });
     // API trả về 204, không cần xử lý body
   } catch (error: any) {
     const errorMessage =
@@ -253,6 +259,7 @@ export const deleteNotification = async (notificationId: number | string): Promi
 };
 
 export interface GetNotificationsByScopeIdParams {
+  userId: number | string; // Required for security
   page?: number;
   limit?: number;
   search?: string;
@@ -276,6 +283,7 @@ export const getNotificationsByScopeId = async (
     }
 
     const requestParams: Record<string, any> = {
+      userId: params?.userId,
       page: params?.page ?? 1,
       limit: params?.limit ?? 10,
     };

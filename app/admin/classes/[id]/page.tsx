@@ -29,6 +29,7 @@ import { deleteRagTestsByClass } from "@/lib/api/rag-exams";
 import type { StudentItem } from "@/interface/students";
 import { ensureMinLoadingTime, CLASS_STATUS_MAP, formatStudentId } from "@/lib/utils/classUtils";
 import { getUserIdFromCookie } from "@/lib/utils/cookies";
+import { classSocketClient } from "@/lib/socket/class-client";
 
 export default function ClassDetail() {
   const router = useRouter();
@@ -219,6 +220,135 @@ export default function ClassDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId]);
 
+  // Real-time updates via Socket.io
+  useEffect(() => {
+    if (!classId) return;
+
+    // Connect and join class room
+    classSocketClient.connect();
+    classSocketClient.joinClass(classId);
+
+    // Listen for class updates
+    const unsubscribe = classSocketClient.on("class_updated", (data: any) => {
+      console.log("Class updated via socket:", data);
+      if (Number(data.class_id) === Number(classId)) {
+        setClassData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            name: data.name,
+            code: data.code,
+            status: data.status === "active" ? CLASS_STATUS_MAP.active : CLASS_STATUS_MAP.inactive,
+          };
+        });
+        classNameRef.current = data.name;
+
+        // Chỉ hiển thị toast nếu không phải là người vừa thực hiện chỉnh sửa (để tránh 2 toast)
+        const currentUserId = getUserIdFromCookie();
+        if (Number(data.updated_by) !== Number(currentUserId)) {
+          const toastMessage = data.old_name && data.name !== data.old_name
+            ? `Lớp học "${data.old_name}" vừa đổi tên thành "${data.name}"`
+            : `Lớp học "${data.name}" vừa được cập nhật`;
+          
+          message.info({
+            content: toastMessage,
+            key: `class_update_${data.class_id}_${new Date().getTime() / 1000}`,
+            duration: 3,
+          });
+        }
+      }
+    });
+
+    // Listen for class deleted
+    const unsubscribeDeleted = classSocketClient.on("class_deleted", (data: any) => {
+      console.log("Class deleted via socket:", data);
+      if (Number(data.class_id) === Number(classId)) {
+        const currentUserId = getUserIdFromCookie();
+        if (data.deleted_by && Number(data.deleted_by) !== Number(currentUserId)) {
+          message.warning(`Lớp học "${data.name}" đã bị giải tán bởi quản trị viên khác.`);
+          router.push("/admin/classes");
+        }
+      }
+    });
+
+    // Listen for student joined
+    const unsubscribeJoined = classSocketClient.on("student_joined", (data: any) => {
+      console.log("Student joined via socket:", data);
+      if (Number(data.class_id) === Number(classId)) {
+        const newStudent = mapStudentRecordToItem(data, classNameRef.current);
+        setStudents((prev) => {
+          // Check if student already exists
+          if (prev.some((s) => String(s.userId) === String(newStudent.userId))) return prev;
+          
+          const newList = [newStudent, ...prev];
+          // Use count from server if available, otherwise fallback to local list length
+          const newCount = data.student_count !== undefined ? data.student_count : newList.length;
+          setClassData((prevData) => (prevData ? { ...prevData, students: newCount } : prevData));
+          return newList;
+        });
+        
+        message.info({
+          content: `Học sinh ${data.student?.fullname || "mới"} vừa tham gia lớp học`,
+          key: `student_joined_${data.student?.user_id}`,
+          duration: 3,
+        });
+      }
+    });
+
+    // Listen for student removed
+    const unsubscribeRemoved = classSocketClient.on("student_removed", (data: any) => {
+      console.log("Student removed via socket:", data);
+      if (Number(data.class_id) === Number(classId)) {
+        setStudents((prev) => {
+          const newList = prev.filter((s) => String(s.userId) !== String(data.user_id));
+          // Use count from server if available, otherwise fallback to local list length
+          const newCount = data.student_count !== undefined ? data.student_count : newList.length;
+          setClassData((prevData) => (prevData ? { ...prevData, students: newCount } : prevData));
+          return newList;
+        });
+      }
+    });
+
+    // Listen for student status updated (e.g. banned)
+    const unsubscribeStatus = classSocketClient.on("student_status_updated", (data: any) => {
+      console.log("Student status updated via socket:", data);
+      if (Number(data.class_id) === Number(classId)) {
+        if (data.status === "banned") {
+          setStudents((prev) => {
+            const newList = prev.filter((s) => String(s.userId) !== String(data.user_id));
+            // Use count from server if available, otherwise fallback to local list length
+            const newCount = data.student_count !== undefined ? data.student_count : newList.length;
+            setClassData((prevData) => (prevData ? { ...prevData, students: newCount } : prevData));
+            return newList;
+          });
+        } else {
+          setStudents((prev) => {
+            const index = prev.findIndex((s) => String(s.userId) === String(data.user_id));
+            if (index !== -1) {
+              const newList = [...prev];
+              newList[index] = {
+                ...newList[index],
+                status: data.status === "banned" ? "Bị cấm" : "Đang học",
+                apiStatus: data.status,
+              };
+              return newList;
+            }
+            return prev;
+          });
+        }
+      }
+    });
+
+    return () => {
+      classSocketClient.leaveClass(classId);
+      unsubscribe();
+      unsubscribeDeleted();
+      unsubscribeJoined();
+      unsubscribeRemoved();
+      unsubscribeStatus();
+    };
+  }, [classId, message]);
+
   const handleEdit = useCallback(() => {
     setIsEditModalOpen(true);
   }, []);
@@ -262,53 +392,9 @@ export default function ClassDetail() {
 
   const handleBanStudent = useCallback(
     (student: StudentItem) => {
-      const currentClassId = classIdRef.current;
-
-      modal.confirm({
-        title: "Xác nhận cấm học sinh",
-        content: `Bạn có chắc chắn muốn cấm học sinh "${student.name}"? Học sinh này sẽ không thể tham gia các hoạt động của lớp học.`,
-        okText: "Cấm",
-        okType: "danger",
-        cancelText: "Hủy",
-        onOk: async () => {
-          try {
-            // Lấy class-student id (id của bản ghi class-student) nếu chưa có
-            let classStudentId = student.classStudentId;
-            if (!classStudentId) {
-              // Gọi API để lấy id của bản ghi class-student từ userId
-              const id = await getClassStudentId(currentClassId, student.userId);
-              if (!id) {
-                message.error("Không tìm thấy ID bản ghi học sinh trong lớp");
-                return;
-              }
-              classStudentId = id;
-            }
-
-            await updateClassStudentStatus({
-              id: classStudentId, // id của bản ghi class-student, không phải userId
-              status: "banned",
-            });
-
-            // Xóa học sinh khỏi danh sách chính (chỉ hiển thị online)
-            setStudents((prev) => prev.filter((s) => s.key !== student.key));
-
-            // Cập nhật số lượng học sinh
-            setClassData((prev) => {
-              if (!prev) return prev;
-              return {
-                ...prev,
-                students: prev.students - 1,
-              };
-            });
-
-            message.success(`Đã cấm học sinh "${student.name}"`);
-          } catch (error: any) {
-            message.error(error?.message || "Không thể cấm học sinh");
-          }
-        },
-      });
+      message.info("Tính năng này đang được phát triển");
     },
-    [modal, message]
+    [message]
   );
 
   const handleRemoveStudent = useCallback(
@@ -329,16 +415,6 @@ export default function ClassDetail() {
               userId: student.userId,
             });
 
-            // Cập nhật state trực tiếp
-            setStudents((prev) => prev.filter((s) => s.key !== student.key));
-            setClassData((prev) => {
-              if (!prev) return prev;
-              return {
-                ...prev,
-                students: prev.students - 1,
-              };
-            });
-
             message.success(`Đã xóa học sinh "${student.name}" ra khỏi lớp`);
           } catch (error: any) {
             message.error(error?.message || "Không thể xóa học sinh khỏi lớp");
@@ -350,8 +426,8 @@ export default function ClassDetail() {
   );
 
   const handleViewBannedList = useCallback(() => {
-    setIsBannedListModalOpen(true);
-  }, []);
+    message.info("Tính năng này đang được phát triển");
+  }, [message]);
 
   // Memoize classInfo object to prevent unnecessary rerenders
   const classInfo = useMemo(() => {
@@ -494,25 +570,6 @@ export default function ClassDetail() {
             ),
           },
           {
-            key: "exercises",
-            label: (
-              <span>
-                <FileTextOutlined className="mr-2" />
-                Bài tập
-              </span>
-            ),
-            children: renderTabContent(
-              <ClassExercisesTab
-                classId={classId}
-                searchQuery={exerciseSearchQuery}
-                onSearchChange={setExerciseSearchQuery}
-                currentPage={exercisePage}
-                pageSize={exercisePageSize}
-                onPageChange={setExercisePage}
-              />
-            ),
-          },
-          {
             key: "notifications",
             label: (
               <span>
@@ -528,6 +585,25 @@ export default function ClassDetail() {
                 currentPage={notificationPage}
                 pageSize={notificationPageSize}
                 onPageChange={setNotificationPage}
+              />
+            ),
+          },
+          {
+            key: "exercises",
+            label: (
+              <span>
+                <FileTextOutlined className="mr-2" />
+                Bài tập
+              </span>
+            ),
+            children: renderTabContent(
+              <ClassExercisesTab
+                classId={classId}
+                searchQuery={exerciseSearchQuery}
+                onSearchChange={setExerciseSearchQuery}
+                currentPage={exercisePage}
+                pageSize={exercisePageSize}
+                onPageChange={setExercisePage}
               />
             ),
           },

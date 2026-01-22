@@ -51,17 +51,17 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="py-24 relative overflow-hidden bg-[#0f172a]">
+    <section className="py-24 relative overflow-hidden bg-white dark:bg-[#0f172a] transition-colors duration-300">
       {/* Decorative Blob */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/10 dark:bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <div className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-blue-400 uppercase bg-blue-500/10 rounded-full">
+          <div className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-blue-600 dark:text-blue-400 uppercase bg-blue-50 dark:bg-blue-500/10 rounded-full">
             Tại sao chọn chúng tôi?
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Giải pháp học tập toàn diện</h2>
-          <p className="text-slate-400 max-w-2xl mx-auto text-lg">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Giải pháp học tập toàn diện</h2>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">
             Kết hợp công nghệ AI tiên tiến và phương pháp giáo dục hiện đại giúp bạn chinh phục mục tiêu nhanh chóng.
           </p>
         </div>
@@ -70,15 +70,15 @@ export default function Features() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-[#1e293b]/60 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-blue-500/50 hover:bg-[#1e293b] transition-all duration-300 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-900/20"
+              className="bg-white dark:bg-[#1e293b]/60 backdrop-blur-sm rounded-2xl p-6 border border-slate-200 dark:border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-50 dark:hover:bg-[#1e293b] transition-all duration-300 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-900/20"
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-inner border border-white/5">
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-500 mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-inner border border-blue-100 dark:border-white/5">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {feature.title}
               </h3>
-              <p className="text-slate-400 text-sm leading-relaxed group-hover:text-slate-300 transition-colors">
+              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
                 {feature.description}
               </p>
             </div>

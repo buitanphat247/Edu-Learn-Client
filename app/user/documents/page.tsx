@@ -237,7 +237,7 @@ export default function UserDocuments() {
           const currentPage = pagination.current;
           const pageSize = pagination.pageSize;
           const stt = (currentPage - 1) * pageSize + index + 1;
-          return <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">{stt}</span>;
+          return <span className="text-gray-600 dark:text-gray-400 font-mono text-sm bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">{stt}</span>;
         },
       },
       {
@@ -246,7 +246,9 @@ export default function UserDocuments() {
         key: "fileName",
         width: "40%",
         render: (fileName: string) => (
-          <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">{fileName}</span>
+          <span className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-1">
+            {fileName}
+          </span>
         ),
       },
       {
@@ -255,7 +257,7 @@ export default function UserDocuments() {
         key: "fileType",
         width: 120,
         render: (fileType: string) => (
-          <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color="default">
+          <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs border-none bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
             {fileType.toUpperCase()}
           </Tag>
         ),
@@ -265,14 +267,14 @@ export default function UserDocuments() {
         dataIndex: "fileSize",
         key: "fileSize",
         width: 120,
-        render: (fileSize: string) => <span className="text-gray-600">{formatFileSize(fileSize)}</span>,
+        render: (fileSize: string) => <span className="text-gray-600 dark:text-gray-400">{formatFileSize(fileSize)}</span>,
       },
       {
         title: "NGÀY TẠO",
         dataIndex: "createdAt",
         key: "createdAt",
         width: 150,
-        render: (date: string) => <span className="text-gray-600">{formatDate(date)}</span>,
+        render: (date: string) => <span className="text-gray-600 dark:text-gray-400">{formatDate(date)}</span>,
       },
       {
         title: "HÀNH ĐỘNG",
@@ -284,7 +286,8 @@ export default function UserDocuments() {
               <Button
                 icon={<EyeOutlined />}
                 size="small"
-                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
+                type="primary"
+                ghost
                 onClick={() => handleView(record)}
               >
                 Xem
@@ -292,7 +295,8 @@ export default function UserDocuments() {
               <Button
                 icon={<DownloadOutlined />}
                 size="small"
-                className="hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200"
+                type="default"
+                className="dark:bg-transparent dark:text-gray-300 dark:border-slate-600 dark:hover:text-blue-400 dark:hover:border-blue-400"
                 onClick={() => handleDownload(record)}
               >
                 Tải xuống
@@ -312,6 +316,7 @@ export default function UserDocuments() {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
+          margin-top: 16px !important;
         }
         .ant-pagination-item {
           margin: 0 !important;
@@ -322,6 +327,22 @@ export default function UserDocuments() {
         }
         .ant-pagination-total-text {
           margin-right: 16px !important;
+        }
+        .dark .ant-select-selector {
+          background-color: #1f2937 !important; /* gray-800 */
+          border-color: #475569 !important; /* slate-600 */
+          color: #e5e7eb !important; /* gray-200 */
+        }
+        .dark .ant-select-arrow {
+          color: #9ca3af !important; /* gray-400 */
+        }
+        .dark .ant-input {
+          background-color: #1f2937 !important;
+          border-color: #475569 !important; /* slate-600 */
+          color: #e5e7eb !important;
+        }
+        .dark .ant-input::placeholder {
+          color: #6b7280 !important; /* gray-500 */
         }
       `}</style>
       {/* Search Bar and File Type Filter */}
@@ -346,6 +367,7 @@ export default function UserDocuments() {
           onChange={setSelectedFileType}
           allowClear
           style={{ width: 200 }}
+          popupClassName="dark:bg-gray-800 dark:text-gray-200"
         >
           <Option value="pdf">PDF</Option>
           <Option value="docx">Word</Option>
@@ -354,7 +376,7 @@ export default function UserDocuments() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-none dark:shadow-sm">
         <Table
           columns={columns}
           dataSource={documents}
@@ -364,13 +386,14 @@ export default function UserDocuments() {
             pageSize: pagination.pageSize,
             total: pagination.total,
             showSizeChanger: false,
-            showTotal: (total) => `Tổng ${total} tài liệu`,
-            size: "small",
+            showTotal: (total) => <span className="text-gray-500 dark:text-gray-400 font-medium">Tổng {total} tài liệu</span>,
+            size: "default",
             onChange: handleTableChange,
           }}
-          className="news-table"
-          rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
-          size="small"
+          bordered={false}
+          className="[&_.ant-pagination]:px-6 [&_.ant-pagination]:pb-4"
+          rowClassName="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer border-b border-gray-100 dark:border-gray-800"
+          size="middle"
         />
       </div>
 

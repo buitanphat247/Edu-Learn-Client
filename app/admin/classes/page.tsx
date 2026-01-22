@@ -11,6 +11,7 @@ import { deleteRagTestsByClass } from "@/lib/api/rag-exams";
 import type { ClassItem } from "@/interface/classes";
 import { ensureMinLoadingTime, CLASS_STATUS_MAP } from "@/lib/utils/classUtils";
 import { getUserIdFromCookie } from "@/lib/utils/cookies";
+import { classSocketClient } from "@/lib/socket/class-client";
 
 export default function AdminClasses() {
   const { message, modal } = App.useApp();
@@ -68,7 +69,7 @@ export default function AdminClasses() {
         userId: userId,
         page: pagination.current,
         limit: pagination.pageSize,
-        name: debouncedSearchQuery || undefined,
+        search: debouncedSearchQuery || undefined,
       });
 
       const mappedClasses: ClassItem[] = result.classes.map(mapClassData);
@@ -89,6 +90,109 @@ export default function AdminClasses() {
   useEffect(() => {
     fetchClasses();
   }, [fetchClasses]);
+
+  // Real-time updates via Socket.io
+  useEffect(() => {
+    if (classes.length === 0) return;
+
+    // Connect to socket
+    classSocketClient.connect();
+
+    // Lấy danh sách ID hiện tại
+    const currentClassIds = classes.map((c) => c.key);
+
+    // Join all class rooms for this admin
+    currentClassIds.forEach((id) => {
+      classSocketClient.joinClass(id);
+    });
+
+    // Listen for updates
+    const unsubscribeUpdated = classSocketClient.on("class_updated", (data: any) => {
+      setClasses((prev) => {
+        const index = prev.findIndex((c) => Number(c.key) === Number(data.class_id));
+        if (index === -1) return prev;
+
+        const updatedList = [...prev];
+        updatedList[index] = {
+          ...updatedList[index],
+          name: data.name,
+          code: data.code,
+          status: data.status === "active" ? CLASS_STATUS_MAP.active : CLASS_STATUS_MAP.inactive,
+        };
+
+        return updatedList;
+      });
+    });
+
+    // Listen for student joined
+    const unsubscribeJoined = classSocketClient.on("student_joined", (data: any) => {
+      setClasses((prev) => {
+        const index = prev.findIndex((c) => Number(c.key) === Number(data.class_id));
+        if (index === -1) return prev;
+
+        const updatedList = [...prev];
+        updatedList[index] = {
+          ...updatedList[index],
+          students: updatedList[index].students + 1,
+        };
+        return updatedList;
+      });
+    });
+
+    // Listen for student removed
+    const unsubscribeRemoved = classSocketClient.on("student_removed", (data: any) => {
+      setClasses((prev) => {
+        const index = prev.findIndex((c) => Number(c.key) === Number(data.class_id));
+        if (index === -1) return prev;
+
+        const updatedList = [...prev];
+        updatedList[index] = {
+          ...updatedList[index],
+          students: Math.max(0, updatedList[index].students - 1),
+        };
+        return updatedList;
+      });
+    });
+
+    // Listen for student status updated (banned)
+    const unsubscribeStatus = classSocketClient.on("student_status_updated", (data: any) => {
+      if (data.status === "banned") {
+        setClasses((prev) => {
+          const index = prev.findIndex((c) => Number(c.key) === Number(data.class_id));
+          if (index === -1) return prev;
+
+          const updatedList = [...prev];
+          updatedList[index] = {
+            ...updatedList[index],
+            students: Math.max(0, updatedList[index].students - 1),
+          };
+          return updatedList;
+        });
+      }
+    });
+
+    // Listen for class deleted
+    const unsubscribeDeleted = classSocketClient.on("class_deleted", (data: any) => {
+      setClasses((prev) => prev.filter((c) => Number(c.key) !== Number(data.class_id)));
+      setPagination((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }));
+      
+      const currentUserId = getUserIdFromCookie();
+      if (data.deleted_by && Number(data.deleted_by) !== Number(currentUserId)) {
+          message.info(`Lớp học "${data.name}" đã bị xóa`);
+      }
+    });
+
+    return () => {
+      currentClassIds.forEach((id) => {
+        classSocketClient.leaveClass(id);
+      });
+      unsubscribeUpdated();
+      unsubscribeJoined();
+      unsubscribeRemoved();
+      unsubscribeStatus();
+      unsubscribeDeleted();
+    };
+  }, [JSON.stringify(classes.map((c) => c.key))]);
 
   const handleTableChange = (page: number, pageSize: number) => {
     setPagination((prev) => ({ ...prev, current: page, pageSize }));
@@ -123,9 +227,6 @@ export default function AdminClasses() {
           // 2. Xóa lớp học
           await deleteClass(classItem.key);
           message.success(`Đã xóa lớp học "${classItem.name}" thành công`);
-          // Cập nhật UI trực tiếp
-          setClasses((prev) => prev.filter((c) => c.key !== classItem.key));
-          setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
         } catch (error: any) {
           message.error(error?.message || "Không thể xóa lớp học");
         }
@@ -169,18 +270,20 @@ export default function AdminClasses() {
         />
       )}
 
-      <ClassesTable
-        data={classes}
-        loading={loading}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          onChange: handleTableChange,
-        }}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-none dark:shadow-sm">
+        <ClassesTable
+          data={classes}
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            onChange: handleTableChange,
+          }}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
     </div>
   );
 }

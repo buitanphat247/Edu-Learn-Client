@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { App, Spin, Button, Tabs, Table, Tag } from "antd";
+import { App, Spin, Button, Tabs, Table } from "antd";
 import { ArrowLeftOutlined, BellOutlined, FileTextOutlined, CalendarOutlined, UserOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import ClassInfoCard from "@/app/components/classes/ClassInfoCard";
 import ClassExercisesTab from "@/app/components/classes/ClassExercisesTab";
@@ -15,6 +15,7 @@ import { CLASS_STATUS_MAP, formatStudentId } from "@/lib/utils/classUtils";
 import { getUserIdFromCookie } from "@/lib/utils/cookies";
 import type { StudentItem } from "@/interface/students";
 import type { ColumnsType } from "antd/es/table";
+import { classSocketClient } from "@/lib/socket/class-client";
 
 export default function UserClassDetail() {
   const router = useRouter();
@@ -182,7 +183,7 @@ export default function UserClassDetail() {
         if (showLoading) setStudentsLoading(false);
       }
     },
-    [mapStudentRecordToItem]
+    [mapStudentRecordToItem],
   );
 
   // Fetch both class info and students
@@ -225,6 +226,141 @@ export default function UserClassDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId]);
 
+  // Real-time updates via Socket.io
+  useEffect(() => {
+    if (!classId) return;
+
+    // Connect and join class room
+    classSocketClient.connect();
+    classSocketClient.joinClass(classId);
+
+    // Listen for class updates
+    const unsubscribe = classSocketClient.on("class_updated", (data: any) => {
+      console.log("Class updated via socket (User side):", data);
+      if (Number(data.class_id) === Number(classId)) {
+        setClassData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            name: data.name,
+            code: data.code,
+            status: data.status === "active" ? CLASS_STATUS_MAP.active : CLASS_STATUS_MAP.inactive,
+          };
+        });
+        classNameRef.current = data.name;
+      }
+    });
+
+    // Listen for student joined
+    const unsubscribeJoined = classSocketClient.on("student_joined", (data: any) => {
+      console.log("Student joined via socket (User side):", data);
+      if (Number(data.class_id) === Number(classId)) {
+        const newStudent = mapStudentRecordToItem(data, classNameRef.current);
+        setStudents((prev) => {
+          // Check if student already exists
+          if (prev.some((s) => String(s.userId) === String(newStudent.userId))) return prev;
+          
+          const newList = [newStudent, ...prev];
+          // Use count from server if available, otherwise fallback to local list length
+          const newCount = data.student_count !== undefined ? data.student_count : newList.length;
+          setClassData((prevData) => (prevData ? { ...prevData, students: newCount } : prevData));
+          return newList;
+        });
+      }
+    });
+
+    // Listen for student removed
+    const unsubscribeRemoved = classSocketClient.on("student_removed", (data: any) => {
+      console.log("Student removed via socket (User side):", data);
+      if (Number(data.class_id) === Number(classId)) {
+        const currentUserId = getUserIdFromCookie();
+        if (String(data.user_id) === String(currentUserId)) {
+          // The current user was removed from class
+          message.warning({
+            content: "Bạn đã được quản trị viên mời ra khỏi lớp học này.",
+            key: "removed_from_class",
+            duration: 5,
+          });
+          router.push("/user/classes");
+          return;
+        }
+
+        setStudents((prev) => {
+          const newList = prev.filter((s) => String(s.userId) !== String(data.user_id));
+          // Use count from server if available, otherwise fallback to local list length
+          const newCount = data.student_count !== undefined ? data.student_count : newList.length;
+          setClassData((prevData) => (prevData ? { ...prevData, students: newCount } : prevData));
+          return newList;
+        });
+      }
+    });
+
+    // Listen for student status updated
+    const unsubscribeStatus = classSocketClient.on("student_status_updated", (data: any) => {
+      console.log("Student status updated via socket (User side):", data);
+      if (Number(data.class_id) === Number(classId)) {
+        const currentUserId = getUserIdFromCookie();
+        if (String(data.user_id) === String(currentUserId) && data.status === "banned") {
+          // The current user was banned from class
+          message.error({
+            content: "Tài khoản của bạn đã bị cấm khỏi lớp học này.",
+            key: "banned_from_class",
+            duration: 5,
+          });
+          router.push("/user/classes");
+          return;
+        }
+
+        if (data.status === "banned") {
+          setStudents((prev) => {
+            const newList = prev.filter((s) => String(s.userId) !== String(data.user_id));
+            // Use count from server if available, otherwise fallback to local list length
+            const newCount = data.student_count !== undefined ? data.student_count : newList.length;
+            setClassData((prevData) => (prevData ? { ...prevData, students: newCount } : prevData));
+            return newList;
+          });
+        } else {
+          // ...
+          setStudents((prev) => {
+            const index = prev.findIndex((s) => String(s.userId) === String(data.user_id));
+            if (index !== -1) {
+              const newList = [...prev];
+              newList[index] = {
+                ...newList[index],
+                status: data.status === "banned" ? "Bị cấm" : "Đang học",
+                apiStatus: data.status,
+              };
+              return newList;
+            }
+            return prev;
+          });
+        }
+      }
+    });
+
+    // Listen for class deleted
+    const unsubscribeDeleted = classSocketClient.on("class_deleted", (data: any) => {
+      console.log("Class deleted via socket (User side):", data);
+      if (Number(data.class_id) === Number(classId)) {
+        message.warning({
+          content: `Lớp học "${data.name}" đã bị giải tán bởi giáo viên.`,
+          key: "class_deleted",
+          duration: 5,
+        });
+        router.push("/user/classes");
+      }
+    });
+
+    return () => {
+      classSocketClient.leaveClass(classId);
+      unsubscribe();
+      unsubscribeJoined();
+      unsubscribeRemoved();
+      unsubscribeStatus();
+      unsubscribeDeleted();
+    };
+  }, [classId, message]);
+
   // Memoize classInfo object
   const classInfo = useMemo(() => {
     if (!classData) return null;
@@ -238,14 +374,6 @@ export default function UserClassDetail() {
     };
   }, [classData]);
 
-  // Memoize status tag render function
-  const renderStatusTag = useCallback((status: string) => {
-    let color = "default";
-    if (status === "Đang học") color = "green";
-    else if (status === "Tạm nghỉ") color = "orange";
-    else if (status === "Bị cấm") color = "red";
-    return <Tag color={color}>{status}</Tag>;
-  }, []);
 
   // Memoize student columns to prevent re-render
   const studentColumns: ColumnsType<StudentItem> = useMemo(
@@ -254,33 +382,26 @@ export default function UserClassDetail() {
         title: "Mã học sinh",
         dataIndex: "studentId",
         key: "studentId",
-        render: (text: string) => <span className="font-mono text-sm bg-gray-50 px-2 py-1 rounded">{text}</span>,
+        render: (text: string) => <span className="font-mono text-sm bg-gray-50 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded">{text}</span>,
       },
       {
         title: "Họ và tên",
         dataIndex: "name",
         key: "name",
-        render: (text: string) => <span className="font-semibold text-gray-800">{text}</span>,
+        render: (text: string) => <span className="font-semibold text-gray-800 dark:text-gray-100">{text}</span>,
       },
       {
         title: "Email",
         dataIndex: "email",
         key: "email",
       },
-      {
-        title: "Trạng thái",
-        dataIndex: "status",
-        key: "status",
-        render: renderStatusTag,
-      },
     ],
-    [renderStatusTag]
+    [],
   );
 
   const handleCopyCode = useCallback(() => {
     if (classData?.code) {
       navigator.clipboard.writeText(classData.code);
-      messageRef.current.success("Đã sao chép mã lớp học");
     }
   }, [classData?.code]);
 
@@ -317,7 +438,7 @@ export default function UserClassDetail() {
         <div className="absolute text-gray-600 mt-20">Đang tải thông tin lớp học...</div>
       </div>
     ),
-    []
+    [],
   );
 
   // Memoize not found component - System notification style
@@ -373,23 +494,23 @@ export default function UserClassDetail() {
         </div>
       </div>
     ),
-    [handleBack]
+    [handleBack],
   );
 
   // Memoize students table content
   const studentsTableContent = useMemo(
     () => (
-      <CustomCard title="Danh sách học sinh" bodyClassName="py-6">
+      <CustomCard title="Danh sách học sinh" bodyClassName="py-6" className="border border-gray-200 dark:!border-slate-600">
         <Table
           columns={studentColumns}
           dataSource={students}
           pagination={false}
-          rowClassName="hover:bg-gray-50 transition-colors"
+          rowClassName="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           loading={studentsLoading}
         />
       </CustomCard>
     ),
-    [students, studentsLoading, studentColumns]
+    [students, studentsLoading, studentColumns],
   );
 
   // Memoize tab items to prevent re-render
@@ -422,7 +543,7 @@ export default function UserClassDetail() {
             pageSize={notificationPageSize}
             onPageChange={handleNotificationPageChange}
             readOnly={true}
-          />
+          />,
         ),
       },
       {
@@ -442,7 +563,7 @@ export default function UserClassDetail() {
             pageSize={exercisePageSize}
             onPageChange={handleExercisePageChange}
             readOnly={true}
-          />
+          />,
         ),
       },
       {
@@ -462,7 +583,7 @@ export default function UserClassDetail() {
             pageSize={examPageSize}
             onPageChange={handleExamPageChange}
             readOnly={true}
-          />
+          />,
         ),
       },
     ],
@@ -485,7 +606,7 @@ export default function UserClassDetail() {
       handleExamSearchChange,
       handleExamPageChange,
       isTabLoading,
-    ]
+    ],
   );
 
   // Early returns after all hooks

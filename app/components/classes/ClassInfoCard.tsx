@@ -28,14 +28,12 @@ interface ClassInfoCardProps {
 }
 
 function ClassInfoCard({ classInfo, onCopyCode }: ClassInfoCardProps) {
-  const { message } = App.useApp();
 
   const handleCopyCode = () => {
     if (onCopyCode) {
       onCopyCode();
     } else {
       navigator.clipboard.writeText(classInfo.code);
-      message.success("Đã sao chép mã lớp học");
     }
   };
 
@@ -51,33 +49,25 @@ function ClassInfoCard({ classInfo, onCopyCode }: ClassInfoCardProps) {
     >
       <Descriptions column={2} bordered>
         <Descriptions.Item label="Tên lớp" span={1}>
-          <span className="font-semibold text-gray-800">{classInfo.name}</span>
+          <span className="font-semibold text-gray-800 dark:text-gray-100">{classInfo.name}</span>
         </Descriptions.Item>
         <Descriptions.Item label="Mã lớp" span={1}>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-sm bg-gray-50 px-2 py-1 rounded">{classInfo.code}</span>
+            <span className="font-mono text-sm bg-gray-50 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded">{classInfo.code}</span>
             <Button
               type="text"
               size="small"
               icon={<CopyOutlined />}
               onClick={handleCopyCode}
-              className="text-gray-500 hover:text-blue-500"
+              className="text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"
             />
           </div>
         </Descriptions.Item>
         <Descriptions.Item label="Số lượng học sinh" span={1}>
           <span className="flex items-center gap-2">
             <UserOutlined className="text-blue-500" />
-            <span className="font-medium">{classInfo.students} học sinh</span>
+            <span className="font-medium dark:text-gray-200">{classInfo.students} học sinh</span>
           </span>
-        </Descriptions.Item>
-        <Descriptions.Item label="Trạng thái" span={1}>
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${classInfo.status === "Đang hoạt động" ? "bg-green-500" : "bg-orange-500"}`} />
-            <Tag color={classInfo.status === "Đang hoạt động" ? "green" : "orange"} className="px-2 py-1 border-0">
-              {classInfo.status}
-            </Tag>
-          </div>
         </Descriptions.Item>
         {classInfo.creator && (
           <Descriptions.Item label="Giáo viên chủ nhiệm" span={2}>
@@ -91,8 +81,8 @@ function ClassInfoCard({ classInfo, onCopyCode }: ClassInfoCardProps) {
                 {classInfo.creator.fullname?.charAt(0) || "GV"}
               </Avatar>
               <div className="flex flex-col">
-                <span className="font-semibold text-gray-800">{classInfo.creator.fullname}</span>
-                <span className="text-sm text-gray-500">email: {classInfo.creator.email}</span>
+                <span className="font-semibold text-gray-800 dark:text-gray-100">{classInfo.creator.fullname}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">email: {classInfo.creator.email}</span>
               </div>
             </div>
           </Descriptions.Item>

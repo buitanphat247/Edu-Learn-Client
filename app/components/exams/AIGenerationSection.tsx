@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Form, 
   Input, 
@@ -16,16 +16,10 @@ import {
   Card,
   Typography
 } from "antd";
-import { 
-  RobotOutlined, 
-  SettingOutlined, 
-  FileTextOutlined,
-  ThunderboltFilled,
-  LoadingOutlined,
-  ExperimentOutlined
-} from "@ant-design/icons";
+import { RobotOutlined, SettingOutlined, FileTextOutlined, ThunderboltFilled, LoadingOutlined, ExperimentOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
+import { getCurrentUser } from "@/lib/api/users";
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -33,14 +27,22 @@ const { TextArea } = Input;
 
 interface AIGenerationSectionProps {
   uploadedFile: any;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
-export default function AIGenerationSection({ uploadedFile }: AIGenerationSectionProps) {
+export default function AIGenerationSection({ uploadedFile, onLoadingChange }: AIGenerationSectionProps) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const params = useParams();
   const router = useRouter();
   const classId = params?.id as string;
+  const currentUser = getCurrentUser();
+
+  useEffect(() => {
+    if (onLoadingChange) {
+      onLoadingChange(loading);
+    }
+  }, [loading, onLoadingChange]);
 
   const generateAutoTitle = () => {
     const now = new Date();
@@ -88,6 +90,11 @@ export default function AIGenerationSection({ uploadedFile }: AIGenerationSectio
       // Class ID
       if (classId) {
         formData.append("class_id", classId);
+      }
+
+      // Teacher ID - Required by backend
+      if (currentUser?.user_id) {
+        formData.append("teacher_id", currentUser.user_id.toString());
       }
       
       // Các cấu hình khác (duration_minutes, total_score, max_attempts, difficulty) 
@@ -175,6 +182,7 @@ export default function AIGenerationSection({ uploadedFile }: AIGenerationSectio
           <TextArea 
             placeholder="Nhập nội dung tóm tắt hoặc yêu cầu cụ thể cho AI (Ví dụ: Hãy tập trung vào chương 2 - Kim loại kiềm)... Hoặc upload file tài liệu ở tab 'Tải file thủ công'" 
             rows={4}
+            disabled={loading}
             className="rounded-lg border-gray-200 hover:border-blue-400 focus:border-blue-500"
           />
         </Form.Item>
@@ -186,7 +194,7 @@ export default function AIGenerationSection({ uploadedFile }: AIGenerationSectio
           </div>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-x-6 gap-y-0">
             <Form.Item name="num_questions" label={<span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Số lượng câu hỏi</span>}>
-              <InputNumber min={1} max={30} className="w-full rounded-lg h-10 flex items-center" />
+              <InputNumber min={1} max={30} disabled={loading} className="w-full rounded-lg h-10 flex items-center" />
             </Form.Item>
           </div>
 
@@ -210,16 +218,6 @@ export default function AIGenerationSection({ uploadedFile }: AIGenerationSectio
             {loading ? "AI ĐANG TẠO CÂU HỎI..." : "BẮT ĐẦU TẠO ĐỀ THI BẰNG AI"}
           </Button>
         </div>
-
-        {loading && (
-          <div className="mt-4 p-4 bg-blue-50/50 rounded-xl flex items-center gap-3 animate-pulse border border-blue-100">
-            <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
-            <div>
-              <div className="text-blue-700 font-semibold text-sm">AI Agent đang đọc tài liệu...</div>
-              <div className="text-blue-500 text-xs">Quá trình này có thể mất 30-60 giây tùy độ dài tài liệu.</div>
-            </div>
-          </div>
-        )}
       </Form>
     </div>
   );

@@ -19,7 +19,7 @@ export default function UserExercisesTable({ data }: UserExercisesTableProps) {
       dataIndex: "name",
       key: "name",
       render: (text: string) => (
-        <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200">
+        <span className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
           {text}
         </span>
       ),
@@ -29,20 +29,20 @@ export default function UserExercisesTable({ data }: UserExercisesTableProps) {
       dataIndex: "subject",
       key: "subject",
       render: (subject: string) => (
-        <span className="text-gray-700 font-medium">{subject}</span>
+        <span className="text-gray-700 dark:text-gray-300 font-medium">{subject}</span>
       ),
     },
     {
       title: "Ngày giao",
       dataIndex: "date",
       key: "date",
-      render: (date: string) => <span className="text-gray-600">{date}</span>,
+      render: (date: string) => <span className="text-gray-600 dark:text-gray-400">{date}</span>,
     },
     {
       title: "Hạn nộp",
       dataIndex: "deadline",
       key: "deadline",
-      render: (deadline: string) => <span className="text-gray-600 font-medium">{deadline}</span>,
+      render: (deadline: string) => <span className="text-gray-600 dark:text-gray-400 font-medium">{deadline}</span>,
     },
     {
       title: "Trạng thái",
@@ -65,7 +65,7 @@ export default function UserExercisesTable({ data }: UserExercisesTableProps) {
         <Button
           icon={<EyeOutlined />}
           size="small"
-          className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
+          className="hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200"
           onClick={(e) => {
             e.stopPropagation();
             router.push(`/user/exercises/${record.key}`);
@@ -90,7 +90,7 @@ export default function UserExercisesTable({ data }: UserExercisesTableProps) {
           size: "small",
         }}
         className="news-table"
-        rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+        rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20 transition-all duration-200 cursor-pointer border-b border-gray-100 dark:border-gray-800"
         size="small"
         style={{
           padding: "0",

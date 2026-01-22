@@ -140,7 +140,7 @@ export default function AdminStudents() {
           const pageSize = pagination.pageSize;
           const stt = (currentPage - 1) * pageSize + index + 1;
           return (
-            <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">
+            <span className="text-gray-600 dark:text-gray-300 font-mono text-sm bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
               {stt}
             </span>
           );
@@ -151,7 +151,7 @@ export default function AdminStudents() {
         dataIndex: "name",
         key: "name",
         render: (text: string) => (
-          <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200">
+          <span className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
             {text}
           </span>
         ),
@@ -161,7 +161,7 @@ export default function AdminStudents() {
         dataIndex: "studentId",
         key: "studentId",
         render: (id: string) => (
-          <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">
+          <span className="text-gray-600 dark:text-gray-300 font-mono text-sm bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
             {id}
           </span>
         ),
@@ -170,13 +170,13 @@ export default function AdminStudents() {
         title: "Email",
         dataIndex: "email",
         key: "email",
-        render: (email: string) => <span className="text-gray-600">{email}</span>,
+        render: (email: string) => <span className="text-gray-600 dark:text-gray-400">{email}</span>,
       },
       {
         title: "Số điện thoại",
         dataIndex: "phone",
         key: "phone",
-        render: (phone: string) => <span className="text-gray-600">{phone || "N/A"}</span>,
+        render: (phone: string) => <span className="text-gray-600 dark:text-gray-400">{phone || "N/A"}</span>,
       },
       {
         title: "Hành động",
@@ -187,7 +187,7 @@ export default function AdminStudents() {
             <Button
               icon={<EyeOutlined />}
               size="small"
-              className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200 cursor-pointer"
+              className="hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 handleViewStudent(record);
@@ -211,7 +211,7 @@ export default function AdminStudents() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           allowClear
-          className="flex-1 min-w-[200px]"
+          className="flex-1 min-w-[200px] dark:bg-gray-800 dark:border-slate-600 dark:text-white dark:placeholder-gray-500"
           size="middle"
           autoComplete="off"
           autoCorrect="off"
@@ -220,7 +220,7 @@ export default function AdminStudents() {
         />
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-none dark:shadow-sm">
         <Spin spinning={loading}>
           <Table
             columns={columns}
@@ -229,14 +229,14 @@ export default function AdminStudents() {
               current: pagination.current,
               pageSize: pagination.pageSize,
               total: pagination.total,
-              showSizeChanger: true,
-              showTotal: (total) => `Tổng ${total} học sinh`,
-              pageSizeOptions: ["10", "20", "50"],
+              showSizeChanger: false,
+              showTotal: (total) => <span className="text-gray-500 dark:text-gray-400">Tổng {total} học sinh</span>,
+              // pageSizeOptions: ["10", "20", "50"],
               size: "small",
               onChange: handleTableChange,
             }}
-            className="news-table"
-            rowClassName="group hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+            className="[&_.ant-pagination]:px-6 [&_.ant-pagination]:pb-4"
+            rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20 transition-all duration-200 cursor-pointer border-b border-gray-100 dark:border-gray-800"
             size="small"
             onRow={(record) => ({
               onClick: () => {

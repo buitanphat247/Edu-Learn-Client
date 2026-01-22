@@ -23,31 +23,19 @@ function ClassStudentsTable({ students, onViewStudent, onRemoveStudent, onViewBa
       title: "Mã học sinh",
       dataIndex: "studentId",
       key: "studentId",
-      render: (text: string) => <span className="font-mono text-sm bg-gray-50 px-2 py-1 rounded">{text}</span>,
+      render: (text: string) => <span className="font-mono text-sm bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">{text}</span>,
     },
     {
       title: "Họ và tên",
       dataIndex: "name",
       key: "name",
-      render: (text: string) => <span className="font-semibold text-gray-800">{text}</span>,
+      render: (text: string) => <span className="font-semibold text-gray-800 dark:text-gray-100">{text}</span>,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => {
-        let color = "default";
-        if (status === "Đang học") color = "green";
-        else if (status === "Tạm nghỉ") color = "orange";
-        else if (status === "Bị cấm") color = "red";
-        
-        return <Tag color={color}>{status}</Tag>;
-      },
+      render: (text: string) => <span className="text-gray-600 dark:text-gray-400">{text}</span>,
     },
     {
       title: "Hành động",
@@ -105,7 +93,7 @@ function ClassStudentsTable({ students, onViewStudent, onRemoveStudent, onViewBa
               icon={<StopOutlined />}
               size="middle"
               danger
-              className="bg-white border-red-300 hover:bg-red-50 shadow-sm"
+              className="bg-white dark:bg-transparent border-red-300 dark:border-red-700 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 shadow-sm"
               onClick={onViewBannedList}
             >
               Danh sách cấm
@@ -114,7 +102,7 @@ function ClassStudentsTable({ students, onViewStudent, onRemoveStudent, onViewBa
         </Space>
       }
     >
-      <Table columns={studentColumns} dataSource={students} pagination={false} rowClassName="hover:bg-gray-50 transition-colors" />
+      <Table columns={studentColumns} dataSource={students} pagination={false} rowClassName="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-100 dark:border-gray-800" />
     </CustomCard>
   );
 }

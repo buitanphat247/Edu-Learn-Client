@@ -8,6 +8,8 @@ import { getClassStudentsByUser, joinClassByCode, type ClassStudentRecord } from
 import { getCurrentUser } from "@/lib/api/users";
 import ClassesHeader from "@/app/components/classes/ClassesHeader";
 import type { ColumnsType } from "antd/es/table";
+import { classSocketClient } from "@/lib/socket/class-client";
+import { getUserIdFromCookie } from "@/lib/utils/cookies";
 
 interface ClassTableItem {
   key: string;
@@ -99,6 +101,121 @@ export default function UserClasses() {
     fetchClasses();
   }, [fetchClasses]);
 
+  // Real-time updates via Socket.io
+  useEffect(() => {
+    if (classes.length === 0) return;
+
+    // Connect to socket
+    classSocketClient.connect();
+
+    // Lấy danh sách ID hiện tại
+    const currentClassIds = classes.map((c) => c.classId);
+
+    // Join all class rooms for this user
+    currentClassIds.forEach((id) => {
+      classSocketClient.joinClass(id);
+    });
+
+    // Listen for updates
+    const unsubscribe = classSocketClient.on("class_updated", (data: any) => {
+      setClasses((prev) => {
+        const index = prev.findIndex((c) => Number(c.classId) === Number(data.class_id));
+        if (index === -1) return prev;
+
+        const updatedList = [...prev];
+        updatedList[index] = {
+          ...updatedList[index],
+          name: data.name,
+          code: data.code,
+          status: data.status === "active" ? "Đang hoạt động" : "Không hoạt động",
+        };
+
+        return updatedList;
+      });
+    });
+
+    // Listen for student joined (to update count)
+    const unsubscribeJoined = classSocketClient.on("student_joined", (data: any) => {
+      setClasses((prev) => {
+        const index = prev.findIndex((c) => Number(c.classId) === Number(data.class_id));
+        if (index === -1) return prev;
+
+        const updatedList = [...prev];
+        updatedList[index] = {
+          ...updatedList[index],
+          students: updatedList[index].students + 1,
+        };
+        return updatedList;
+      });
+    });
+
+    // Listen for student removed
+    const unsubscribeRemoved = classSocketClient.on("student_removed", (data: any) => {
+      const currentUserId = getUserIdFromCookie();
+      
+      if (Number(data.user_id) === Number(currentUserId)) {
+        // Current user was removed, remove class from list
+        setClasses((prev) => prev.filter((c) => Number(c.classId) !== Number(data.class_id)));
+        message.warning(`Bạn đã được mời khỏi lớp học`);
+      } else {
+        // Other student removed, update count
+        setClasses((prev) => {
+          const index = prev.findIndex((c) => Number(c.classId) === Number(data.class_id));
+          if (index === -1) return prev;
+
+          const updatedList = [...prev];
+          updatedList[index] = {
+            ...updatedList[index],
+            students: Math.max(0, updatedList[index].students - 1),
+          };
+          return updatedList;
+        });
+      }
+    });
+
+    // Listen for student status updated (banned)
+    const unsubscribeStatus = classSocketClient.on("student_status_updated", (data: any) => {
+      const currentUserId = getUserIdFromCookie();
+
+      if (Number(data.user_id) === Number(currentUserId) && data.status === "banned") {
+        // Current user was banned, remove class from list
+        setClasses((prev) => prev.filter((c) => Number(c.classId) !== Number(data.class_id)));
+        message.error(`Tài khoản của bạn đã bị chặn khỏi lớp học`);
+      } else if (data.status === "banned") {
+        // Other student banned, update count
+        setClasses((prev) => {
+          const index = prev.findIndex((c) => Number(c.classId) === Number(data.class_id));
+          if (index === -1) return prev;
+
+          const updatedList = [...prev];
+          updatedList[index] = {
+            ...updatedList[index],
+            students: Math.max(0, updatedList[index].students - 1),
+          };
+          return updatedList;
+        });
+      }
+    });
+
+    // Listen for class deleted
+    const unsubscribeDeleted = classSocketClient.on("class_deleted", (data: any) => {
+      setClasses((prev) => prev.filter((c) => Number(c.classId) !== Number(data.class_id)));
+      message.info(`Lớp học "${data.name}" đã bị giải tán bởi giáo viên`);
+    });
+
+    return () => {
+      currentClassIds.forEach((id) => {
+        classSocketClient.leaveClass(id);
+      });
+      unsubscribe();
+      unsubscribeJoined();
+      unsubscribeRemoved();
+      unsubscribeStatus();
+      unsubscribeDeleted();
+    };
+    // Re-run khi tập hợp các ID lớp thay đổi (ví dụ khi chuyển trang)
+  }, [JSON.stringify(classes.map((c) => c.classId)), message]);
+
   const handleTableChange = (page: number, pageSize: number) => {
     setPagination((prev) => ({ ...prev, current: page, pageSize }));
   };
@@ -137,33 +254,23 @@ export default function UserClasses() {
       title: "Tên lớp",
       dataIndex: "name",
       key: "name",
-      render: (text: string) => <span className="font-semibold text-gray-800">{text}</span>,
+      render: (text: string) => <span className="font-semibold text-gray-800 dark:text-gray-200">{text}</span>,
     },
     {
       title: "Mã lớp",
       dataIndex: "code",
       key: "code",
-      render: (code: string) => <span className="text-gray-600 font-mono text-sm bg-gray-50 px-2 py-1 rounded">{code}</span>,
+      render: (code: string) => <span className="text-gray-600 dark:text-gray-400 font-mono text-sm bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">{code}</span>,
     },
     {
       title: "Số học sinh",
       dataIndex: "students",
       key: "students",
       render: (count: number) => (
-        <span className="flex items-center gap-1.5 text-gray-700">
+        <span className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
           <UserOutlined className="text-blue-500" />
           <span className="font-medium">{count}</span>
         </span>
-      ),
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => (
-        <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color={status === "Đang hoạt động" ? "green" : "orange"}>
-          {status}
-        </Tag>
       ),
     },
     {
@@ -171,7 +278,7 @@ export default function UserClasses() {
       key: "action",
       width: 120,
       render: (_: any, record: ClassTableItem) => (
-        <Button icon={<EyeOutlined />} size="small" onClick={() => handleView(record.classId)}>
+        <Button icon={<EyeOutlined />} size="small" type="primary" ghost onClick={() => handleView(record.classId)}>
           Xem
         </Button>
       ),
@@ -183,7 +290,7 @@ export default function UserClasses() {
       <ClassesHeader searchValue={searchQuery} onSearchChange={setSearchQuery} onJoinClick={() => setIsJoinModalOpen(true)} />
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-none dark:shadow-sm">
         <Table
           columns={columns}
           dataSource={classes}
@@ -194,12 +301,12 @@ export default function UserClasses() {
             total: pagination.total,
             onChange: handleTableChange,
             showSizeChanger: false,
-            showTotal: (total) => `Tổng ${total} lớp học`,
+            showTotal: (total) => <span className="text-gray-500 dark:text-gray-400">Tổng {total} lớp học</span>,
           }}
           scroll={{ x: "max-content" }}
-          className="news-table"
-          rowClassName="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 cursor-pointer border-b border-gray-100"
-          size="small"
+          className="[&_.ant-pagination]:px-6 [&_.ant-pagination]:pb-4"
+          rowClassName="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer border-b border-gray-100 dark:border-gray-800"
+          size="middle"
         />
       </div>
 
@@ -237,7 +344,7 @@ export default function UserClasses() {
                 prefix={<KeyOutlined className="text-gray-400" />}
                 placeholder="Nhập mã code tại đây..."
                 size="large"
-                className="rounded-lg"
+                className="rounded-lg dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
                 autoFocus
               />
             </Form.Item>

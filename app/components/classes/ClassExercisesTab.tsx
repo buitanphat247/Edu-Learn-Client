@@ -387,11 +387,11 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
             onSearchChange(e.target.value);
             onPageChange(1);
           }}
-          className="flex-1"
+          className="flex-1 dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
           allowClear
         />
         {!readOnly && (
-          <Button size="middle" icon={<PlusOutlined />} onClick={handleCreateExercise} className="bg-blue-600 hover:bg-blue-700">
+          <Button size="middle" icon={<PlusOutlined />} onClick={handleCreateExercise} className="bg-blue-600 hover:bg-blue-700 border-none">
             Tạo bài tập mới
           </Button>
         )}
@@ -403,7 +403,7 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
           currentExercises.map((exercise) => (
             <div
               key={exercise.id}
-              className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer relative ${
+              className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:!border-slate-600 p-6 hover:shadow-lg transition-all cursor-pointer relative ${
                 deletingId === exercise.id ? "opacity-50 pointer-events-none" : ""
               }`}
               onClick={(e) => handleCardClick(exercise, e)}
@@ -430,7 +430,7 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
                         }}
                         trigger={["click"]}
                       >
-                        <Button type="text" icon={<MoreOutlined />} className="shrink-0 text-gray-500 hover:text-gray-700" />
+                        <Button type="text" icon={<MoreOutlined />} className="shrink-0 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" />
                       </Dropdown>
                     </div>
                   )}
@@ -438,16 +438,16 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
 
                 {/* Content */}
                 <div className="flex-1 space-y-3">
-                  <h3 className="font-semibold text-gray-800 text-lg line-clamp-2 leading-tight">{exercise.title}</h3>
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-lg line-clamp-2 leading-tight">{exercise.title}</h3>
                   
                   {/* Class Info */}
                   {(exercise.className || exercise.classCode) && (
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      {exercise.className && <span className="font-medium text-gray-600">{exercise.className}</span>}
+                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                      {exercise.className && <span className="font-medium text-gray-600 dark:text-gray-300">{exercise.className}</span>}
                       {exercise.classCode && (
                         <>
                           {exercise.className && <span>•</span>}
-                          <span className="text-gray-500">Mã: {exercise.classCode}</span>
+                          <span className="text-gray-500 dark:text-gray-400">Mã: {exercise.classCode}</span>
                         </>
                       )}
                     </div>
@@ -456,14 +456,14 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
                   {/* Creator */}
                   {exercise.creatorName && (
                     <div className="text-xs text-gray-500">
-                      Người tạo: <span className="text-gray-700 font-medium">{exercise.creatorName}</span>
+                      Người tạo: <span className="text-gray-700 dark:text-gray-300 font-medium">{exercise.creatorName}</span>
                     </div>
                   )}
 
                   {/* Due Date */}
-                  <div className="text-sm text-gray-600">
-                    Hạn nộp: <span className="text-gray-800 font-semibold">{exercise.dueDate}</span>
-                    {exercise.dueTime && <span className="text-gray-800 font-semibold"> - {exercise.dueTime}</span>}
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Hạn nộp: <span className="text-gray-800 dark:text-gray-200 font-semibold">{exercise.dueDate}</span>
+                    {exercise.dueTime && <span className="text-gray-800 dark:text-gray-200 font-semibold"> - {exercise.dueTime}</span>}
                   </div>
 
                
@@ -485,7 +485,7 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
       {/* Pagination */}
       {total > pageSize && (
         <div className="flex items-center justify-between pt-4">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             Hiển thị {(currentPage - 1) * pageSize + 1} đến {Math.min(currentPage * pageSize, total)} của {total} kết quả
           </div>
           <Pagination current={currentPage} total={total} pageSize={pageSize} onChange={onPageChange} showSizeChanger={false} />
@@ -499,7 +499,7 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
             <div className="bg-blue-500 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm">
               <IoBookOutline className="text-white text-xl" />
             </div>
-            <span className="text-lg font-semibold text-gray-800">Chi tiết bài tập</span>
+            <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">Chi tiết bài tập</span>
           </div>
         }
         open={isDetailModalOpen}
@@ -528,11 +528,11 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
               </div>
 
               {/* Due Date */}
-              <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                <CalendarOutlined className="text-blue-500 text-lg mt-0.5" />
+              <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-100 dark:!border-slate-600">
+                <CalendarOutlined className="text-blue-500 dark:text-blue-400 text-lg mt-0.5" />
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Hạn nộp</div>
-                  <div className="text-sm font-medium text-gray-800">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Hạn nộp</div>
+                  <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
                     {selectedExercise.dueDate}
                     {selectedExercise.dueTime && ` - ${selectedExercise.dueTime}`}
                   </div>
@@ -542,9 +542,9 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
               {/* Description */}
               {selectedAssignment?.description && (
                 <div>
-                  <div className="text-sm font-semibold text-gray-600 mb-2">Mô tả</div>
+                  <div className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2">Mô tả</div>
                   <div
-                    className="p-4 bg-gray-50 rounded-lg border border-gray-200 prose prose-sm max-w-none text-gray-700 max-h-56 overflow-y-auto"
+                    className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:!border-slate-600 prose prose-sm max-w-none text-gray-700 dark:text-gray-200 max-h-56 overflow-y-auto"
                     dangerouslySetInnerHTML={{ __html: selectedAssignment.description }}
                   />
                 </div>
@@ -553,17 +553,17 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
               {/* Attachments List */}
               {selectedAssignment?.attachments && selectedAssignment.attachments.length > 0 && (
                 <div>
-                  <div className="text-sm font-semibold text-gray-600 mb-2">File đính kèm ({selectedAssignment.attachments.length})</div>
+                  <div className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2">File đính kèm ({selectedAssignment.attachments.length})</div>
                   <div className="space-y-2">
                     {selectedAssignment.attachments.map((attachment) => (
                       <div
                         key={String(attachment.attachment_id)}
-                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                        className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:!border-slate-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                       >
-                        <FileOutlined className="text-blue-500 text-lg" />
+                        <FileOutlined className="text-blue-500 dark:text-blue-400 text-lg" />
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-gray-800 truncate">{attachment.file_name}</div>
-                          <div className="text-xs text-gray-500">{(Number(attachment.file_size) / 1024 / 1024).toFixed(2)} MB</div>
+                          <div className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{attachment.file_name}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{(Number(attachment.file_size) / 1024 / 1024).toFixed(2)} MB</div>
                         </div>
                       </div>
                     ))}
@@ -572,12 +572,12 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
               )}
 
               {/* Action Button */}
-              <div className="pt-4 border-t border-gray-200">
+              <div className="pt-4 border-t border-gray-200 dark:!border-slate-600">
                 <Button
                   type="primary"
                   icon={<FileOutlined />}
                   onClick={handleDownloadFiles}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-blue-600 hover:bg-blue-700 border-none"
                   size="large"
                   disabled={!selectedAssignment?.attachments || selectedAssignment.attachments.length === 0}
                 >

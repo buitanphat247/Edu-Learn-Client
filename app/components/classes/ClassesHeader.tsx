@@ -17,9 +17,9 @@ export default function ClassesHeader({ searchValue, onSearchChange, onAddClick,
       <div className="flex flex-wrap gap-3 items-center">
         <Input
           prefix={<SearchOutlined className="text-gray-400" />}
-          placeholder="Tìm kiếm lớp học... (Ctrl+K)"
+          placeholder="Tìm kiếm lớp học hoặc mã code... (Ctrl+K)"
           size="middle"
-          className="flex-1 min-w-[200px]"
+          className="flex-1 min-w-[200px] dark:bg-gray-700/50 dark:!border-slate-600 dark:text-white dark:placeholder-gray-500 hover:dark:!border-slate-500 focus:dark:!border-blue-500"
           value={searchValue}
           onChange={(e) => onSearchChange?.(e.target.value)}
           allowClear
@@ -31,10 +31,10 @@ export default function ClassesHeader({ searchValue, onSearchChange, onAddClick,
         )}
         {onAddClick && (
           <Button
-            type="default"
+            type="primary"
             icon={<PlusOutlined />}
             size="middle"
-            className="bg-white border-gray-300 hover:bg-gray-50 shadow-sm"
+            className="shadow-sm"
             onClick={onAddClick}
           >
             Thêm lớp học

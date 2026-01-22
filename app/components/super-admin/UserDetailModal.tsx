@@ -85,23 +85,20 @@ export default function UserDetailModal({ open, onCancel, userDetail, loading = 
             bordered
             size="middle"
             labelStyle={{
-              backgroundColor: "#f5f5f5",
               fontWeight: 600,
               width: "180px",
             }}
-            contentStyle={{
-              backgroundColor: "#fff",
-            }}
+            className="dark-descriptions"
           >
             <Descriptions.Item
               label={
                 <span className="flex items-center gap-2">
                   <IdcardOutlined className="text-blue-500" />
-                  <span>User ID</span>
+                  <span className="dark:text-gray-200">User ID</span>
                 </span>
               }
             >
-              <Text strong className="text-gray-700">
+              <Text strong className="text-gray-700 dark:text-gray-300">
                 {userDetail.user_id}
               </Text>
             </Descriptions.Item>
@@ -110,51 +107,51 @@ export default function UserDetailModal({ open, onCancel, userDetail, loading = 
               label={
                 <span className="flex items-center gap-2">
                   <UserOutlined className="text-blue-500" />
-                  <span>Username</span>
+                  <span className="dark:text-gray-200">Username</span>
                 </span>
               }
             >
-              <Text className="text-gray-700">{userDetail.username}</Text>
+              <Text className="text-gray-700 dark:text-gray-300">{userDetail.username}</Text>
             </Descriptions.Item>
 
             <Descriptions.Item
               label={
                 <span className="flex items-center gap-2">
                   <UserOutlined className="text-blue-500" />
-                  <span>Họ và tên</span>
+                  <span className="dark:text-gray-200">Họ và tên</span>
                 </span>
               }
             >
-              <Text className="text-gray-700">{userDetail.fullname}</Text>
+              <Text className="text-gray-700 dark:text-gray-300">{userDetail.fullname}</Text>
             </Descriptions.Item>
 
             <Descriptions.Item
               label={
                 <span className="flex items-center gap-2">
                   <MailOutlined className="text-blue-500" />
-                  <span>Email</span>
+                  <span className="dark:text-gray-200">Email</span>
                 </span>
               }
             >
-              <Text className="text-gray-700">{userDetail.email}</Text>
+              <Text className="text-gray-700 dark:text-gray-300">{userDetail.email}</Text>
             </Descriptions.Item>
 
             <Descriptions.Item
               label={
                 <span className="flex items-center gap-2">
                   <PhoneOutlined className="text-blue-500" />
-                  <span>Số điện thoại</span>
+                  <span className="dark:text-gray-200">Số điện thoại</span>
                 </span>
               }
             >
-              <Text className="text-gray-700">{userDetail.phone || "-"}</Text>
+              <Text className="text-gray-700 dark:text-gray-300">{userDetail.phone || "-"}</Text>
             </Descriptions.Item>
 
             <Descriptions.Item
               label={
                 <span className="flex items-center gap-2">
                   <IdcardOutlined className="text-blue-500" />
-                  <span>Vai trò</span>
+                  <span className="dark:text-gray-200">Vai trò</span>
                 </span>
               }
             >
@@ -162,7 +159,7 @@ export default function UserDetailModal({ open, onCancel, userDetail, loading = 
                 <Tag color={roleInfo.color} className="px-2 py-1">
                   {userDetail.role?.role_name}
                 </Tag>
-                <Text type="secondary" className="text-sm">
+                <Text type="secondary" className="text-sm dark:text-gray-400">
                   (Role ID: {userDetail.role_id || userDetail.role?.role_id || "N/A"})
                 </Text>
               </div>
@@ -172,22 +169,22 @@ export default function UserDetailModal({ open, onCancel, userDetail, loading = 
               label={
                 <span className="flex items-center gap-2">
                   <CalendarOutlined className="text-blue-500" />
-                  <span>Ngày tạo</span>
+                  <span className="dark:text-gray-200">Ngày tạo</span>
                 </span>
               }
             >
-              <Text className="text-gray-700">{formatDateTime(userDetail.created_at)}</Text>
+              <Text className="text-gray-700 dark:text-gray-300">{formatDateTime(userDetail.created_at)}</Text>
             </Descriptions.Item>
 
             <Descriptions.Item
               label={
                 <span className="flex items-center gap-2">
                   <CalendarOutlined className="text-blue-500" />
-                  <span>Ngày cập nhật</span>
+                  <span className="dark:text-gray-200">Ngày cập nhật</span>
                 </span>
               }
             >
-              <Text className="text-gray-700">{formatDateTime(userDetail.updated_at)}</Text>
+              <Text className="text-gray-700 dark:text-gray-300">{formatDateTime(userDetail.updated_at)}</Text>
             </Descriptions.Item>
           </Descriptions>
         </div>

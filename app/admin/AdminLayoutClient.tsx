@@ -83,7 +83,7 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
   const displayName = useMemo(() => userInfo?.username || initialUserData?.username || "Admin", [userInfo?.username, initialUserData?.username]);
   const displayRole = useMemo(
     () => userInfo?.role?.role_name || initialUserData?.role_name || "Giáo viên",
-    [userInfo?.role?.role_name, initialUserData?.role_name]
+    [userInfo?.role?.role_name, initialUserData?.role_name],
   );
 
   // Memoize initials for avatar
@@ -107,11 +107,7 @@ function AdminHeader({ initialUserData }: { initialUserData: InitialUserData | n
             onClick={toggleTheme}
             className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-yellow-500 dark:hover:text-white transition-all duration-300"
           >
-            {theme === "dark" ? (
-              <SunOutlined className="text-xl text-yellow-400" />
-            ) : (
-              <MoonOutlined className="text-xl" />
-            )}
+            {theme === "dark" ? <SunOutlined className="text-xl text-yellow-400" /> : <MoonOutlined className="text-xl" />}
           </button>
           <div
             onClick={() => setIsProfileModalOpen(true)}

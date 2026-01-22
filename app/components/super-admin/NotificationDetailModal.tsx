@@ -73,20 +73,20 @@ export default function NotificationDetailModal({ open, notificationId, onCancel
         {notification && (
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-semibold text-gray-600">Tiêu đề</label>
-              <div className="mt-1 text-base font-semibold text-gray-800">{notification.title}</div>
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">Tiêu đề</label>
+              <div className="mt-1 text-base font-semibold text-gray-800 dark:text-gray-100">{notification.title}</div>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-gray-600">Nội dung</label>
-              <div className="mt-1 p-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-700 whitespace-pre-wrap">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">Nội dung</label>
+              <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                 {notification.message}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-gray-600">Phạm vi</label>
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">Phạm vi</label>
                 <div className="mt-1">
                   <Tag className="px-2 py-0.5 rounded-md font-semibold text-xs" color={getScopeInfo(notification.scope).color}>
                     {getScopeInfo(notification.scope).text}
@@ -96,30 +96,30 @@ export default function NotificationDetailModal({ open, notificationId, onCancel
 
               {notification.scope_id && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                     {notification.scope === "user" ? "Mã người dùng" : "Mã lớp"}
                   </label>
-                  <div className="mt-1 text-gray-700">{notification.scope_id}</div>
+                  <div className="mt-1 text-gray-700 dark:text-gray-300">{notification.scope_id}</div>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-200 dark:border-gray-700">
               <div>
-                <label className="text-sm font-semibold text-gray-600 flex items-center gap-1">
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 flex items-center gap-1">
                   <ClockCircleOutlined />
                   Ngày tạo
                 </label>
-                <div className="mt-1 text-gray-700">{formatDate(notification.created_at)}</div>
+                <div className="mt-1 text-gray-700 dark:text-gray-300">{formatDate(notification.created_at)}</div>
               </div>
 
               {notification.updated_at && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 flex items-center gap-1">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 flex items-center gap-1">
                     <ClockCircleOutlined />
                     Ngày cập nhật
                   </label>
-                  <div className="mt-1 text-gray-700">{formatDate(notification.updated_at)}</div>
+                  <div className="mt-1 text-gray-700 dark:text-gray-300">{formatDate(notification.updated_at)}</div>
                 </div>
               )}
             </div>

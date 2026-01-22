@@ -135,33 +135,33 @@ function UserHeader({ initialUserData }: { initialUserData: InitialUserData | nu
                   {getInitials(userInfo.fullname || userInfo.username || "A")}
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">{userInfo.fullname || userInfo.username}</h3>
-                  <p className="text-gray-600">{userInfo.role?.role_name || "Học sinh"}</p>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">{userInfo.fullname || userInfo.username}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">{userInfo.role?.role_name || "Học sinh"}</p>
                 </div>
               </div>
-              <div className="border-t border-gray-200 pt-4 space-y-3">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
                 <div>
-                  <span className="text-sm text-gray-500">Tên đăng nhập:</span>
-                  <p className="text-gray-800 font-medium">{userInfo.username || "Chưa cập nhật"}</p>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Tên đăng nhập:</span>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">{userInfo.username || "Chưa cập nhật"}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Email:</span>
-                  <p className="text-gray-800 font-medium">{userInfo.email || "Chưa cập nhật"}</p>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Email:</span>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">{userInfo.email || "Chưa cập nhật"}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Số điện thoại:</span>
-                  <p className="text-gray-800 font-medium">{userInfo.phone || "Chưa cập nhật"}</p>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Số điện thoại:</span>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">{userInfo.phone || "Chưa cập nhật"}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Ngày tạo:</span>
-                  <p className="text-gray-800 font-medium">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Ngày tạo:</span>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">
                     {userInfo.created_at ? new Date(userInfo.created_at).toLocaleDateString("vi-VN") : "Chưa có thông tin"}
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">Không có thông tin</div>
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">Không có thông tin</div>
           )}
         </Spin>
       </Modal>

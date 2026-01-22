@@ -221,15 +221,15 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
                 <Link
                   key={link.to}
                   href={link.to}
-                  className={`relative py-2 transition-colors duration-200 ${
+                  className={`relative py-2 transition-all duration-300 ${
                     isActive
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-slate-700 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                      ? "text-blue-600 dark:text-blue-400 opacity-100"
+                      : "text-slate-600 dark:text-white/80 hover:opacity-100 hover:text-blue-600 dark:hover:text-blue-400"
                   }`}
                 >
                   <span className="font-bold text-lg relative z-10">{link.label}</span>
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full"></span>
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full animate-in fade-in slide-in-from-left-1/2 duration-300"></span>
                   )}
                 </Link>
               );

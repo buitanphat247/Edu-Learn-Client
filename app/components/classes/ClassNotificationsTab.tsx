@@ -445,7 +445,8 @@ const ClassNotificationsTab = memo(function ClassNotificationsTab({
                     )}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-lg line-clamp-2">{notification.title}</h3>
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-lg line-clamp-2 mb-2">{notification.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-3">{notification.content}</p>
                     <span className="text-xs text-gray-500 dark:text-gray-400">{notification.author}</span>
                   </div>
                 </div>

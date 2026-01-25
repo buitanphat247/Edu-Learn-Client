@@ -192,3 +192,103 @@ export const deleteAssignment = async (assignmentId: number | string): Promise<v
   }
 };
 
+// --- Assignment Student Progress APIs ---
+
+export interface AssignmentStudentResponse {
+  id: number;
+  assignment_id: number;
+  class_id: number;
+  student_id: number;
+  status: "assigned" | "viewed" | "submitted" | "graded";
+  score: number | null;
+  submitted_at: string | null;
+  student?: {
+    user_id: number;
+    username: string;
+    fullname: string;
+    email: string;
+    avatar: string | null;
+  };
+}
+
+export interface GetAssignmentStudentsParams {
+  page?: number;
+  limit?: number;
+  assignmentId?: number | string;
+  classId?: number | string;
+  status?: string;
+  search?: string;
+}
+
+export interface GetAssignmentStudentsResult {
+  data: AssignmentStudentResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export const getAssignmentStudents = async (
+  params: GetAssignmentStudentsParams
+): Promise<GetAssignmentStudentsResult> => {
+  try {
+    const response = await apiClient.get<any>(
+      `/assignment-students`,
+      {
+        params: {
+          page: params.page,
+          limit: params.limit,
+          assignmentId: params.assignmentId,
+          classId: params.classId,
+          status: params.status,
+          search: params.search,
+        },
+      }
+    );
+
+    // Handle NestJS response structure (often wrapped in data or directly returned)
+    const apiResponse = response.data; // This is the full body
+    
+    // Case 1: Wrapped response { status: true, data: { data: [...], total: ... } }
+    if (apiResponse && apiResponse.data && typeof apiResponse.data === 'object' && 'data' in apiResponse.data) {
+        const innerData = apiResponse.data;
+        return {
+            data: Array.isArray(innerData.data) ? innerData.data : [],
+            total: innerData.total || 0,
+            page: innerData.page || params.page || 1,
+            limit: innerData.limit || params.limit || 10,
+        };
+    }
+
+    // Case 2: Direct pagination response { data: [...], total: ... }
+    if (apiResponse && Array.isArray(apiResponse.data)) {
+        return {
+            data: apiResponse.data,
+            total: apiResponse.total || 0,
+            page: apiResponse.page || params.page || 1,
+            limit: apiResponse.limit || params.limit || 10,
+        };
+    }
+    
+    // Case 3: Just an array (unlikely for paginated, but safeguard)
+    if (Array.isArray(apiResponse)) {
+        return {
+            data: apiResponse,
+            total: apiResponse.length,
+            page: params.page || 1,
+            limit: params.limit || 10,
+        };
+    }
+
+    return {
+      data: [],
+      total: 0,
+      page: params.page || 1,
+      limit: params.limit || 10,
+    };
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message || error?.message || "Không thể lấy danh sách bài làm";
+    throw new Error(errorMessage);
+  }
+};
+

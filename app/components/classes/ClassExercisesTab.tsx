@@ -189,12 +189,14 @@ const ClassExercisesTab = memo(function ClassExercisesTab({
 
   const getMenuItems = useCallback(
     (exercise: Exercise): MenuProps["items"] => {
-      const items: MenuProps["items"] = [
-        {
+      const items: MenuProps["items"] = [];
+
+      if (readOnly) {
+        items.push({
           key: "view",
           label: "Xem chi tiết",
-        },
-      ];
+        });
+      }
 
       // Only show edit/delete actions if not readOnly
       if (!readOnly) {

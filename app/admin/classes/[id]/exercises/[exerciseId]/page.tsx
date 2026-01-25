@@ -2,25 +2,29 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { App, Button, Table, Tag, Input, Tooltip, Avatar } from "antd";
+import CountUp from "react-countup";
+import { App, Button, Table, Tag, Input, Tooltip, Avatar, Select } from "antd";
 import {
   ArrowLeftOutlined,
   SearchOutlined,
   UserOutlined,
-  FileTextOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   EyeOutlined,
   PaperClipOutlined,
-  DownloadOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import CustomCard from "@/app/components/common/CustomCard";
 import DataLoadingSplash from "@/app/components/common/DataLoadingSplash";
-import { getAssignmentById, type AssignmentDetailResponse } from "@/lib/api/assignments";
-import { getSubmissions, type StudentSubmission } from "@/lib/api/submissions";
-import { getClassStudentsByClass } from "@/lib/api/classes";
+import { 
+  getAssignmentById, 
+  getAssignmentStudents,
+  type AssignmentDetailResponse,
+  type AssignmentStudentResponse
+} from "@/lib/api/assignments";
+import { getClassById } from "@/lib/api/classes";
+import { getCurrentUser } from "@/lib/api/users";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 
@@ -34,34 +38,60 @@ export default function ExerciseDetailPage() {
   const exerciseId = params?.exerciseId as string;
 
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [assignment, setAssignment] = useState<AssignmentDetailResponse | null>(null);
-  const [submissions, setSubmissions] = useState<StudentSubmission[]>([]);
-  const [students, setStudents] = useState<any[]>([]); // Store class student list to map names
+  const [classInfo, setClassInfo] = useState<any | null>(null);
+  
+  // Data for table
+  const [dataSource, setDataSource] = useState<AssignmentStudentResponse[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  
+  // Filters
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string | undefined>(undefined);
+
+  // Stats
+  const [submittedCount, setSubmittedCount] = useState(0);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      setCurrentPage(1); // Reset page on search
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
+      const currentUser = getCurrentUser();
 
-      // 1. Fetch Assignment Details
-      const assignmentData = await getAssignmentById(exerciseId);
+      // 1. Fetch Assignment & Class Info (Run once or in parallel)
+      const promises: Promise<any>[] = [getAssignmentById(exerciseId)];
+      
+      if (currentUser?.user_id) {
+        promises.push(getClassById(classId, currentUser.user_id));
+      }
+
+      const results = await Promise.all(promises);
+      const assignmentData = results[0];
+      const classData = results.length > 1 ? results[1] : null;
+
       setAssignment(assignmentData);
+      if (classData) setClassInfo(classData);
 
-      // 2. Fetch Class Students (to get full list even if not submitted)
-      // Note: We need a way to get all students. Using existing API.
-      // Assuming paginated, we might need a large limit or proper handling.
-      // For now, let's fetch submissions and map known students. 
-      // If we want "Not submitted" status, we need the full student list.
-      const studentsData = await getClassStudentsByClass({ classId, limit: 1000 });
-      setStudents(studentsData);
-
-      // 3. Fetch Submissions
-      const submissionsData = await getSubmissions({ 
-        assignmentId: Number(exerciseId),
-        classId: Number(classId),
-        limit: 1000 // Get all
+      // 2. Fetch Submitted Count (for stats)
+      // fetch only count (limit=1)
+      const submittedResult = await getAssignmentStudents({
+        assignmentId: exerciseId,
+        status: 'submitted', 
+        limit: 1, 
       });
-      setSubmissions(submissionsData.data);
+      setSubmittedCount(submittedResult.total);
 
     } catch (error: any) {
       console.error(error);
@@ -71,45 +101,50 @@ export default function ExerciseDetailPage() {
     }
   }, [exerciseId, classId, message]);
 
+  // Separate effect for Table Data to support pagination/filtering without re-fetching static info
+  const fetchTableData = useCallback(async () => {
+    if (!assignment) return; // Wait for assignment to be loaded
+    
+    try {
+      setTableLoading(true);
+      const result = await getAssignmentStudents({
+        assignmentId: exerciseId,
+        page: currentPage,
+        limit: pageSize,
+        search: debouncedSearchQuery,
+        status: filterStatus === 'all' ? undefined : filterStatus,
+      });
+
+      setDataSource(result.data);
+      setTotalRecords(result.total);
+    } catch (error) {
+       console.error("Error fetching table data", error);
+    } finally {
+      setTableLoading(false);
+    }
+  }, [assignment, exerciseId, currentPage, pageSize, debouncedSearchQuery, filterStatus]);
+
+  // Initial Load
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Merge students and submissions
-  const studentSubmissionMap = submissions.reduce((acc, sub) => {
-    acc[sub.student_id] = sub;
-    return acc;
-  }, {} as Record<number, StudentSubmission>);
+  // Trigger table refresh when filters change
+  useEffect(() => {
+    fetchTableData();
+  }, [fetchTableData]);
 
-  const dataSource = students.map((record: any) => {
-    const student = record.student;
-    const submission = studentSubmissionMap[student.user_id];
-    
-    return {
-      key: student.user_id,
-      studentId: student.id || student.user_id, // Adjust based on actual API response structure
-      name: student.fullname,
-      email: student.email,
-      avatar: student.avatar,
-      submission: submission,
-      status: submission ? submission.status : "not_submitted",
-    };
-  }).filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    item.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const columns: ColumnsType<any> = [
+  const columns: ColumnsType<AssignmentStudentResponse> = [
     {
       title: "Học sinh",
-      dataIndex: "name",
+      dataIndex: "student",
       key: "name",
-      render: (text, record) => (
+      render: (student) => (
         <div className="flex items-center gap-3">
-          <Avatar src={record.avatar} icon={<UserOutlined />} />
+          <Avatar src={student?.avatar} icon={<UserOutlined />} />
           <div>
-            <div className="font-medium text-gray-800">{text}</div>
-            <div className="text-xs text-gray-500">{record.email}</div>
+            <div className="font-medium text-gray-800 dark:text-gray-200">{student?.fullname || "N/A"}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">{student?.email || "N/A"}</div>
           </div>
         </div>
       ),
@@ -123,18 +158,16 @@ export default function ExerciseDetailPage() {
         let text = "Chưa nộp";
         let icon = <CloseCircleOutlined />;
 
-        if (status === "submitted" || status === "resubmitted") {
+        if (status === "submitted" || status === "graded") {
           color = "success";
           text = "Đã nộp";
           icon = <CheckCircleOutlined />;
         } else if (status === "late") {
-          color = "warning";
-          text = "Nộp muộn";
-          icon = <ClockCircleOutlined />;
-        } else if (status === "graded") {
-            color = "blue";
-            text = "Đã chấm";
-            icon = <CheckCircleOutlined />;
+           color = "warning";
+           text = "Nộp muộn";
+           icon = <ClockCircleOutlined />;
+        } else if (status === "assigned" || status === "viewed") {
+           // Default
         }
 
         return <Tag color={color} icon={icon}>{text}</Tag>;
@@ -142,26 +175,26 @@ export default function ExerciseDetailPage() {
     },
     {
       title: "Thời gian nộp",
-      dataIndex: "submission",
+      dataIndex: "submitted_at",
       key: "submitted_at",
-      render: (submission) => 
-        submission ? dayjs(submission.submitted_at).format("HH:mm - DD/MM/YYYY") : "-",
+      render: (date) => 
+        date ? dayjs(date).format("HH:mm - DD/MM/YYYY") : "-",
     },
     {
        title: "File đính kèm",
-       dataIndex: "submission",
+       dataIndex: "attachments",
        key: "files",
-       render: (submission) => {
-           if (!submission || !submission.attachments || submission.attachments.length === 0) return "-";
+       render: (attachments: any[]) => {
+           if (!attachments || attachments.length === 0) return "-";
            return (
                <div className="flex flex-col gap-1">
-                   {submission.attachments.map((att: any) => (
+                   {attachments.map((att: any) => (
                        <a 
                           key={att.id} 
                           href={att.file_url} 
                           target="_blank" 
                           rel="noreferrer"
-                          className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                          className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
                         >
                            <PaperClipOutlined /> {att.file_name}
                         </a>
@@ -170,17 +203,11 @@ export default function ExerciseDetailPage() {
            );
        }
     },
-    // {
-    //   title: "Điểm số",
-    //   dataIndex: "submission",
-    //   key: "grade",
-    //   render: (submission) => submission?.grade !== undefined ? submission.grade : "-",
-    // },
     {
       title: "Hành động",
       key: "action",
       render: (_, record) => (
-        record.submission ? (
+        (record.status === "submitted" || record.status === "graded") ? (
             <Tooltip title="Xem chi tiết & Chấm điểm">
                  <Button 
                     type="primary" 
@@ -188,8 +215,6 @@ export default function ExerciseDetailPage() {
                     size="small" 
                     icon={<EyeOutlined />} 
                     onClick={() => {
-                        // TODO: Navigate to grading page or open modal
-                        // router.push(`/admin/classes/${classId}/exercises/${exerciseId}/grading/${record.studentId}`);
                         message.info("Tính năng chấm điểm đang phát triển");
                     }}
                 />
@@ -199,8 +224,12 @@ export default function ExerciseDetailPage() {
     },
   ];
 
-  if (loading) return <DataLoadingSplash tip="Đang tải thông tin..." />;
+  if (loading && !assignment) return <DataLoadingSplash tip="Đang tải thông tin..." />;
   if (!assignment) return <div className="p-8 text-center">Bài tập không tồn tại</div>;
+
+  // Stats
+  const totalStudents = classInfo?.student_count || 0;
+  const notSubmittedCount = Math.max(0, totalStudents - submittedCount);
 
   return (
     <div className="space-y-6">
@@ -210,7 +239,7 @@ export default function ExerciseDetailPage() {
           <Button 
             icon={<ArrowLeftOutlined />} 
             onClick={() => router.push(`/admin/classes/${classId}`)}
-            className="border-none bg-white shadow-sm hover:bg-gray-100 dark:bg-gray-800"
+            className="border-none bg-white shadow-sm hover:bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
           >
             Quay lại
           </Button>
@@ -218,53 +247,103 @@ export default function ExerciseDetailPage() {
              <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-1">
                 {assignment.title}
              </h1>
-             <div className="flex items-center gap-4 text-sm text-gray-500">
+             <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                 <span><ClockCircleOutlined /> Hạn nộp: {assignment.due_at ? dayjs(assignment.due_at).format("HH:mm - DD/MM/YYYY") : "Không có"}</span>
              </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Stats Cards */}
-          <CustomCard className="lg:col-span-1 h-fit" padding="sm">
-              <div className="space-y-4">
-                  <div className="text-gray-500 font-medium border-b border-gray-100 pb-2">Thống kê nộp bài</div>
-                  <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-blue-50 p-3 rounded-lg text-center">
-                          <div className="text-2xl font-bold text-blue-600">{submissions.length}</div>
-                          <div className="text-xs text-blue-400 font-medium uppercase">Đã nộp</div>
-                      </div>
-                      <div className="bg-gray-50 p-3 rounded-lg text-center">
-                          <div className="text-2xl font-bold text-gray-600">{students.length - submissions.length}</div>
-                          <div className="text-xs text-gray-400 font-medium uppercase">Chưa nộp</div>
-                      </div>
-                  </div>
-              </div>
-          </CustomCard>
+      {/* Stats Cards Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CustomCard padding="sm" className="bg-indigo-50/50 border-indigo-100 transition-shadow">
+           <div className="flex flex-col items-center justify-center py-2 relative">
+               <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-1">
+                 <CountUp end={totalStudents} duration={2} />
+               </div>
+               <div className="text-sm font-semibold text-indigo-600 dark:text-indigo-300 uppercase tracking-wide">Tổng học sinh</div>
+               <div className="absolute top-0 right-0 p-2 opacity-10">
+                  <UserOutlined className="text-4xl text-indigo-600" />
+               </div>
+           </div>
+        </CustomCard>
 
-          {/* Submissions Table */}
-          <div className="lg:col-span-3">
-              <CustomCard padding="none">
-                  <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                      <h3 className="font-bold text-gray-700">Danh sách bài làm</h3>
-                      <Input 
-                        placeholder="Tìm kiếm học sinh..." 
-                        prefix={<SearchOutlined className="text-gray-400" />}
-                        className="w-64"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                      />
-                  </div>
-                  <Table 
-                    columns={columns} 
-                    dataSource={dataSource}
-                    pagination={{ pageSize: 10 }}
-                    rowClassName="hover:bg-gray-50"
-                  />
-              </CustomCard>
-          </div>
+        <CustomCard padding="sm" className="bg-blue-50/50 border-blue-100 transition-shadow">
+           <div className="flex flex-col items-center justify-center py-2 relative">
+               <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                 <CountUp end={submittedCount} duration={2} />
+               </div>
+               <div className="text-sm font-semibold text-blue-600 dark:text-blue-300 uppercase tracking-wide">Đã nộp</div>
+               <div className="absolute top-0 right-0 p-2 opacity-10">
+                  <CheckCircleOutlined className="text-4xl text-blue-600" />
+               </div>
+           </div>
+        </CustomCard>
+        
+        <CustomCard padding="sm" className="bg-gray-50/50 border-gray-200 transition-shadow">
+            <div className="flex flex-col items-center justify-center py-2 relative">
+               <div className="text-4xl font-bold text-gray-600 dark:text-gray-300 mb-1">
+                 <CountUp end={notSubmittedCount} duration={2} />
+               </div>
+               <div className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Chưa nộp</div>
+               <div className="absolute top-0 right-0 p-2 opacity-10">
+                  <CloseCircleOutlined className="text-4xl text-gray-600" />
+               </div>
+           </div>
+        </CustomCard>
       </div>
+
+      {/* Filter & Search Bar */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-64">
+             <Select
+                placeholder="Trạng thái"
+                style={{ width: '100%', height: '40px', boxShadow: 'none' }}
+                allowClear
+                value={filterStatus}
+                onChange={(value) => setFilterStatus(value)}
+                options={[
+                    { value: 'all', label: 'Tất cả' },
+                    { value: 'submitted', label: 'Đã nộp' },
+                    { value: 'assigned', label: 'Chưa nộp' },
+                ]}
+                className="no-shadow-select"
+             />
+        </div>
+        <div className="flex-1">
+            <Input 
+              size="large"
+              placeholder="Tìm kiếm học sinh theo tên hoặc email..." 
+              prefix={<SearchOutlined className="text-gray-400" />}
+              className="w-full transition-shadow border-gray-200"
+              allowClear
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{ boxShadow: 'none' }}
+            />
+        </div>
+      </div>
+
+      {/* Submissions Table */}
+      <CustomCard padding="none" className="border-gray-200 shadow-sm">
+          <Table 
+            loading={tableLoading}
+            columns={columns} 
+            dataSource={dataSource}
+            rowKey="id"
+            pagination={{
+                current: currentPage,
+                pageSize: pageSize,
+                total: totalRecords,
+                onChange: (page, size) => {
+                    setCurrentPage(page);
+                    setPageSize(size);
+                },
+                showSizeChanger: false,
+            }}
+            rowClassName="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+          />
+      </CustomCard>
     </div>
   );
 }
